@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use WebSystem\WizardPackage\Steps\AbstractStep;
+use WebSystem\WizardPackage\ValueObjects\StepData;
+use WebSystem\WizardPackage\ValueObjects\StepResult;
+
+class {{ class }} extends AbstractStep
+{
+    public function __construct()
+    {
+        parent::__construct(
+            id: '{{ stepId }}',
+            title: '{{ title }}',
+            order: {{ order }},
+            isOptional: {{ optional }},
+            canSkip: {{ optional }}
+        );
+    }
+
+    public function process(StepData $data): StepResult
+    {
+        // Data is already validated by {{ class }}Request
+        // Implement your business logic here
+
+        return StepResult::success(
+            data: $data->all(),
+            message: 'Step completed successfully'
+        );
+    }
+}
