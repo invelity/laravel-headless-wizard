@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+class {{ class }}
+{
+    public function __construct()
+    {
+        // Wizard initialization
+    }
+
+    public function getId(): string
+    {
+        return '{{ id }}';
+    }
+
+    public function getName(): string
+    {
+        return '{{ name }}';
+    }
+
+    public function getSteps(): array
+    {
+        return config('wizard-package.wizards.{{ id }}.steps', []);
+    }
+}
