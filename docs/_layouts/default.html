@@ -8,6 +8,10 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css" rel="stylesheet" />
     
     <script>
@@ -26,53 +30,22 @@
                             700: '#1d4ed8',
                             800: '#1e40af',
                             900: '#1e3a8a',
-                        },
-                        dark: {
-                            50: '#f8fafc',
-                            100: '#f1f5f9',
-                            200: '#e2e8f0',
-                            300: '#cbd5e1',
-                            400: '#94a3b8',
-                            500: '#64748b',
-                            600: '#475569',
-                            700: '#334155',
-                            800: '#1e293b',
-                            900: '#0f172a',
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['Fira Code', 'Monaco', 'monospace'],
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-up': 'slideUp 0.5s ease-out',
-                        'gradient': 'gradient 8s ease infinite',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        },
-                        gradient: {
-                            '0%, 100%': { backgroundPosition: '0% 50%' },
-                            '50%': { backgroundPosition: '100% 50%' },
-                        },
-                    },
+                        mono: ['Fira Code', 'Monaco', 'Courier New', 'monospace'],
+                    }
                 }
             }
         }
     </script>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -91,124 +64,40 @@
             background: linear-gradient(180deg, #2563eb, #1d4ed8);
         }
         
-        .gradient-bg {
-            background: linear-gradient(-45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-        }
-        
-        .glass {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         
         pre[class*="language-"] {
-            @apply rounded-xl shadow-lg my-6 border border-dark-700;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
         code[class*="language-"],
         pre[class*="language-"] {
-            @apply font-mono text-sm;
-        }
-        
-        .prose {
-            @apply max-w-none;
-        }
-        
-        .prose h1 {
-            @apply text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-800 mb-6 mt-8;
-        }
-        
-        .prose h2 {
-            @apply text-3xl font-bold text-dark-900 mb-4 mt-10 pb-2 border-b-2 border-primary-100;
-        }
-        
-        .prose h3 {
-            @apply text-2xl font-semibold text-dark-800 mb-3 mt-6;
-        }
-        
-        .prose h4 {
-            @apply text-xl font-medium text-dark-700 mb-2 mt-4;
-        }
-        
-        .prose p {
-            @apply text-dark-600 leading-relaxed mb-4;
-        }
-        
-        .prose a {
-            @apply text-primary-600 hover:text-primary-700 font-medium transition-all duration-200 border-b-2 border-transparent hover:border-primary-300;
-        }
-        
-        .prose ul, .prose ol {
-            @apply my-4 space-y-2;
-        }
-        
-        .prose li {
-            @apply text-dark-600;
-        }
-        
-        .prose strong {
-            @apply text-dark-900 font-semibold;
-        }
-        
-        .prose code {
-            @apply bg-dark-100 text-primary-700 px-2 py-0.5 rounded text-sm font-mono;
-        }
-        
-        .prose pre code {
-            @apply bg-transparent text-inherit px-0 py-0;
-        }
-        
-        .prose blockquote {
-            @apply border-l-4 border-primary-500 pl-4 italic text-dark-600 my-4;
-        }
-        
-        .prose table {
-            @apply w-full my-6 border-collapse shadow-sm rounded-lg overflow-hidden;
-        }
-        
-        .prose th {
-            @apply bg-gradient-to-r from-primary-50 to-primary-100 px-6 py-3 text-left font-semibold text-dark-900 border-b-2 border-primary-200;
-        }
-        
-        .prose td {
-            @apply px-6 py-4 border-b border-dark-100 text-dark-600;
-        }
-        
-        .prose hr {
-            @apply my-8 border-0 h-px bg-gradient-to-r from-transparent via-dark-200 to-transparent;
-        }
-        
-        .badge {
-            @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
-        }
-        
-        .nav-link {
-            @apply flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200;
-        }
-        
-        .nav-link-active {
-            @apply bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm;
-        }
-        
-        .nav-link-inactive {
-            @apply text-dark-600 hover:bg-dark-50 hover:text-dark-900;
+            font-family: 'Fira Code', Monaco, 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-dark-50 via-white to-primary-50 min-h-screen">
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
     
-    <nav class="glass sticky top-0 z-50 border-b border-dark-200 shadow-sm">
+    <nav class="glass-nav sticky top-0 z-50 border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="{{ site.baseurl }}/" class="flex items-center space-x-3 group">
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                            <svg class="relative w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
+                        <div class="relative w-10 h-10">
+                            <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity duration-200"></div>
+                            <div class="relative bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg p-2">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
                         </div>
                         <span class="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">{{ site.title }}</span>
                     </a>
@@ -216,9 +105,10 @@
                 
                 <div class="flex items-center space-x-3">
                     <a href="https://packagist.org/packages/invelity/laravel-headless-wizard" 
-                       class="text-dark-600 hover:text-primary-600 transition-colors p-2 rounded-lg hover:bg-dark-50"
+                       class="text-slate-600 hover:text-primary-600 transition-colors p-2 rounded-lg hover:bg-slate-100"
                        target="_blank"
-                       rel="noopener">
+                       rel="noopener"
+                       title="Packagist">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                         </svg>
@@ -242,24 +132,24 @@
         <aside class="hidden lg:block w-64 flex-shrink-0">
             <nav class="sticky top-16 py-8 px-4 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
                 <a href="{{ site.baseurl }}/" 
-                   class="nav-link {% if page.url == '/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {% if page.url == '/' %}bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm{% else %}text-slate-700 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if page.url == '/' %}text-primary-600{% else %}text-slate-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
                     Home
                 </a>
                 
                 <a href="{{ site.baseurl }}/installation" 
-                   class="nav-link {% if page.url contains 'installation' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {% if page.url contains 'installation' %}bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm{% else %}text-slate-700 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'installation' %}text-primary-600{% else %}text-slate-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
                     Installation
                 </a>
                 
                 <a href="{{ site.baseurl }}/configuration" 
-                   class="nav-link {% if page.url contains 'configuration' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {% if page.url contains 'configuration' %}bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm{% else %}text-slate-700 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'configuration' %}text-primary-600{% else %}text-slate-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
@@ -267,32 +157,32 @@
                 </a>
                 
                 <a href="{{ site.baseurl }}/creating-wizards" 
-                   class="nav-link {% if page.url contains 'creating-wizards' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {% if page.url contains 'creating-wizards' %}bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm{% else %}text-slate-700 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'creating-wizards' %}text-primary-600{% else %}text-slate-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Creating Wizards
                 </a>
                 
                 <a href="{{ site.baseurl }}/api-reference" 
-                   class="nav-link {% if page.url contains 'api-reference' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {% if page.url contains 'api-reference' %}bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm{% else %}text-slate-700 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'api-reference' %}text-primary-600{% else %}text-slate-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                     </svg>
                     API Reference
                 </a>
                 
                 <a href="{{ site.baseurl }}/examples" 
-                   class="nav-link {% if page.url contains 'examples' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {% if page.url contains 'examples' %}bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm{% else %}text-slate-700 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'examples' %}text-primary-600{% else %}text-slate-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
                     </svg>
                     Examples
                 </a>
                 
                 <a href="{{ site.baseurl }}/testing" 
-                   class="nav-link {% if page.url contains 'testing' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 {% if page.url contains 'testing' %}bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm{% else %}text-slate-700 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'testing' %}text-primary-600{% else %}text-slate-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     Testing
@@ -300,28 +190,47 @@
             </nav>
         </aside>
 
-        <main class="flex-1 min-w-0 animate-fade-in">
-            <div class="prose max-w-4xl px-6 sm:px-8 lg:px-12 py-12">
+        <main class="flex-1 min-w-0">
+            <article class="max-w-4xl px-6 sm:px-8 lg:px-12 py-12 prose prose-slate prose-lg max-w-none
+                prose-headings:scroll-mt-24
+                prose-h1:text-5xl prose-h1:font-extrabold prose-h1:text-transparent prose-h1:bg-clip-text prose-h1:bg-gradient-to-r prose-h1:from-primary-600 prose-h1:to-primary-800 prose-h1:mb-6 prose-h1:mt-8
+                prose-h2:text-3xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mb-4 prose-h2:mt-10 prose-h2:pb-2 prose-h2:border-b-2 prose-h2:border-primary-100
+                prose-h3:text-2xl prose-h3:font-semibold prose-h3:text-slate-800 prose-h3:mb-3 prose-h3:mt-6
+                prose-h4:text-xl prose-h4:font-medium prose-h4:text-slate-700 prose-h4:mb-2 prose-h4:mt-4
+                prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-4
+                prose-a:text-primary-600 prose-a:font-medium prose-a:no-underline hover:prose-a:text-primary-700 hover:prose-a:underline prose-a:transition-colors
+                prose-strong:text-slate-900 prose-strong:font-semibold
+                prose-code:bg-slate-100 prose-code:text-primary-700 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+                prose-pre:bg-slate-900 prose-pre:rounded-xl prose-pre:shadow-lg prose-pre:border prose-pre:border-slate-700
+                prose-ul:my-4 prose-ul:space-y-2
+                prose-ol:my-4 prose-ol:space-y-2
+                prose-li:text-slate-600
+                prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-slate-600 prose-blockquote:my-4
+                prose-hr:my-8 prose-hr:border-0 prose-hr:h-px prose-hr:bg-gradient-to-r prose-hr:from-transparent prose-hr:via-slate-200 prose-hr:to-transparent
+                prose-table:w-full prose-table:my-6 prose-table:border-collapse prose-table:shadow-sm prose-table:rounded-lg prose-table:overflow-hidden
+                prose-th:bg-gradient-to-r prose-th:from-primary-50 prose-th:to-primary-100 prose-th:px-6 prose-th:py-3 prose-th:text-left prose-th:font-semibold prose-th:text-slate-900 prose-th:border-b-2 prose-th:border-primary-200
+                prose-td:px-6 prose-td:py-4 prose-td:border-b prose-td:border-slate-100 prose-td:text-slate-600
+                prose-img:rounded-lg prose-img:shadow-lg">
                 {{ content }}
-            </div>
+            </article>
         </main>
 
         <aside class="hidden xl:block w-64 flex-shrink-0">
             <nav class="sticky top-16 py-8 px-4">
-                <h3 class="text-xs font-bold text-dark-400 uppercase tracking-wider mb-3">On this page</h3>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">On this page</h3>
                 <div id="toc" class="space-y-1.5 text-sm"></div>
             </nav>
         </aside>
     </div>
 
-    <footer class="glass border-t border-dark-200 mt-16">
+    <footer class="glass-nav border-t border-slate-200 mt-16">
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center">
-                <p class="text-dark-500 text-sm">
-                    Built with ❤️ by <a href="https://github.com/invelity" class="text-primary-600 hover:text-primary-700 font-medium">Invelity</a>
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p class="text-slate-600 text-sm">
+                    Built with ❤️ by <a href="https://github.com/invelity" class="text-primary-600 hover:text-primary-700 font-medium transition-colors">Invelity</a>
                 </p>
-                <p class="text-dark-500 text-sm">
-                    Licensed under <a href="{{ site.github.repository_url }}/blob/main/LICENSE.md" class="text-primary-600 hover:text-primary-700 font-medium">MIT License</a>
+                <p class="text-slate-600 text-sm">
+                    Licensed under <a href="{{ site.github.repository_url }}/blob/main/LICENSE.md" class="text-primary-600 hover:text-primary-700 font-medium transition-colors">MIT License</a>
                 </p>
             </div>
         </div>
@@ -338,7 +247,7 @@
             const toc = document.getElementById('toc');
             if (!toc) return;
             
-            const headings = document.querySelectorAll('.prose h2, .prose h3');
+            const headings = document.querySelectorAll('article h2, article h3');
             
             headings.forEach((heading, index) => {
                 if (!heading.id) {
@@ -348,9 +257,12 @@
                 const link = document.createElement('a');
                 link.href = '#' + heading.id;
                 link.textContent = heading.textContent.replace(/[#→]/g, '').trim();
-                link.className = heading.tagName === 'H2' 
-                    ? 'block py-1.5 text-dark-700 hover:text-primary-600 font-medium transition-colors border-l-2 border-transparent hover:border-primary-500 pl-3'
-                    : 'block py-1 pl-6 text-dark-600 hover:text-primary-600 transition-colors text-xs border-l-2 border-transparent hover:border-primary-400';
+                
+                if (heading.tagName === 'H2') {
+                    link.className = 'block py-1.5 text-slate-700 hover:text-primary-600 font-medium transition-colors border-l-2 border-transparent hover:border-primary-500 pl-3 -ml-px';
+                } else {
+                    link.className = 'block py-1 pl-6 text-slate-600 hover:text-primary-600 transition-colors text-xs border-l-2 border-transparent hover:border-primary-400 -ml-px';
+                }
                 
                 toc.appendChild(link);
             });
@@ -362,14 +274,18 @@
                     if (link) {
                         if (entry.intersectionRatio > 0) {
                             link.classList.add('text-primary-600', 'border-primary-500');
-                            link.classList.remove('text-dark-700', 'text-dark-600');
+                            link.classList.remove('text-slate-700', 'text-slate-600');
                         } else {
                             link.classList.remove('text-primary-600', 'border-primary-500');
-                            link.classList.add(link.classList.contains('text-xs') ? 'text-dark-600' : 'text-dark-700');
+                            if (link.classList.contains('text-xs')) {
+                                link.classList.add('text-slate-600');
+                            } else {
+                                link.classList.add('text-slate-700');
+                            }
                         }
                     }
                 });
-            }, { threshold: 0.5 });
+            }, { rootMargin: '-80px 0px -80% 0px' });
             
             headings.forEach(heading => {
                 observer.observe(heading);
