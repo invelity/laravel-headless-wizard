@@ -19,6 +19,14 @@ class TestCase extends Orchestra
         );
     }
 
+    protected function refreshApplication()
+    {
+        parent::refreshApplication();
+
+        restore_error_handler();
+        restore_exception_handler();
+    }
+
     protected function getPackageProviders($app)
     {
         return [
