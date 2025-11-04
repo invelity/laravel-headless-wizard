@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Invelity\WizardPackage\WizardServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {

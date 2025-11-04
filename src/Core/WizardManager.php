@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Core;
 
 use Illuminate\Support\Facades\Event;
-use RuntimeException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
@@ -21,6 +19,8 @@ use Invelity\WizardPackage\Steps\StepFactory;
 use Invelity\WizardPackage\ValueObjects\StepData;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
+use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class WizardManager implements WizardManagerInterface
 {
