@@ -37,6 +37,11 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
+        config()->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
         config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
 
         config()->set('wizard.storage', 'session');
@@ -48,5 +53,10 @@ class TestCase extends Orchestra
         config()->set('wizard.events.fire_events', true);
         config()->set('wizard.route.prefix', 'wizard');
         config()->set('wizard.route.middleware', ['web', 'wizard.session']);
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 }
