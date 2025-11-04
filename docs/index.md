@@ -6,10 +6,12 @@ nav_order: 1
 
 # Laravel Multi-Step Wizard Package (Headless)
 
+<div class="badges">
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/invelity/laravel-headless-wizard.svg?style=flat-square)](https://packagist.org/packages/invelity/laravel-headless-wizard)
 [![GitHub Tests](https://img.shields.io/github/actions/workflow/status/invelity/laravel-headless-wizard/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/invelity/laravel-headless-wizard/actions)
 [![Code Coverage](https://img.shields.io/badge/coverage-98.6%25-brightgreen?style=flat-square)](https://github.com/invelity/laravel-headless-wizard)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%205-brightgreen?style=flat-square)](https://github.com/invelity/laravel-headless-wizard)
+</div>
 
 A powerful **headless** multi-step wizard package for Laravel applications. Build complex, multi-page forms with progress tracking, navigation, validation, and conditional steps. **Bring your own frontend** - works with React, Vue, Inertia, Livewire, Alpine.js, or any JavaScript framework.
 
@@ -86,6 +88,13 @@ The MIT License (MIT). Please see [License File](https://github.com/invelity/lar
 ---
 
 <style>
+.badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
 .docs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
