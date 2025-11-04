@@ -73,7 +73,7 @@ class MakeWizardCommandTest extends TestCase
     {
         $this->artisan('wizard:make')
             ->expectsQuestion('What is the wizard name?', 'Onboarding')
-            ->expectsOutput('✓ Wizard class created: app/Wizards/Onboarding.php')
+            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => 'Onboarding']))
             ->assertSuccessful();
 
         $this->assertFileExists(app_path('Wizards/Onboarding.php'));
@@ -82,7 +82,7 @@ class MakeWizardCommandTest extends TestCase
     public function test_command_accepts_wizard_name_as_argument(): void
     {
         $this->artisan('wizard:make', ['name' => 'Registration'])
-            ->expectsOutput('✓ Wizard class created: app/Wizards/Registration.php')
+            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => 'Registration']))
             ->assertSuccessful();
 
         $this->assertFileExists(app_path('Wizards/Registration.php'));
@@ -100,7 +100,7 @@ class MakeWizardCommandTest extends TestCase
         $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
 
         $this->artisan('wizard:make', ['name' => 'Onboarding'])
-            ->expectsOutput("Wizard 'Onboarding' already exists. Use --force to overwrite.")
+            ->expectsOutput(__('Wizard \':class\' already exists. Use --force to overwrite.', ['class' => 'Onboarding']))
             ->assertFailed();
     }
 
@@ -109,7 +109,7 @@ class MakeWizardCommandTest extends TestCase
         $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
 
         $this->artisan('wizard:make', ['name' => 'Onboarding', '--force' => true])
-            ->expectsOutput('✓ Wizard class created: app/Wizards/Onboarding.php')
+            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => 'Onboarding']))
             ->assertSuccessful();
     }
 

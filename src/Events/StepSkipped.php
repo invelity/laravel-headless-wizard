@@ -7,7 +7,7 @@ namespace WebSystem\WizardPackage\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class StepSkipped
+final class StepSkipped
 {
     use Dispatchable, SerializesModels;
 

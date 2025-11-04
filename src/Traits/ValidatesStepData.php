@@ -9,6 +9,9 @@ use WebSystem\WizardPackage\Exceptions\StepValidationException;
 
 trait ValidatesStepData
 {
+    /**
+     * @throws StepValidationException
+     */
     public function validate(array $data): array
     {
         $validator = Validator::make($data, $this->rules(), $this->messages());

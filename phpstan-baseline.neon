@@ -5,9 +5,3 @@ parameters:
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 3
 			path: config/wizard.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between string and null will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 2
-			path: src/Core/WizardManager.php

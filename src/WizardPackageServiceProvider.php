@@ -25,6 +25,7 @@ class WizardPackageServiceProvider extends PackageServiceProvider
             ->hasConfigFile('wizard')
             ->hasRoute('web')
             ->hasMigration('create_wizard_progress_table')
+            ->hasTranslations()
             ->hasCommands([
                 Commands\MakeStepCommand::class,
                 Commands\MakeWizardCommand::class,

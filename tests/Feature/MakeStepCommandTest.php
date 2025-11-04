@@ -90,7 +90,7 @@ class MakeStepCommandTest extends TestCase
     {
         $this->artisan('wizard:make-step', ['name' => 'PersonalInfo', '--wizard' => 'onboarding', '--order' => 1, '--optional' => false])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->expectsOutput('✓ Step class created: app/Wizards/Steps/PersonalInfoStep.php')
+            ->expectsOutput(__('✓ Step class created: app/Wizards/Steps/{class}.php', ['class' => 'PersonalInfoStep']))
             ->assertSuccessful();
 
         $this->assertFileExists(app_path('Wizards/Steps/PersonalInfoStep.php'));

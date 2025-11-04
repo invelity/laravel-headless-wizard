@@ -7,7 +7,7 @@ namespace WebSystem\WizardPackage\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class WizardStarted
+final class WizardStarted
 {
     use Dispatchable, SerializesModels;
 

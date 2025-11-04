@@ -6,32 +6,16 @@ namespace WebSystem\WizardPackage\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
+use WebSystem\WizardPackage\Actions\CompleteWizardAction;
 
 class WizardCompletionController extends Controller
 {
     public function __construct(
-        private readonly WizardManagerInterface $manager,
+        private readonly CompleteWizardAction $completeAction,
     ) {}
 
     public function __invoke(string $wizard): JsonResponse
     {
-        $this->manager->initialize($wizard);
-
-        $result = $this->manager->complete();
-
-        if (! $result->success) {
-            return response()->json([
-                'success' => false,
-                'errors' => $result->errors,
-                'message' => $result->message ?? 'Wizard cannot be completed',
-            ], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $result->data,
-            'message' => $result->message ?? 'Wizard completed successfully',
-        ]);
+        return $this->completeAction->execute($wizard);
     }
 }

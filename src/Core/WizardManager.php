@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace WebSystem\WizardPackage\Core;
 
 use Illuminate\Support\Facades\Event;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
+use WebSystem\WizardPackage\Contracts\WizardNavigationInterface;
 use WebSystem\WizardPackage\Contracts\WizardStepInterface;
 use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
 use WebSystem\WizardPackage\Events\StepCompleted;
@@ -68,11 +70,10 @@ class WizardManager implements WizardManagerInterface
             ]);
 
             if ($this->configuration->fireEvents) {
-                $sessionId = session()->getId();
                 Event::dispatch(new WizardStarted(
                     wizardId: $wizardId,
                     userId: $config['user_id'] ?? null,
-                    sessionId: $sessionId !== null ? $sessionId : '',
+                    sessionId: (string) session()->getId(),
                     initialData: $config['metadata'] ?? []
                 ));
             }
@@ -106,6 +107,9 @@ class WizardManager implements WizardManagerInterface
         return $step;
     }
 
+    /**
+     * @throws InvalidStepException
+     */
     public function processStep(string $stepId, array $data): StepResult
     {
         $this->ensureInitialized();
@@ -260,6 +264,9 @@ class WizardManager implements WizardManagerInterface
         $this->initialize($this->currentWizardId);
     }
 
+    /**
+     * @throws InvalidStepException
+     */
     public function skipStep(string $stepId): void
     {
         $this->ensureInitialized();
@@ -279,8 +286,7 @@ class WizardManager implements WizardManagerInterface
         }
 
         if ($this->configuration->fireEvents) {
-            $sessionId = session()->getId();
-            Event::dispatch(new StepSkipped($this->currentWizardId, $stepId, $sessionId !== null ? $sessionId : ''));
+            Event::dispatch(new StepSkipped($this->currentWizardId, $stepId, (string) session()->getId()));
         }
 
         $nextStep = $this->navigation->getNextStep($stepId);
@@ -352,12 +358,12 @@ class WizardManager implements WizardManagerInterface
         $this->storage->forget($wizardId);
     }
 
-    public function getNavigation(): \WebSystem\WizardPackage\Contracts\WizardNavigationInterface
+    public function getNavigation(): WizardNavigationInterface
     {
         $this->ensureInitialized();
 
         if ($this->navigation === null) {
-            throw new \RuntimeException('Navigation not initialized.');
+            throw new RuntimeException(__('Navigation not initialized.'));
         }
 
         return $this->navigation;
@@ -366,7 +372,7 @@ class WizardManager implements WizardManagerInterface
     private function ensureInitialized(): void
     {
         if ($this->currentWizardId === null) {
-            throw new \RuntimeException('Wizard not initialized. Call initialize() first.');
+            throw new RuntimeException(__('Wizard not initialized. Call initialize() first.'));
         }
     }
 }
