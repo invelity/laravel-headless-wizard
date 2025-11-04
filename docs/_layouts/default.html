@@ -1,51 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }} | {{ site.title }}</title>
     <meta name="description" content="{{ site.description }}">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Prism.js for syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css" rel="stylesheet" />
     
-    <!-- Custom Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        dark: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
                         }
-                    }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Fira Code', 'Monaco', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'gradient': 'gradient 8s ease infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                    },
                 }
             }
         }
     </script>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
         }
         
         ::-webkit-scrollbar-track {
@@ -53,81 +83,154 @@
         }
         
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+            background: linear-gradient(180deg, #3b82f6, #2563eb);
+            border-radius: 5px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: linear-gradient(180deg, #2563eb, #1d4ed8);
         }
         
-        /* Code blocks */
+        .gradient-bg {
+            background: linear-gradient(-45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
         pre[class*="language-"] {
-            border-radius: 0.5rem;
-            margin: 1.5rem 0;
+            @apply rounded-xl shadow-lg my-6 border border-dark-700;
         }
         
-        /* Headings */
+        code[class*="language-"],
+        pre[class*="language-"] {
+            @apply font-mono text-sm;
+        }
+        
+        .prose {
+            @apply max-w-none;
+        }
+        
         .prose h1 {
-            @apply text-4xl font-bold text-gray-900 mb-4 mt-8 pb-2 border-b border-gray-200;
+            @apply text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-800 mb-6 mt-8;
         }
         
         .prose h2 {
-            @apply text-3xl font-bold text-gray-900 mb-3 mt-6;
+            @apply text-3xl font-bold text-dark-900 mb-4 mt-10 pb-2 border-b-2 border-primary-100;
         }
         
         .prose h3 {
-            @apply text-2xl font-semibold text-gray-800 mb-2 mt-4;
+            @apply text-2xl font-semibold text-dark-800 mb-3 mt-6;
         }
         
-        /* Links */
+        .prose h4 {
+            @apply text-xl font-medium text-dark-700 mb-2 mt-4;
+        }
+        
+        .prose p {
+            @apply text-dark-600 leading-relaxed mb-4;
+        }
+        
         .prose a {
-            @apply text-primary-600 hover:text-primary-700 transition-colors;
+            @apply text-primary-600 hover:text-primary-700 font-medium transition-all duration-200 border-b-2 border-transparent hover:border-primary-300;
         }
         
-        /* Tables */
+        .prose ul, .prose ol {
+            @apply my-4 space-y-2;
+        }
+        
+        .prose li {
+            @apply text-dark-600;
+        }
+        
+        .prose strong {
+            @apply text-dark-900 font-semibold;
+        }
+        
+        .prose code {
+            @apply bg-dark-100 text-primary-700 px-2 py-0.5 rounded text-sm font-mono;
+        }
+        
+        .prose pre code {
+            @apply bg-transparent text-inherit px-0 py-0;
+        }
+        
+        .prose blockquote {
+            @apply border-l-4 border-primary-500 pl-4 italic text-dark-600 my-4;
+        }
+        
         .prose table {
-            @apply w-full my-4 border-collapse;
+            @apply w-full my-6 border-collapse shadow-sm rounded-lg overflow-hidden;
         }
         
         .prose th {
-            @apply bg-gray-50 px-4 py-2 text-left font-semibold text-gray-900 border-b-2 border-gray-200;
+            @apply bg-gradient-to-r from-primary-50 to-primary-100 px-6 py-3 text-left font-semibold text-dark-900 border-b-2 border-primary-200;
         }
         
         .prose td {
-            @apply px-4 py-2 border-b border-gray-200;
+            @apply px-6 py-4 border-b border-dark-100 text-dark-600;
+        }
+        
+        .prose hr {
+            @apply my-8 border-0 h-px bg-gradient-to-r from-transparent via-dark-200 to-transparent;
+        }
+        
+        .badge {
+            @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+        }
+        
+        .nav-link {
+            @apply flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200;
+        }
+        
+        .nav-link-active {
+            @apply bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm;
+        }
+        
+        .nav-link-inactive {
+            @apply text-dark-600 hover:bg-dark-50 hover:text-dark-900;
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Top Navigation -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+<body class="bg-gradient-to-br from-dark-50 via-white to-primary-50 min-h-screen">
+    
+    <nav class="glass sticky top-0 z-50 border-b border-dark-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="{{ site.baseurl }}/" class="flex items-center space-x-3">
-                        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                        <span class="text-xl font-bold text-gray-900">{{ site.title }}</span>
+                    <a href="{{ site.baseurl }}/" class="flex items-center space-x-3 group">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                            <svg class="relative w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">{{ site.title }}</span>
                     </a>
                 </div>
                 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
                     <a href="https://packagist.org/packages/invelity/laravel-headless-wizard" 
-                       class="text-gray-600 hover:text-gray-900 transition-colors"
+                       class="text-dark-600 hover:text-primary-600 transition-colors p-2 rounded-lg hover:bg-dark-50"
                        target="_blank"
                        rel="noopener">
-                        <span class="sr-only">Packagist</span>
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                         </svg>
                     </a>
                     <a href="{{ site.github.repository_url }}" 
-                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+                       class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-md hover:shadow-lg transition-all duration-200"
                        target="_blank"
                        rel="noopener">
-                        View on GitHub
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                        </svg>
+                        GitHub
                     </a>
                 </div>
             </div>
@@ -135,28 +238,28 @@
     </nav>
 
     <div class="flex max-w-7xl mx-auto">
-        <!-- Sidebar Navigation -->
-        <aside class="hidden lg:block w-64 flex-shrink-0 border-r border-gray-200 bg-white min-h-screen">
-            <nav class="sticky top-16 py-6 px-4 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
+        
+        <aside class="hidden lg:block w-64 flex-shrink-0">
+            <nav class="sticky top-16 py-8 px-4 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
                 <a href="{{ site.baseurl }}/" 
-                   class="flex items-center px-3 py-2 text-sm font-medium rounded-md {% if page.url == '/' %}bg-primary-50 text-primary-700{% else %}text-gray-700 hover:bg-gray-50{% endif %} transition-colors">
-                    <svg class="mr-3 h-5 w-5 {% if page.url == '/' %}text-primary-600{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="nav-link {% if page.url == '/' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
                     Home
                 </a>
                 
                 <a href="{{ site.baseurl }}/installation" 
-                   class="flex items-center px-3 py-2 text-sm font-medium rounded-md {% if page.url contains 'installation' %}bg-primary-50 text-primary-700{% else %}text-gray-700 hover:bg-gray-50{% endif %} transition-colors">
-                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'installation' %}text-primary-600{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="nav-link {% if page.url contains 'installation' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
                     Installation
                 </a>
                 
                 <a href="{{ site.baseurl }}/configuration" 
-                   class="flex items-center px-3 py-2 text-sm font-medium rounded-md {% if page.url contains 'configuration' %}bg-primary-50 text-primary-700{% else %}text-gray-700 hover:bg-gray-50{% endif %} transition-colors">
-                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'configuration' %}text-primary-600{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="nav-link {% if page.url contains 'configuration' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
@@ -164,32 +267,32 @@
                 </a>
                 
                 <a href="{{ site.baseurl }}/creating-wizards" 
-                   class="flex items-center px-3 py-2 text-sm font-medium rounded-md {% if page.url contains 'creating-wizards' %}bg-primary-50 text-primary-700{% else %}text-gray-700 hover:bg-gray-50{% endif %} transition-colors">
-                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'creating-wizards' %}text-primary-600{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="nav-link {% if page.url contains 'creating-wizards' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Creating Wizards
                 </a>
                 
                 <a href="{{ site.baseurl }}/api-reference" 
-                   class="flex items-center px-3 py-2 text-sm font-medium rounded-md {% if page.url contains 'api-reference' %}bg-primary-50 text-primary-700{% else %}text-gray-700 hover:bg-gray-50{% endif %} transition-colors">
-                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'api-reference' %}text-primary-600{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="nav-link {% if page.url contains 'api-reference' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                     </svg>
                     API Reference
                 </a>
                 
                 <a href="{{ site.baseurl }}/examples" 
-                   class="flex items-center px-3 py-2 text-sm font-medium rounded-md {% if page.url contains 'examples' %}bg-primary-50 text-primary-700{% else %}text-gray-700 hover:bg-gray-50{% endif %} transition-colors">
-                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'examples' %}text-primary-600{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="nav-link {% if page.url contains 'examples' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
                     </svg>
                     Examples
                 </a>
                 
                 <a href="{{ site.baseurl }}/testing" 
-                   class="flex items-center px-3 py-2 text-sm font-medium rounded-md {% if page.url contains 'testing' %}bg-primary-50 text-primary-700{% else %}text-gray-700 hover:bg-gray-50{% endif %} transition-colors">
-                    <svg class="mr-3 h-5 w-5 {% if page.url contains 'testing' %}text-primary-600{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="nav-link {% if page.url contains 'testing' %}nav-link-active{% else %}nav-link-inactive{% endif %}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     Testing
@@ -197,61 +300,79 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 min-w-0">
-            <div class="prose prose-lg max-w-none px-4 sm:px-6 lg:px-8 py-8">
+        <main class="flex-1 min-w-0 animate-fade-in">
+            <div class="prose max-w-4xl px-6 sm:px-8 lg:px-12 py-12">
                 {{ content }}
             </div>
         </main>
 
-        <!-- Table of Contents (Right Sidebar) -->
-        <aside class="hidden xl:block w-64 flex-shrink-0 border-l border-gray-200 bg-white">
-            <nav class="sticky top-16 py-6 px-4">
-                <h3 class="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-2">On this page</h3>
-                <div id="toc" class="space-y-1 text-sm"></div>
+        <aside class="hidden xl:block w-64 flex-shrink-0">
+            <nav class="sticky top-16 py-8 px-4">
+                <h3 class="text-xs font-bold text-dark-400 uppercase tracking-wider mb-3">On this page</h3>
+                <div id="toc" class="space-y-1.5 text-sm"></div>
             </nav>
         </aside>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-12">
+    <footer class="glass border-t border-dark-200 mt-16">
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
-                <p class="text-gray-500 text-sm">
-                    Built with ❤️ by <a href="https://github.com/invelity" class="text-primary-600 hover:text-primary-700">Invelity</a>
+                <p class="text-dark-500 text-sm">
+                    Built with ❤️ by <a href="https://github.com/invelity" class="text-primary-600 hover:text-primary-700 font-medium">Invelity</a>
                 </p>
-                <p class="text-gray-500 text-sm">
-                    Licensed under <a href="{{ site.github.repository_url }}/blob/main/LICENSE.md" class="text-primary-600 hover:text-primary-700">MIT License</a>
+                <p class="text-dark-500 text-sm">
+                    Licensed under <a href="{{ site.github.repository_url }}/blob/main/LICENSE.md" class="text-primary-600 hover:text-primary-700 font-medium">MIT License</a>
                 </p>
             </div>
         </div>
     </footer>
 
-    <!-- Prism.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     
-    <!-- Table of Contents Generator -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toc = document.getElementById('toc');
+            if (!toc) return;
+            
             const headings = document.querySelectorAll('.prose h2, .prose h3');
             
-            headings.forEach(heading => {
+            headings.forEach((heading, index) => {
+                if (!heading.id) {
+                    heading.id = 'heading-' + index;
+                }
+                
                 const link = document.createElement('a');
                 link.href = '#' + heading.id;
-                link.textContent = heading.textContent;
+                link.textContent = heading.textContent.replace(/[#→]/g, '').trim();
                 link.className = heading.tagName === 'H2' 
-                    ? 'block py-1 text-gray-700 hover:text-primary-600 transition-colors'
-                    : 'block py-1 pl-4 text-gray-600 hover:text-primary-600 transition-colors text-xs';
-                toc.appendChild(link);
+                    ? 'block py-1.5 text-dark-700 hover:text-primary-600 font-medium transition-colors border-l-2 border-transparent hover:border-primary-500 pl-3'
+                    : 'block py-1 pl-6 text-dark-600 hover:text-primary-600 transition-colors text-xs border-l-2 border-transparent hover:border-primary-400';
                 
-                // Add ID if not present
-                if (!heading.id) {
-                    heading.id = heading.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                }
+                toc.appendChild(link);
+            });
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const id = entry.target.getAttribute('id');
+                    const link = toc.querySelector(`a[href="#${id}"]`);
+                    if (link) {
+                        if (entry.intersectionRatio > 0) {
+                            link.classList.add('text-primary-600', 'border-primary-500');
+                            link.classList.remove('text-dark-700', 'text-dark-600');
+                        } else {
+                            link.classList.remove('text-primary-600', 'border-primary-500');
+                            link.classList.add(link.classList.contains('text-xs') ? 'text-dark-600' : 'text-dark-700');
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            headings.forEach(heading => {
+                observer.observe(heading);
             });
         });
     </script>
