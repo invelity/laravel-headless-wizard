@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Contract;
+namespace Invelity\WizardPackage\Tests\Contract;
 
-use WebSystem\WizardPackage\Facades\Wizard;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Facades\Wizard;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class WizardFacadeTest extends TestCase
 {
@@ -15,7 +15,7 @@ class WizardFacadeTest extends TestCase
         $facade = Wizard::getFacadeRoot();
 
         expect($facade)
-            ->toBeInstanceOf(\WebSystem\WizardPackage\Contracts\WizardManagerInterface::class);
+            ->toBeInstanceOf(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
     }
 
     /** @test */

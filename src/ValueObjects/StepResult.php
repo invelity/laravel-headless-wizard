@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\ValueObjects;
+namespace Invelity\WizardPackage\ValueObjects;
 
 class StepResult
 {

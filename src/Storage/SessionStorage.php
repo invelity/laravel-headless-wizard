@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Storage;
+namespace Invelity\WizardPackage\Storage;
 
 use Illuminate\Session\Store;
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 
 readonly class SessionStorage implements WizardStorageInterface
 {

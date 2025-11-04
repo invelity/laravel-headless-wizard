@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Fixtures;
+namespace Invelity\WizardPackage\Tests\Fixtures;
 
-use WebSystem\WizardPackage\Steps\AbstractStep;
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 class ContactDetailsStep extends AbstractStep
 {

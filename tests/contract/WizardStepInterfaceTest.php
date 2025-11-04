@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Contract;
+namespace Invelity\WizardPackage\Tests\Contract;
 
 use Illuminate\Contracts\View\View;
-use WebSystem\WizardPackage\Steps\AbstractStep;
-use WebSystem\WizardPackage\Tests\TestCase;
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 class WizardStepInterfaceTest extends TestCase
 {

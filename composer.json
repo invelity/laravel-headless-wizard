@@ -1,8 +1,8 @@
 {
-    "name": "websystem-studio/wizard-package",
+    "name": "invelity/laravel-headless-wizard",
     "description": "Headless multi-step wizard package for Laravel with FormRequest validation, progress tracking, and frontend-agnostic API",
     "keywords": [
-        "WebSystem",
+        "Invelity",
         "laravel",
         "wizard",
         "multi-step-form",
@@ -13,12 +13,12 @@
         "formrequest",
         "validation"
     ],
-    "homepage": "https://github.com/websystem-studio/wizard-package",
+    "homepage": "https://github.com/invelity/laravel-headless-wizard",
     "license": "MIT",
     "authors": [
         {
-            "name": "martin",
-            "email": "m.halaj@websystem.sk",
+            "name": "Martin Halaj",
+            "email": "m.halaj@invelity.com",
             "role": "Developer"
         }
     ],
@@ -43,13 +43,13 @@
     },
     "autoload": {
         "psr-4": {
-            "WebSystem\\WizardPackage\\": "src/",
-            "WebSystem\\WizardPackage\\Database\\Factories\\": "database/factories/"
+            "Invelity\\WizardPackage\\": "src/",
+            "Invelity\\WizardPackage\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "WebSystem\\WizardPackage\\Tests\\": "tests/",
+            "Invelity\\WizardPackage\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -65,16 +65,17 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "WebSystem\\WizardPackage\\WizardPackageServiceProvider"
+                "Invelity\\WizardPackage\\WizardServiceProvider"
             ],
             "aliases": {
-                "WizardPackage": "WebSystem\\WizardPackage\\Facades\\WizardPackage"
+                "Wizard": "Invelity\\WizardPackage\\Facades\\Wizard"
             }
         }
     },

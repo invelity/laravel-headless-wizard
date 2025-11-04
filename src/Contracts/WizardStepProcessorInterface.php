@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Contracts;
+namespace Invelity\WizardPackage\Contracts;
 
-use WebSystem\WizardPackage\Exceptions\InvalidStepException;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 interface WizardStepProcessorInterface
 {

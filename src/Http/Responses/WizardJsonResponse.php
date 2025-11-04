@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Http\Responses;
+namespace Invelity\WizardPackage\Http\Responses;
 
 use Illuminate\Http\JsonResponse;
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
-use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 final class WizardJsonResponse
 {

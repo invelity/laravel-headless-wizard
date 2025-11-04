@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Core;
+namespace Invelity\WizardPackage\Core;
 
 readonly class WizardConfiguration
 {

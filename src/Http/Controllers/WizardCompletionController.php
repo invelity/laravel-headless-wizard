@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Http\Controllers;
+namespace Invelity\WizardPackage\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use WebSystem\WizardPackage\Actions\CompleteWizardAction;
+use Invelity\WizardPackage\Actions\CompleteWizardAction;
 
 class WizardCompletionController extends Controller
 {

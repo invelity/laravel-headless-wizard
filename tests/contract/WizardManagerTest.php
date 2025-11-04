@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Contract;
+namespace Invelity\WizardPackage\Tests\Contract;
 
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\Exceptions\InvalidStepException;
-use WebSystem\WizardPackage\Exceptions\WizardNotInitializedException;
-use WebSystem\WizardPackage\Tests\TestCase;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
-use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Exceptions\WizardNotInitializedException;
+use Invelity\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 class WizardManagerTest extends TestCase
 {

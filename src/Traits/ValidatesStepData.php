@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Traits;
+namespace Invelity\WizardPackage\Traits;
 
 use Illuminate\Support\Facades\Validator;
-use WebSystem\WizardPackage\Exceptions\StepValidationException;
+use Invelity\WizardPackage\Exceptions\StepValidationException;
 
 trait ValidatesStepData
 {

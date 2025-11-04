@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit\Php84;
+namespace Invelity\WizardPackage\Tests\Unit\Php84;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use WebSystem\WizardPackage\Models\WizardProgress;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Models\WizardProgress;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class AsymmetricVisibilityTest extends TestCase
 {

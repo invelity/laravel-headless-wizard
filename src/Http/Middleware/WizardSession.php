@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Http\Middleware;
+namespace Invelity\WizardPackage\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;

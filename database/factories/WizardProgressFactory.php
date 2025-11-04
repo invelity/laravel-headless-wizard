@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Database\Factories;
+namespace Invelity\WizardPackage\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use WebSystem\WizardPackage\Models\WizardProgress;
+use Invelity\WizardPackage\Models\WizardProgress;
 
 class WizardProgressFactory extends Factory
 {

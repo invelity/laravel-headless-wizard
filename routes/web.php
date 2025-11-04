@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use WebSystem\WizardPackage\Http\Controllers\WizardCompletionController;
-use WebSystem\WizardPackage\Http\Controllers\WizardController;
-use WebSystem\WizardPackage\Http\Controllers\WizardStepSkipController;
+use Invelity\WizardPackage\Http\Controllers\WizardCompletionController;
+use Invelity\WizardPackage\Http\Controllers\WizardController;
+use Invelity\WizardPackage\Http\Controllers\WizardStepSkipController;
 
 Route::group([
     'prefix' => config('wizard.route.prefix', 'wizard'),

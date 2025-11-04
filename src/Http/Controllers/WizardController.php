@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Http\Controllers;
+namespace Invelity\WizardPackage\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use WebSystem\WizardPackage\Actions\EditWizardStepAction;
-use WebSystem\WizardPackage\Actions\ProcessWizardStepAction;
-use WebSystem\WizardPackage\Actions\ShowWizardStepAction;
-use WebSystem\WizardPackage\Actions\UpdateWizardStepAction;
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
-use WebSystem\WizardPackage\Http\Responses\WizardJsonResponse;
+use Invelity\WizardPackage\Actions\EditWizardStepAction;
+use Invelity\WizardPackage\Actions\ProcessWizardStepAction;
+use Invelity\WizardPackage\Actions\ShowWizardStepAction;
+use Invelity\WizardPackage\Actions\UpdateWizardStepAction;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
 
 class WizardController extends Controller
 {

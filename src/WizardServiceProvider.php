@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage;
+namespace Invelity\WizardPackage;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
-use WebSystem\WizardPackage\Core\WizardConfiguration;
-use WebSystem\WizardPackage\Core\WizardManager;
-use WebSystem\WizardPackage\Http\Middleware\StepAccess;
-use WebSystem\WizardPackage\Http\Middleware\WizardSession;
-use WebSystem\WizardPackage\Storage\CacheStorage;
-use WebSystem\WizardPackage\Storage\DatabaseStorage;
-use WebSystem\WizardPackage\Storage\SessionStorage;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Core\WizardConfiguration;
+use Invelity\WizardPackage\Core\WizardManager;
+use Invelity\WizardPackage\Http\Middleware\StepAccess;
+use Invelity\WizardPackage\Http\Middleware\WizardSession;
+use Invelity\WizardPackage\Storage\CacheStorage;
+use Invelity\WizardPackage\Storage\DatabaseStorage;
+use Invelity\WizardPackage\Storage\SessionStorage;
 
-class WizardPackageServiceProvider extends PackageServiceProvider
+class WizardServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
@@ -50,8 +50,8 @@ class WizardPackageServiceProvider extends PackageServiceProvider
 
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
 
-        $this->app->singleton(WizardPackage::class, function ($app) {
-            return new WizardPackage($app->make(WizardManagerInterface::class));
+        $this->app->singleton(Wizard::class, function ($app) {
+            return new Wizard($app->make(WizardManagerInterface::class));
         });
     }
 

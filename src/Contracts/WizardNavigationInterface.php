@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Contracts;
+namespace Invelity\WizardPackage\Contracts;
 
-use WebSystem\WizardPackage\ValueObjects\NavigationItem;
+use Invelity\WizardPackage\ValueObjects\NavigationItem;
 
 interface WizardNavigationInterface
 {

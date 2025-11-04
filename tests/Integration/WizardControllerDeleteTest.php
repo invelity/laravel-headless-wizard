@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Integration;
+namespace Invelity\WizardPackage\Tests\Integration;
 
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class WizardControllerDeleteTest extends TestCase
 {

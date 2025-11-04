@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Core;
+namespace Invelity\WizardPackage\Core;
 
-use WebSystem\WizardPackage\Contracts\WizardNavigationInterface;
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
-use WebSystem\WizardPackage\ValueObjects\NavigationItem;
+use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\ValueObjects\NavigationItem;
 
 class WizardNavigation implements WizardNavigationInterface
 {
@@ -36,10 +36,10 @@ class WizardNavigation implements WizardNavigationInterface
                 title: $step->getTitle(),
                 position: $index + 1,
                 status: in_array($step->getId(), $completedSteps)
-                    ? \WebSystem\WizardPackage\Enums\StepStatus::Completed
+                    ? \Invelity\WizardPackage\Enums\StepStatus::Completed
                     : ($step->getId() === $currentStepId
-                        ? \WebSystem\WizardPackage\Enums\StepStatus::InProgress
-                        : \WebSystem\WizardPackage\Enums\StepStatus::Pending),
+                        ? \Invelity\WizardPackage\Enums\StepStatus::InProgress
+                        : \Invelity\WizardPackage\Enums\StepStatus::Pending),
                 isAccessible: $this->canNavigateTo($step->getId()),
                 isOptional: $step->isOptional(),
                 url: $this->getStepUrl($step->getId()),

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit;
+namespace Invelity\WizardPackage\Tests\Unit;
 
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
-use WebSystem\WizardPackage\Core\WizardManager;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Core\WizardManager;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class WizardManagerTest extends TestCase
 {

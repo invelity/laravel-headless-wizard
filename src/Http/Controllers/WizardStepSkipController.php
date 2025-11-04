@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Http\Controllers;
+namespace Invelity\WizardPackage\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use WebSystem\WizardPackage\Actions\SkipWizardStepAction;
+use Invelity\WizardPackage\Actions\SkipWizardStepAction;
 
 class WizardStepSkipController extends Controller
 {

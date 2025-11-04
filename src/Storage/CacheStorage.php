@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Storage;
+namespace Invelity\WizardPackage\Storage;
 
 use Illuminate\Contracts\Cache\Repository;
 use Psr\SimpleCache\InvalidArgumentException;
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 
 readonly class CacheStorage implements WizardStorageInterface
 {

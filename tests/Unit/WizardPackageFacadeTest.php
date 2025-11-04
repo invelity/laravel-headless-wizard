@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit;
+namespace Invelity\WizardPackage\Tests\Unit;
 
 use Mockery;
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
-use WebSystem\WizardPackage\Contracts\WizardNavigationInterface;
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\Facades\WizardPackage as WizardPackageFacade;
-use WebSystem\WizardPackage\Tests\TestCase;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
-use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
-use WebSystem\WizardPackage\WizardPackage;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\Facades\WizardPackage as WizardPackageFacade;
+use Invelity\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Wizard;
 
 class WizardPackageFacadeTest extends TestCase
 {
@@ -21,7 +21,7 @@ class WizardPackageFacadeTest extends TestCase
         parent::setUp();
 
         $this->mockManager = Mockery::mock(WizardManagerInterface::class);
-        $this->app->instance(WizardPackage::class, new WizardPackage($this->mockManager));
+        $this->app->instance(Wizard::class, new Wizard($this->mockManager));
     }
 
     public function test_facade_delegates_initialize(): void

@@ -105,7 +105,7 @@ New documentation structure in `/docs`:
 
 **Required Steps:**
 
-1. Update composer: `composer require websystem-studio/wizard-package:^2.0`
+1. Update composer: `composer require invelity/laravel-headless-wizard:^2.0`
 2. Remove old views: `rm -rf resources/views/wizards`
 3. Create FormRequest for each step
 4. Move validation from `Step::rules()` to FormRequest classes
