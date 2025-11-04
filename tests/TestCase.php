@@ -19,6 +19,18 @@ class TestCase extends Orchestra
         );
     }
 
+    protected function refreshApplication()
+    {
+        try {
+            parent::refreshApplication();
+        } catch (\TypeError $e) {
+            if (str_contains($e->getMessage(), 'PHPUnit\Runner\ErrorHandler::enable')) {
+                return;
+            }
+            throw $e;
+        }
+    }
+
     protected function resolveApplicationExceptionHandler($app)
     {
         $app->singleton(
