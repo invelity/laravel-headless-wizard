@@ -12,12 +12,18 @@ class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
-        error_reporting(E_ALL & ~E_USER_DEPRECATED & ~E_DEPRECATED);
-
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'Invelity\\WizardPackage\\Database\\Factories\\'.class_basename($modelName).'Factory'
+        );
+    }
+
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \Illuminate\Foundation\Exceptions\Handler::class
         );
     }
 
