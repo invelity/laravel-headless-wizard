@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Tests\Unit;
 
-use Mockery;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
@@ -13,6 +12,7 @@ use Invelity\WizardPackage\Tests\TestCase;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 use Invelity\WizardPackage\Wizard;
+use Mockery;
 
 class WizardPackageFacadeTest extends TestCase
 {

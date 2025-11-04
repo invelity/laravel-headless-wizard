@@ -6,8 +6,8 @@ namespace Invelity\WizardPackage\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 final readonly class StepAccess
 {
