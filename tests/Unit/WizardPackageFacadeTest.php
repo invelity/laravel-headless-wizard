@@ -16,6 +16,8 @@ use Mockery;
 
 class WizardPackageFacadeTest extends TestCase
 {
+    private WizardManagerInterface $mockManager;
+
     protected function setUp(): void
     {
         parent::setUp();
