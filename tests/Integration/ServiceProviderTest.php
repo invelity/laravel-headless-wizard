@@ -51,24 +51,24 @@ test('config file is published', function () {
 test('it registers database storage when configured', function () {
     config(['wizard.storage' => 'database']);
     $this->app->forgetInstance(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
-    
+
     $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
-    
+
     expect($storage)->toBeInstanceOf(\Invelity\WizardPackage\Storage\DatabaseStorage::class);
 });
 
 test('it registers cache storage when configured', function () {
     config(['wizard.storage' => 'cache']);
     $this->app->forgetInstance(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
-    
+
     $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
-    
+
     expect($storage)->toBeInstanceOf(\Invelity\WizardPackage\Storage\CacheStorage::class);
 });
 
 test('it registers Wizard facade singleton', function () {
     $wizard1 = app(\Invelity\WizardPackage\Wizard::class);
     $wizard2 = app(\Invelity\WizardPackage\Wizard::class);
-    
+
     expect($wizard1)->toBe($wizard2);
 });

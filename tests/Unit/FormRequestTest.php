@@ -12,7 +12,7 @@ beforeEach(function () {
     if (File::exists(app_path('Http/Requests/Wizards'))) {
         File::deleteDirectory(app_path('Http/Requests/Wizards'));
     }
-    
+
     $configPath = config_path('wizard-package.php');
     $configDir = dirname($configPath);
 
@@ -32,7 +32,7 @@ beforeEach(function () {
     ];
 
     File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
-    
+
     $loadedConfig = require $configPath;
     config(['wizard-package' => $loadedConfig]);
 });

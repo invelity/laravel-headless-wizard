@@ -51,7 +51,7 @@ test('middleware blocks access to inaccessible step', function () {
 test('middleware redirects to current accessible step when blocked', function () {
     $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
     $manager->initialize('checkout');
-    
+
     $response = $this->get(route('wizard.show', [
         'wizard' => 'checkout',
         'step' => 'contact-details',
@@ -74,7 +74,7 @@ test('middleware initializes wizard if not already initialized', function () {
     ]));
 
     $response->assertOk();
-    
+
     $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
     expect($manager->getCurrentStep())->not->toBeNull();
 });
@@ -106,7 +106,7 @@ test('middleware validates wizard flow across multiple steps', function () {
     $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
     $manager->initialize('checkout');
     $progress = $manager->getProgress();
-    
+
     expect($progress->completedSteps)->toBeGreaterThanOrEqual(1);
 });
 
