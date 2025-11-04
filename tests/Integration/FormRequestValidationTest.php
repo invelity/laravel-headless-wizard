@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Tests\Integration;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Invelity\WizardPackage\Tests\TestCase;
 
@@ -15,6 +16,7 @@ class FormRequestValidationTest extends TestCase
 
         $this->cleanupGeneratedFiles();
         $this->setupWizardConfig();
+        Artisan::call('config:clear');
     }
 
     protected function tearDown(): void
