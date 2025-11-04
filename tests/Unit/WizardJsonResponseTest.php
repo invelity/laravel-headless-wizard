@@ -9,7 +9,7 @@ use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 test('stepAccessDenied returns 403 with error message', function () {
-    $currentStep = new PersonalInfoStep();
+    $currentStep = new PersonalInfoStep;
     $response = WizardJsonResponse::stepAccessDenied($currentStep, 'contact-details');
 
     expect($response->status())->toBe(403);
@@ -38,7 +38,7 @@ test('validationError returns 422 with errors array', function () {
 
 test('stepProcessed returns success with next step', function () {
     $result = StepResult::success(['name' => 'John'], 'Step completed');
-    $nextStep = new ContactDetailsStep();
+    $nextStep = new ContactDetailsStep;
     $progress = new WizardProgressValue(2, 1, 1, 50, ['contact-details'], false);
 
     $response = WizardJsonResponse::stepProcessed($result, $nextStep, $progress);
@@ -119,7 +119,7 @@ test('completed returns success message', function () {
 });
 
 test('stepSkipped returns success with next step and progress', function () {
-    $nextStep = new ContactDetailsStep();
+    $nextStep = new ContactDetailsStep;
     $progress = new WizardProgressValue(3, 2, 1, 66, ['contact-details'], false);
 
     $response = WizardJsonResponse::stepSkipped($nextStep, $progress);
