@@ -6,11 +6,26 @@ nav_order: 1
 
 # Laravel Multi-Step Wizard Package (Headless)
 
-<div class="badges">
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/invelity/laravel-headless-wizard.svg?style=flat-square)](https://packagist.org/packages/invelity/laravel-headless-wizard)
-[![GitHub Tests](https://img.shields.io/github/actions/workflow/status/invelity/laravel-headless-wizard/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/invelity/laravel-headless-wizard/actions)
-[![Code Coverage](https://img.shields.io/badge/coverage-98.6%25-brightgreen?style=flat-square)](https://github.com/invelity/laravel-headless-wizard)
-[![PHPStan](https://img.shields.io/badge/PHPStan-level%205-brightgreen?style=flat-square)](https://github.com/invelity/laravel-headless-wizard)
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6">
+  <a href="https://packagist.org/packages/invelity/laravel-headless-wizard" target="_blank" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-lg hover:shadow-md transition-all duration-200 group">
+    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Version</span>
+    <span class="text-lg font-bold text-primary-600 group-hover:text-primary-700">v1.0.0</span>
+  </a>
+  
+  <a href="https://github.com/invelity/laravel-headless-wizard/actions" target="_blank" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group">
+    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Tests</span>
+    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">Passing</span>
+  </a>
+  
+  <a href="https://github.com/invelity/laravel-headless-wizard" target="_blank" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group">
+    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Coverage</span>
+    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">98.6%</span>
+  </a>
+  
+  <a href="https://github.com/invelity/laravel-headless-wizard" target="_blank" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group">
+    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">PHPStan</span>
+    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">Level 5</span>
+  </a>
 </div>
 
 A powerful **headless** multi-step wizard package for Laravel applications. Build complex, multi-page forms with progress tracking, navigation, validation, and conditional steps. **Bring your own frontend** - works with React, Vue, Inertia, Livewire, Alpine.js, or any JavaScript framework.
@@ -100,13 +115,6 @@ The MIT License (MIT). Please see [License File](https://github.com/invelity/lar
 ---
 
 <style>
-.badges {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin: 1rem 0;
-}
-
 .docs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
