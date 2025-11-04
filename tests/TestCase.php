@@ -10,30 +10,8 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
-    private $previousErrorHandler;
-
-    private $previousExceptionHandler;
-
     protected function setUp(): void
     {
-        $this->previousExceptionHandler = set_exception_handler(function ($e) {
-            throw $e;
-        });
-        if ($this->previousExceptionHandler !== null) {
-            set_exception_handler($this->previousExceptionHandler);
-        } else {
-            restore_exception_handler();
-        }
-
-        $this->previousErrorHandler = set_error_handler(function ($errno, $errstr, $errfile = null, $errline = null) {
-            return false;
-        });
-        if ($this->previousErrorHandler !== null) {
-            set_error_handler($this->previousErrorHandler);
-        } else {
-            restore_error_handler();
-        }
-
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
@@ -41,21 +19,12 @@ class TestCase extends Orchestra
         );
     }
 
-    protected function tearDown(): void
+    protected function refreshApplication()
     {
-        if ($this->previousExceptionHandler !== null) {
-            set_exception_handler($this->previousExceptionHandler);
-        } else {
-            restore_exception_handler();
-        }
+        parent::refreshApplication();
 
-        if ($this->previousErrorHandler !== null) {
-            set_error_handler($this->previousErrorHandler);
-        } else {
-            restore_error_handler();
-        }
-
-        parent::tearDown();
+        restore_error_handler();
+        restore_exception_handler();
     }
 
     protected function getPackageProviders($app)
