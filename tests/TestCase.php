@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Invelity\WizardPackage\WizardServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -12,6 +13,8 @@ class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
+        error_reporting(E_ALL & ~E_USER_DEPRECATED & ~E_DEPRECATED);
+        
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
