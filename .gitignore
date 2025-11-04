@@ -39,3 +39,7 @@ testbench.yaml
 *.anthropic-tmp
 CLAUDE.md
 add_strict_types.sh
+
+# Backup files
+.backups/
+add_strict_types.sh
