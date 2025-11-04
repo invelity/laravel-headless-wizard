@@ -16,8 +16,13 @@ readonly class WizardConfiguration
 
     public static function fromConfig(): self
     {
+        $storage = config('wizard.storage', 'session');
+        if (is_array($storage)) {
+            $storage = $storage['driver'] ?? 'session';
+        }
+
         return new self(
-            storage: config('wizard.storage', 'session'),
+            storage: $storage,
             navigation: config('wizard.navigation', []),
             ui: config('wizard.ui', []),
             validation: config('wizard.validation', []),
