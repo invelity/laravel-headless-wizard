@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Tests\Feature;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Invelity\WizardPackage\Tests\TestCase;
 
@@ -16,9 +15,9 @@ class MakeWizardCommandTest extends TestCase
 
         $this->cleanupGeneratedFiles();
         $this->setupConfigFile();
-        Artisan::call('config:clear');
 
-        $this->app['config']->set('wizard-package', require config_path('wizard-package.php'));
+        $config = require config_path('wizard-package.php');
+        config(['wizard-package' => $config]);
     }
 
     protected function tearDown(): void
