@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace WebSystem\WizardPackage\Storage;
 
 use Illuminate\Contracts\Cache\Repository;
+use Psr\SimpleCache\InvalidArgumentException;
 use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
 
-class CacheStorage implements WizardStorageInterface
+readonly class CacheStorage implements WizardStorageInterface
 {
     public function __construct(
-        private readonly Repository $cache,
-        private readonly int $ttl = 7200,
-        private readonly string $prefix = 'wizard:',
+        private Repository $cache,
+        private int $ttl = 7200,
+        private string $prefix = 'wizard:',
     ) {}
 
     public function put(string $key, array $data): void
@@ -20,11 +21,17 @@ class CacheStorage implements WizardStorageInterface
         $this->cache->put($this->getKey($key), $data, $this->ttl);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function get(string $key): ?array
     {
         return $this->cache->get($this->getKey($key));
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function exists(string $key): bool
     {
         return $this->cache->has($this->getKey($key));
@@ -35,6 +42,9 @@ class CacheStorage implements WizardStorageInterface
         $this->cache->forget($this->getKey($key));
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function update(string $key, string $field, mixed $value): void
     {
         $data = $this->get($key) ?? [];

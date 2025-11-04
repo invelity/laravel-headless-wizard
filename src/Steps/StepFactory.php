@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace WebSystem\WizardPackage\Steps;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use WebSystem\WizardPackage\Contracts\WizardStepInterface;
 use WebSystem\WizardPackage\Exceptions\InvalidStepException;
 
-class StepFactory
+readonly class StepFactory
 {
     public function __construct(
-        private readonly Container $container,
+        private Container $container,
     ) {}
 
     /**
      * @param  class-string<WizardStepInterface>  $stepClass
+     *
+     * @throws BindingResolutionException|InvalidStepException
      */
     public function make(string $stepClass): WizardStepInterface
     {
@@ -38,9 +41,13 @@ class StepFactory
      */
     public function makeMany(array $stepClasses): array
     {
-        return array_map(
-            fn (string $class) => $this->make($class),
-            $stepClasses
-        );
+        try {
+            return array_map(
+                fn (string $class) => $this->make($class),
+                $stepClasses
+            );
+        } catch (BindingResolutionException|InvalidStepException $e) {
+            return [];
+        }
     }
 }

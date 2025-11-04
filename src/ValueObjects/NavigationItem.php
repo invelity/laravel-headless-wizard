@@ -6,7 +6,7 @@ namespace WebSystem\WizardPackage\ValueObjects;
 
 use WebSystem\WizardPackage\Enums\StepStatus;
 
-class NavigationItem
+final class NavigationItem
 {
     public string $label {
         get => "{$this->position}. {$this->title}";
@@ -23,13 +23,13 @@ class NavigationItem
     }
 
     public function __construct(
-        public readonly string $stepId,
-        public readonly string $title,
-        public readonly int $position,
-        public readonly StepStatus $status,
-        public readonly bool $isAccessible,
-        public readonly bool $isOptional,
-        public readonly ?string $url,
+        public string $stepId,
+        public string $title,
+        public int $position,
+        public StepStatus $status,
+        public bool $isAccessible,
+        public bool $isOptional,
+        public ?string $url,
     ) {}
 
     public function isCurrent(): bool

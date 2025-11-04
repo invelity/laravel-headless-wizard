@@ -7,11 +7,11 @@ namespace WebSystem\WizardPackage\Storage;
 use Illuminate\Session\Store;
 use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
 
-class SessionStorage implements WizardStorageInterface
+readonly class SessionStorage implements WizardStorageInterface
 {
     public function __construct(
-        private readonly Store $session,
-        private readonly string $prefix = 'wizard_',
+        private Store $session,
+        private string $prefix = 'wizard_',
     ) {}
 
     public function put(string $key, array $data): void

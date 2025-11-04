@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class WizardCompleted
+final class WizardCompleted
 {
     use Dispatchable, SerializesModels;
 

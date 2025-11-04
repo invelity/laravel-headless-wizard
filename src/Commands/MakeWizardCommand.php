@@ -8,11 +8,14 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use WebSystem\WizardPackage\Commands\Concerns\WritesConfig;
 
 use function Laravel\Prompts\text;
 
 class MakeWizardCommand extends Command
 {
+    use WritesConfig;
+
     protected $signature = 'wizard:make 
                             {name? : The name of the wizard}
                             {--force : Overwrite existing wizard}';
@@ -41,7 +44,7 @@ class MakeWizardCommand extends Command
         $force = $this->option('force');
 
         if ($this->wizardExists($wizardClass) && ! $force) {
-            $this->error("Wizard '{$wizardClass}' already exists. Use --force to overwrite.");
+            $this->error(__('Wizard \':class\' already exists. Use --force to overwrite.', ['class' => $wizardClass]));
 
             return self::FAILURE;
         }
@@ -51,21 +54,21 @@ class MakeWizardCommand extends Command
             $this->registerInConfig($wizardId, $wizardClass);
             $this->clearConfigCache();
 
-            $this->info("✓ Wizard class created: app/Wizards/{$wizardClass}.php");
-            $this->info('✓ Registered in config: config/wizard-package.php');
-            $this->info('✓ Config cache cleared');
+            $this->info(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => $wizardClass]));
+            $this->info(__('✓ Registered in config: config/wizard-package.php'));
+            $this->info(__('✓ Config cache cleared'));
             $this->newLine();
-            $this->comment('Next steps:');
-            $this->comment("  • Generate first step: php artisan wizard:make-step --wizard={$wizardId}");
-            $this->comment('  • View wizard config: config/wizard-package.php');
+            $this->comment(__('Next steps:'));
+            $this->comment(__('  • Generate first step: php artisan wizard:make-step --wizard={wizard}', ['wizard' => $wizardId]));
+            $this->comment(__('  • View wizard config: config/wizard-package.php'));
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error("Failed to create wizard: {$e->getMessage()}");
+            $this->error(__('Failed to create wizard: {message}', ['message' => $e->getMessage()]));
             $this->newLine();
-            $this->comment('Troubleshooting:');
-            $this->comment('  • Check directory permissions for app/Wizards/');
-            $this->comment('  • Ensure config/wizard-package.php is writable');
+            $this->comment(__('Troubleshooting:'));
+            $this->comment(__('  • Check directory permissions for app/Wizards/'));
+            $this->comment(__('  • Ensure config/wizard-package.php is writable'));
 
             return self::FAILURE;
         }
@@ -74,11 +77,11 @@ class MakeWizardCommand extends Command
     protected function validateWizardName(string $value): ?string
     {
         if (empty($value)) {
-            return 'Wizard name is required';
+            return __('Wizard name is required');
         }
 
         if (! preg_match('/^[A-Z][a-zA-Z0-9]*$/', $value)) {
-            return 'Wizard name must be PascalCase (e.g., Onboarding)';
+            return __('Wizard name must be PascalCase (e.g., Onboarding)');
         }
 
         return null;
@@ -112,37 +115,14 @@ class MakeWizardCommand extends Command
     {
         $configPath = config_path('wizard-package.php');
 
-        if (! File::exists($configPath)) {
-            throw new \RuntimeException('Config file not found. Please publish the wizard config first.');
-        }
-
-        File::copy($configPath, $configPath.'.backup');
-
-        try {
-            $config = require $configPath;
+        $this->writeConfigSafely($configPath, function (array $config) use ($wizardId, $wizardClass) {
             $config['wizards'][$wizardId] = [
                 'class' => "App\\Wizards\\{$wizardClass}",
                 'steps' => [],
             ];
 
-            $content = "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n";
-            $content = str_replace("'App\\\\\\\\Wizards", "'App\\\\Wizards", $content);
-
-            $handle = fopen($configPath, 'w');
-            if (flock($handle, LOCK_EX)) {
-                fwrite($handle, $content);
-                flock($handle, LOCK_UN);
-            }
-            fclose($handle);
-
-            File::delete($configPath.'.backup');
-        } catch (\Exception $e) {
-            if (File::exists($configPath.'.backup')) {
-                File::move($configPath.'.backup', $configPath);
-            }
-
-            throw $e;
-        }
+            return $config;
+        });
     }
 
     protected function clearConfigCache(): void

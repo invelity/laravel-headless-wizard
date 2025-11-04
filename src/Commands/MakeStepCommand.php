@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace WebSystem\WizardPackage\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use WebSystem\WizardPackage\Commands\Concerns\WritesConfig;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
@@ -15,7 +17,9 @@ use function Laravel\Prompts\text;
 
 class MakeStepCommand extends Command
 {
-    protected $signature = 'wizard:make-step 
+    use WritesConfig;
+
+    protected $signature = 'wizard:make-step
                             {name? : The name of the step}
                             {--wizard= : The wizard ID to add step to}
                             {--order= : Step order number}
@@ -29,7 +33,7 @@ class MakeStepCommand extends Command
         $wizards = $this->getAvailableWizards();
 
         if (empty($wizards)) {
-            $this->error('No wizards found. Create a wizard first:');
+            $this->error(__('No wizards found. Create a wizard first:'));
             $this->comment('php artisan wizard:make');
 
             return self::FAILURE;
@@ -64,7 +68,7 @@ class MakeStepCommand extends Command
         $force = $this->option('force');
 
         if ($this->stepExists($stepClass) && ! $force) {
-            $this->error("Step '{$stepClass}' already exists. Use --force to overwrite.");
+            $this->error(__('Step \':class\' already exists. Use --force to overwrite.', ['class' => $stepClass]));
 
             return self::FAILURE;
         }
@@ -100,24 +104,24 @@ class MakeStepCommand extends Command
 
             $requestClass = str_replace('Step', '', $stepClass).'Request';
 
-            $this->info("✓ Step class created: app/Wizards/Steps/{$stepClass}.php");
-            $this->info("✓ FormRequest created: app/Http/Requests/Wizards/{$requestClass}.php");
-            $this->info("✓ Registered in wizard: {$wizardId}");
-            $this->info('✓ Config cache cleared');
+            $this->info(__('✓ Step class created: app/Wizards/Steps/{class}.php', ['class' => $stepClass]));
+            $this->info(__('✓ FormRequest created: app/Http/Requests/Wizards/{class}.php', ['class' => $requestClass]));
+            $this->info(__('✓ Registered in wizard: {wizard}', ['wizard' => $wizardId]));
+            $this->info(__('✓ Config cache cleared'));
             $this->newLine();
-            $this->comment('Next steps:');
-            $this->comment("  • Add validation rules: app/Http/Requests/Wizards/{$requestClass}.php");
-            $this->comment("  • Implement business logic: app/Wizards/Steps/{$stepClass}.php");
-            $this->comment("  • Generate another step: php artisan wizard:make-step --wizard={$wizardId}");
+            $this->comment(__('Next steps:'));
+            $this->comment(__('  • Add validation rules: app/Http/Requests/Wizards/{class}.php', ['class' => $requestClass]));
+            $this->comment(__('  • Implement business logic: app/Wizards/Steps/{class}.php', ['class' => $stepClass]));
+            $this->comment(__('  • Generate another step: php artisan wizard:make-step --wizard={wizard}', ['wizard' => $wizardId]));
 
             return self::SUCCESS;
-        } catch (\Exception $e) {
-            $this->error("Failed to create step: {$e->getMessage()}");
+        } catch (Exception $e) {
+            $this->error(__('Failed to create step: {message}', ['message' => $e->getMessage()]));
             $this->newLine();
-            $this->comment('Troubleshooting:');
-            $this->comment('  • Check directory permissions for app/Wizards/Steps/');
-            $this->comment('  • Check directory permissions for app/Http/Requests/Wizards/');
-            $this->comment('  • Ensure config/wizard-package.php is writable');
+            $this->comment(__('Troubleshooting:'));
+            $this->comment(__('  • Check directory permissions for app/Wizards/Steps/'));
+            $this->comment(__('  • Check directory permissions for app/Http/Requests/Wizards/'));
+            $this->comment(__('  • Ensure config/wizard-package.php is writable'));
 
             return self::FAILURE;
         }
@@ -194,38 +198,18 @@ class MakeStepCommand extends Command
         File::put(app_path("Http/Requests/Wizards/{$requestClass}.php"), $content);
     }
 
+    /**
+     * @throws Exception
+     */
     protected function registerInConfig(string $wizardId, string $stepClass): void
     {
         $configPath = config_path('wizard-package.php');
 
-        if (! File::exists($configPath)) {
-            throw new \RuntimeException('Config file not found');
-        }
-
-        File::copy($configPath, $configPath.'.backup');
-
-        try {
-            $config = require $configPath;
+        $this->writeConfigSafely($configPath, function (array $config) use ($wizardId, $stepClass) {
             $config['wizards'][$wizardId]['steps'][] = "App\\Wizards\\Steps\\{$stepClass}";
 
-            $content = "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n";
-            $content = str_replace("'App\\\\\\\\Wizards", "'App\\\\Wizards", $content);
-
-            $handle = fopen($configPath, 'w');
-            if (flock($handle, LOCK_EX)) {
-                fwrite($handle, $content);
-                flock($handle, LOCK_UN);
-            }
-            fclose($handle);
-
-            File::delete($configPath.'.backup');
-        } catch (\Exception $e) {
-            if (File::exists($configPath.'.backup')) {
-                File::move($configPath.'.backup', $configPath);
-            }
-
-            throw $e;
-        }
+            return $config;
+        });
     }
 
     protected function clearConfigCache(): void

@@ -9,10 +9,10 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
 
-class StepAccess
+final readonly class StepAccess
 {
     public function __construct(
-        private readonly WizardManagerInterface $manager,
+        private WizardManagerInterface $manager,
     ) {}
 
     public function handle(Request $request, Closure $next): Response
@@ -32,7 +32,7 @@ class StepAccess
             return redirect()->route('wizard.show', [
                 'wizard' => $wizard,
                 'step' => $currentStep?->getId() ?? $step,
-            ])->with('error', 'You cannot access this step yet. Please complete previous steps first.');
+            ])->with('error', __('You cannot access this step yet. Please complete previous steps first.'));
         }
 
         return $next($request);
