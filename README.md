@@ -710,7 +710,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [martin](https://github.com/WebSystem-studio)
+- [Martin Halaj](https://github.com/Martin-1182)
 - [All Contributors](../../contributors)
 
 ## License
