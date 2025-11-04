@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit\Php84;
+namespace Invelity\WizardPackage\Tests\Unit\Php84;
 
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
 
 test('array_find returns matching step', function () {
     $step1 = mock(WizardStepInterface::class);

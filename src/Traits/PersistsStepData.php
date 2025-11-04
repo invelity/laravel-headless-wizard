@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Traits;
+namespace Invelity\WizardPackage\Traits;
 
 trait PersistsStepData
 {

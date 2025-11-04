@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Feature;
+namespace Invelity\WizardPackage\Tests\Feature;
 
 use Illuminate\Support\Facades\File;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class MakeWizardCommandTest extends TestCase
 {

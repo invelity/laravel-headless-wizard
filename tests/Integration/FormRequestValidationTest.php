@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Integration;
+namespace Invelity\WizardPackage\Tests\Integration;
 
 use Illuminate\Support\Facades\File;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class FormRequestValidationTest extends TestCase
 {

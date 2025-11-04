@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Steps;
+namespace Invelity\WizardPackage\Steps;
 
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\Traits\HasWizardSteps;
-use WebSystem\WizardPackage\Traits\PersistsStepData;
-use WebSystem\WizardPackage\Traits\ValidatesStepData;
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\Traits\HasWizardSteps;
+use Invelity\WizardPackage\Traits\PersistsStepData;
+use Invelity\WizardPackage\Traits\ValidatesStepData;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 abstract class AbstractStep implements WizardStepInterface
 {

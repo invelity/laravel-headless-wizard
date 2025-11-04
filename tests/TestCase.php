@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests;
+namespace Invelity\WizardPackage\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use WebSystem\WizardPackage\WizardPackageServiceProvider;
+use Invelity\WizardPackage\WizardServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -15,14 +15,14 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'WebSystem\\WizardPackage\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Invelity\\WizardPackage\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            WizardPackageServiceProvider::class,
+            WizardServiceProvider::class,
         ];
     }
 

@@ -7,52 +7,52 @@ arch('it will not use debugging functions')
     ->each->not->toBeUsed();
 
 arch('all PHP files have strict types declaration')
-    ->expect('WebSystem\WizardPackage')
+    ->expect('Invelity\WizardPackage')
     ->toUseStrictTypes();
 
 arch('events are final')
-    ->expect('WebSystem\WizardPackage\Events')
+    ->expect('Invelity\WizardPackage\Events')
     ->classes()
     ->toBeFinal();
 
 arch('exceptions extend base exception')
-    ->expect('WebSystem\WizardPackage\Exceptions')
+    ->expect('Invelity\WizardPackage\Exceptions')
     ->classes()
     ->toExtend(Exception::class);
 
 arch('contracts are interfaces')
-    ->expect('WebSystem\WizardPackage\Contracts')
+    ->expect('Invelity\WizardPackage\Contracts')
     ->toBeInterfaces();
 
 arch('commands extend Laravel Command')
-    ->expect('WebSystem\WizardPackage\Commands')
+    ->expect('Invelity\WizardPackage\Commands')
     ->classes()
     ->toExtend('Illuminate\Console\Command');
 
 arch('controllers extend Laravel Controller')
-    ->expect('WebSystem\WizardPackage\Http\Controllers')
+    ->expect('Invelity\WizardPackage\Http\Controllers')
     ->classes()
     ->toExtend('Illuminate\Routing\Controller');
 
 arch('form requests extend Laravel FormRequest')
-    ->expect('WebSystem\WizardPackage\Http\Requests')
+    ->expect('Invelity\WizardPackage\Http\Requests')
     ->classes()
     ->toExtend('Illuminate\Foundation\Http\FormRequest');
 
 arch('models extend Eloquent Model')
-    ->expect('WebSystem\WizardPackage\Models')
+    ->expect('Invelity\WizardPackage\Models')
     ->classes()
     ->toExtend('Illuminate\Database\Eloquent\Model');
 
 arch('no static calls except Facades and Laravel helpers')
-    ->expect('WebSystem\WizardPackage')
+    ->expect('Invelity\WizardPackage')
     ->not->toUse('static');
 
 test('controllers follow CRUD or single-action pattern', function () {
     $controllerFiles = glob(__DIR__.'/../src/Http/Controllers/*.php');
 
     foreach ($controllerFiles as $file) {
-        $className = 'WebSystem\\WizardPackage\\Http\\Controllers\\'.basename($file, '.php');
+        $className = 'Invelity\\WizardPackage\\Http\\Controllers\\'.basename($file, '.php');
 
         if (! class_exists($className)) {
             continue;
@@ -82,7 +82,7 @@ test('classes follow single responsibility principle', function () {
 
     foreach ($classFiles as $file) {
         $relativePath = str_replace(__DIR__.'/../src/', '', $file);
-        $className = 'WebSystem\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+        $className = 'Invelity\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($className) && ! interface_exists($className)) {
             continue;
@@ -101,7 +101,7 @@ test('classes follow single responsibility principle', function () {
 
         $methodCount = count($publicMethods);
 
-        if ($className === 'WebSystem\\WizardPackage\\Core\\WizardManager') {
+        if ($className === 'Invelity\\WizardPackage\\Core\\WizardManager') {
             expect($methodCount)->toBeLessThan(20, "$className has $methodCount public methods (core manager - higher limit allowed)");
         } else {
             expect($methodCount)->toBeLessThan(15, "$className has $methodCount public methods - consider splitting responsibilities");
@@ -113,7 +113,7 @@ test('interfaces are focused and not too large', function () {
     $interfaceFiles = glob(__DIR__.'/../src/Contracts/*.php');
 
     foreach ($interfaceFiles as $file) {
-        $className = 'WebSystem\\WizardPackage\\Contracts\\'.basename($file, '.php');
+        $className = 'Invelity\\WizardPackage\\Contracts\\'.basename($file, '.php');
 
         if (! interface_exists($className)) {
             continue;
@@ -124,8 +124,8 @@ test('interfaces are focused and not too large', function () {
         $methodCount = count($methods);
 
         $coreInterfaces = [
-            'WebSystem\\WizardPackage\\Contracts\\WizardManagerInterface',
-            'WebSystem\\WizardPackage\\Contracts\\WizardStepInterface',
+            'Invelity\\WizardPackage\\Contracts\\WizardManagerInterface',
+            'Invelity\\WizardPackage\\Contracts\\WizardStepInterface',
         ];
 
         if (in_array($className, $coreInterfaces)) {
@@ -141,7 +141,7 @@ test('classes depend on abstractions not concretions', function () {
 
     foreach ($classFiles as $file) {
         $relativePath = str_replace(__DIR__.'/../src/', '', $file);
-        $className = 'WebSystem\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+        $className = 'Invelity\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($className)) {
             continue;
@@ -174,8 +174,8 @@ test('classes depend on abstractions not concretions', function () {
                 $isAbstraction = $typeReflection->isInterface() || $typeReflection->isAbstract();
 
                 $allowedConcretes = [
-                    'WebSystem\\WizardPackage\\Core\\WizardConfiguration',
-                    'WebSystem\\WizardPackage\\Steps\\StepFactory',
+                    'Invelity\\WizardPackage\\Core\\WizardConfiguration',
+                    'Invelity\\WizardPackage\\Steps\\StepFactory',
                 ];
 
                 if (in_array($typeName, $allowedConcretes)) {
@@ -195,7 +195,7 @@ test('no methods return View instances', function () {
 
     foreach ($classFiles as $file) {
         $relativePath = str_replace(__DIR__.'/../src/', '', $file);
-        $className = 'WebSystem\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+        $className = 'Invelity\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($className)) {
             continue;
@@ -229,7 +229,7 @@ test('step classes do not have rules method', function () {
 
     foreach ($stepFiles as $file) {
         $relativePath = str_replace(__DIR__.'/../src/', '', $file);
-        $className = 'WebSystem\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+        $className = 'Invelity\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($className)) {
             continue;
@@ -258,7 +258,7 @@ test('all public methods have return type declarations', function () {
 
     foreach ($classFiles as $file) {
         $relativePath = str_replace(__DIR__.'/../src/', '', $file);
-        $className = 'WebSystem\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+        $className = 'Invelity\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($className) && ! interface_exists($className)) {
             continue;
@@ -315,7 +315,7 @@ test('value objects use constructor property promotion and are immutable', funct
     $valueObjectFiles = glob(__DIR__.'/../src/ValueObjects/*.php');
 
     foreach ($valueObjectFiles as $file) {
-        $className = 'WebSystem\\WizardPackage\\ValueObjects\\'.basename($file, '.php');
+        $className = 'Invelity\\WizardPackage\\ValueObjects\\'.basename($file, '.php');
 
         if (! class_exists($className)) {
             continue;
@@ -348,7 +348,7 @@ test('no God objects - classes stay focused', function () {
 
     foreach ($classFiles as $file) {
         $relativePath = str_replace(__DIR__.'/../src/', '', $file);
-        $className = 'WebSystem\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+        $className = 'Invelity\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($className)) {
             continue;
@@ -378,7 +378,7 @@ test('services and managers use constructor property promotion', function () {
 
     foreach ($classFiles as $file) {
         $relativePath = str_replace(__DIR__.'/../src/', '', $file);
-        $className = 'WebSystem\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+        $className = 'Invelity\\WizardPackage\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($className)) {
             continue;

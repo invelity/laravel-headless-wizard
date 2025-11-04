@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Integration;
+namespace Invelity\WizardPackage\Tests\Integration;
 
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class WizardControllerEditTest extends TestCase
 {
     public function test_it_shows_edit_mode_with_prefilled_data(): void
     {
-        config(['wizard.wizards.test-wizard.steps' => [\WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep::class]]);
+        config(['wizard.wizards.test-wizard.steps' => [\Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class]]);
 
         session()->put('test-wizard', [
             'wizard_id' => 'test-wizard',

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit;
+namespace Invelity\WizardPackage\Tests\Unit;
 
-use WebSystem\WizardPackage\Exceptions\StepValidationException;
-use WebSystem\WizardPackage\Steps\AbstractStep;
-use WebSystem\WizardPackage\Tests\TestCase;
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\Exceptions\StepValidationException;
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 class StepValidationTest extends TestCase
 {

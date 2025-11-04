@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Facades;
+namespace Invelity\WizardPackage\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use WebSystem\WizardPackage\Contracts\WizardNavigationInterface;
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
-use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 /**
  * @method static void initialize(string $wizardId, array $config = [])
@@ -28,12 +28,12 @@ use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
  * @method static WizardNavigationInterface getNavigation()
  * @method static void skipStep(string $stepId)
  *
- * @see \WebSystem\WizardPackage\WizardPackage
+ * @see \Invelity\WizardPackage\Wizard
  */
 class WizardPackage extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \WebSystem\WizardPackage\WizardPackage::class;
+        return \Invelity\WizardPackage\Wizard::class;
     }
 }

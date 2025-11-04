@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Commands\Concerns;
+namespace Invelity\WizardPackage\Commands\Concerns;
 
 use Illuminate\Support\Facades\File;
 use RuntimeException;

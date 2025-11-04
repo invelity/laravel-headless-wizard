@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\ValueObjects;
+namespace Invelity\WizardPackage\ValueObjects;
 
-use WebSystem\WizardPackage\Enums\StepStatus;
+use Invelity\WizardPackage\Enums\StepStatus;
 
 final class NavigationItem
 {

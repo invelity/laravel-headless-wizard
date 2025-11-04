@@ -1,9 +1,9 @@
 # Laravel Multi-Step Wizard Package (Headless)
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/websystem-studio/wizard-package.svg?style=flat-square)](https://packagist.org/packages/websystem-studio/wizard-package)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/websystem-studio/wizard-package/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/websystem-studio/wizard-package/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/websystem-studio/wizard-package/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/websystem-studio/wizard-package/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/websystem-studio/wizard-package.svg?style=flat-square)](https://packagist.org/packages/websystem-studio/wizard-package)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/invelity/laravel-headless-wizard.svg?style=flat-square)](https://packagist.org/packages/invelity/laravel-headless-wizard)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/invelity/laravel-headless-wizard/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/invelity/laravel-headless-wizard/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/invelity/laravel-headless-wizard/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/invelity/laravel-headless-wizard/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/invelity/laravel-headless-wizard.svg?style=flat-square)](https://packagist.org/packages/invelity/laravel-headless-wizard)
 
 A powerful **headless** multi-step wizard package for Laravel applications. Build complex, multi-page forms with progress tracking, navigation, validation, and conditional steps. **Bring your own frontend** - works with React, Vue, Inertia, Livewire, Alpine.js, or any JavaScript framework.
 
@@ -30,7 +30,7 @@ A powerful **headless** multi-step wizard package for Laravel applications. Buil
 ### 1. Install via Composer
 
 ```bash
-composer require websystem-studio/wizard-package
+composer require invelity/laravel-headless-wizard
 ```
 
 ### 2. Publish Configuration
@@ -163,9 +163,9 @@ Edit `app/Wizards/Steps/PersonalInfoStep.php`:
 
 namespace App\Wizards\Steps;
 
-use WebSystem\WizardPackage\Steps\AbstractStep;
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 class PersonalInfoStep extends AbstractStep
 {
@@ -493,7 +493,7 @@ export default function WizardShow({ wizard, step, navigation, progress }) {
 namespace App\Livewire;
 
 use Livewire\Component;
-use WebSystem\WizardPackage\Facades\WizardPackage;
+use Invelity\WizardPackage\Facades\Wizard;
 
 class WizardForm extends Component
 {
@@ -503,14 +503,14 @@ class WizardForm extends Component
 
     public function mount()
     {
-        WizardPackage::initialize($this->wizardId);
+        Wizard::initialize($this->wizardId);
     }
 
     public function submit()
     {
-        $currentStep = WizardPackage::getCurrentStep();
+        $currentStep = Wizard::getCurrentStep();
         
-        $result = WizardPackage::processStep($currentStep->getId(), $this->formData);
+        $result = Wizard::processStep($currentStep->getId(), $this->formData);
         
         if ($result->success) {
             $this->formData = [];
@@ -523,9 +523,9 @@ class WizardForm extends Component
     public function render()
     {
         return view('livewire.wizard-form', [
-            'currentStep' => WizardPackage::getCurrentStep(),
-            'progress' => WizardPackage::getProgress(),
-            'navigation' => WizardPackage::getNavigation(),
+            'currentStep' => Wizard::getCurrentStep(),
+            'progress' => Wizard::getProgress(),
+            'navigation' => Wizard::getNavigation(),
         ]);
     }
 }
@@ -636,24 +636,24 @@ function wizardData(wizardId) {
 
 ## Using the Facade API
 
-For backend usage, the `WizardPackage` facade provides a clean, fluent API:
+For backend usage, the `Wizard` facade provides a clean, fluent API:
 
 ```php
 <?php
 
-use WebSystem\WizardPackage\Facades\WizardPackage;
+use Invelity\WizardPackage\Facades\Wizard;
 
 // Initialize wizard
-WizardPackage::initialize('onboarding');
+Wizard::initialize('onboarding');
 
 // Get current step
-$step = WizardPackage::getCurrentStep();
+$step = Wizard::getCurrentStep();
 echo $step->getTitle(); // "Personal Information"
 echo $step->getId();    // "personal-info"
 echo $step->getOrder(); // 1
 
 // Process step (validation happens via FormRequest)
-$result = WizardPackage::processStep('personal-info', [
+$result = Wizard::processStep('personal-info', [
     'first_name' => 'John',
     'last_name' => 'Doe',
     'email' => 'john@example.com',
@@ -664,17 +664,17 @@ if ($result->success) {
 }
 
 // Get all collected data
-$allData = WizardPackage::getAllData();
+$allData = Wizard::getAllData();
 // [
 //     'personal-info' => ['first_name' => 'John', ...],
 //     'preferences' => ['theme' => 'dark', ...],
 // ]
 
 // Get specific step data
-$personalInfo = WizardPackage::getStepData('personal-info');
+$personalInfo = Wizard::getStepData('personal-info');
 
 // Navigation with status
-$navigation = WizardPackage::getNavigation();
+$navigation = Wizard::getNavigation();
 foreach ($navigation as $item) {
     echo $item->label;  // "1. Personal Information"
     echo $item->icon;   // "check" (completed), "arrow-right" (current), "circle" (incomplete)
@@ -682,47 +682,47 @@ foreach ($navigation as $item) {
 }
 
 // Progress tracking
-$progress = WizardPackage::getProgress();
+$progress = Wizard::getProgress();
 echo $progress->completionPercentage; // 33
 echo $progress->totalSteps;           // 3
 echo $progress->completedSteps;       // 1
 echo $progress->isComplete;           // false
 
 // Check step access
-if (WizardPackage::canAccessStep('review')) {
+if (Wizard::canAccessStep('review')) {
     // User can access this step
 }
 
 // Check if step is completed
-if (WizardPackage::isStepCompleted('personal-info')) {
+if (Wizard::isStepCompleted('personal-info')) {
     // Step is done
 }
 
 // Get completed steps
-$completed = WizardPackage::getCompletedSteps();
+$completed = Wizard::getCompletedSteps();
 // ['personal-info', 'preferences']
 
 // Skip optional step
-WizardPackage::skipStep('newsletter');
+Wizard::skipStep('newsletter');
 
 // Navigate to specific step
-WizardPackage::navigateToStep('review');
+Wizard::navigateToStep('review');
 
 // Complete wizard
-$result = WizardPackage::complete();
+$result = Wizard::complete();
 if ($result->success) {
     // Wizard completed successfully
     $allData = $result->data;
 }
 
 // Reset wizard (start over)
-WizardPackage::reset();
+Wizard::reset();
 
 // Load wizard from database for editing
-WizardPackage::loadFromStorage('onboarding', $instanceId);
+Wizard::loadFromStorage('onboarding', $instanceId);
 
 // Delete wizard instance
-WizardPackage::deleteWizard('onboarding', $instanceId);
+Wizard::deleteWizard('onboarding', $instanceId);
 ```
 
 ### Available Facade Methods
@@ -1013,7 +1013,7 @@ Listen to wizard lifecycle events:
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use WebSystem\WizardPackage\Events\{
+use Invelity\WizardPackage\Events\{
     WizardStarted,
     StepCompleted,
     StepSkipped,
@@ -1076,22 +1076,22 @@ Load existing wizard data for editing:
 // Controller
 public function edit(int $wizardInstanceId)
 {
-    WizardPackage::loadFromStorage('onboarding', $wizardInstanceId);
+    Wizard::loadFromStorage('onboarding', $wizardInstanceId);
     
-    $data = WizardPackage::getAllData();
+    $data = Wizard::getAllData();
     
     return response()->json([
         'data' => $data,
-        'current_step' => WizardPackage::getCurrentStep(),
+        'current_step' => Wizard::getCurrentStep(),
     ]);
 }
 
 // Update specific step
 public function updateStep(int $wizardInstanceId, string $stepId, Request $request)
 {
-    WizardPackage::loadFromStorage('onboarding', $wizardInstanceId);
+    Wizard::loadFromStorage('onboarding', $wizardInstanceId);
     
-    $result = WizardPackage::processStep($stepId, $request->all());
+    $result = Wizard::processStep($stepId, $request->all());
     
     return response()->json($result);
 }
@@ -1099,7 +1099,7 @@ public function updateStep(int $wizardInstanceId, string $stepId, Request $reque
 // Delete wizard
 public function destroy(int $wizardInstanceId)
 {
-    WizardPackage::deleteWizard('onboarding', $wizardInstanceId);
+    Wizard::deleteWizard('onboarding', $wizardInstanceId);
     
     return response()->json(['message' => 'Wizard deleted']);
 }
@@ -1189,16 +1189,16 @@ This package leverages modern PHP 8.4 features:
 Computed properties using property hooks:
 
 ```php
-$result = WizardPackage::processStep('step-id', $data);
+$result = Wizard::processStep('step-id', $data);
 
 // Computed via property hook (no method call)
 echo $result->isSuccess;   // true/false
 echo $result->hasErrors;   // true/false
 
-$progress = WizardPackage::getProgress();
+$progress = Wizard::getProgress();
 echo $progress->completionPercentage;  // 33
 
-$navigation = WizardPackage::getNavigation();
+$navigation = Wizard::getNavigation();
 foreach ($navigation as $item) {
     echo $item->label;  // "1. Personal Info" (computed)
     echo $item->icon;   // "check" (computed based on status)

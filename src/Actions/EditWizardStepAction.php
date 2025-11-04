@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Actions;
+namespace Invelity\WizardPackage\Actions;
 
 use Illuminate\Http\JsonResponse;
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
-use WebSystem\WizardPackage\Http\Responses\WizardJsonResponse;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
 
 final readonly class EditWizardStepAction
 {

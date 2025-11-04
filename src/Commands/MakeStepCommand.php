@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Commands;
+namespace Invelity\WizardPackage\Commands;
 
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use WebSystem\WizardPackage\Commands\Concerns\WritesConfig;
+use Invelity\WizardPackage\Commands\Concerns\WritesConfig;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;

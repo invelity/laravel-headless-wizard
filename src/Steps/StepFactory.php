@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Steps;
+namespace Invelity\WizardPackage\Steps;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\Exceptions\InvalidStepException;
 
 readonly class StepFactory
 {
