@@ -220,50 +220,84 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toc = document.getElementById('toc');
-            if (!toc) return;
-            
-            const headings = document.querySelectorAll('article h2, article h3');
-            
-            headings.forEach((heading, index) => {
-                if (!heading.id) {
-                    heading.id = 'heading-' + index;
-                }
+            if (toc) {
+                const headings = document.querySelectorAll('article h2, article h3');
                 
-                const link = document.createElement('a');
-                link.href = '#' + heading.id;
-                link.textContent = heading.textContent.replace(/[#→]/g, '').trim();
+                headings.forEach((heading, index) => {
+                    if (!heading.id) {
+                        heading.id = 'heading-' + index;
+                    }
+                    
+                    const link = document.createElement('a');
+                    link.href = '#' + heading.id;
+                    link.textContent = heading.textContent.replace(/[#→]/g, '').trim();
+                    
+                    if (heading.tagName === 'H2') {
+                        link.className = 'block py-1.5 text-slate-700 hover:text-primary-600 font-medium transition-colors border-l-2 border-transparent hover:border-primary-500 pl-3 -ml-px';
+                    } else {
+                        link.className = 'block py-1 pl-6 text-slate-600 hover:text-primary-600 transition-colors text-xs border-l-2 border-transparent hover:border-primary-400 -ml-px';
+                    }
+                    
+                    toc.appendChild(link);
+                });
                 
-                if (heading.tagName === 'H2') {
-                    link.className = 'block py-1.5 text-slate-700 hover:text-primary-600 font-medium transition-colors border-l-2 border-transparent hover:border-primary-500 pl-3 -ml-px';
-                } else {
-                    link.className = 'block py-1 pl-6 text-slate-600 hover:text-primary-600 transition-colors text-xs border-l-2 border-transparent hover:border-primary-400 -ml-px';
-                }
-                
-                toc.appendChild(link);
-            });
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const id = entry.target.getAttribute('id');
-                    const link = toc.querySelector(`a[href="#${id}"]`);
-                    if (link) {
-                        if (entry.intersectionRatio > 0) {
-                            link.classList.add('text-primary-600', 'border-primary-500');
-                            link.classList.remove('text-slate-700', 'text-slate-600');
-                        } else {
-                            link.classList.remove('text-primary-600', 'border-primary-500');
-                            if (link.classList.contains('text-xs')) {
-                                link.classList.add('text-slate-600');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        const id = entry.target.getAttribute('id');
+                        const link = toc.querySelector(`a[href="#${id}"]`);
+                        if (link) {
+                            if (entry.intersectionRatio > 0) {
+                                link.classList.add('text-primary-600', 'border-primary-500');
+                                link.classList.remove('text-slate-700', 'text-slate-600');
                             } else {
-                                link.classList.add('text-slate-700');
+                                link.classList.remove('text-primary-600', 'border-primary-500');
+                                if (link.classList.contains('text-xs')) {
+                                    link.classList.add('text-slate-600');
+                                } else {
+                                    link.classList.add('text-slate-700');
+                                }
                             }
                         }
+                    });
+                }, { rootMargin: '-80px 0px -80% 0px' });
+                
+                headings.forEach(heading => {
+                    observer.observe(heading);
+                });
+            }
+            
+            document.querySelectorAll('pre').forEach((pre) => {
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                pre.parentNode.insertBefore(wrapper, pre);
+                wrapper.appendChild(pre);
+                
+                const button = document.createElement('button');
+                button.className = 'absolute top-2 right-2 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 transition-colors duration-200';
+                button.textContent = 'Copy';
+                
+                button.addEventListener('click', async () => {
+                    const code = pre.querySelector('code') || pre;
+                    const text = code.textContent;
+                    
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        button.textContent = 'Copied!';
+                        button.classList.add('text-green-400');
+                        
+                        setTimeout(() => {
+                            button.textContent = 'Copy';
+                            button.classList.remove('text-green-400');
+                        }, 2000);
+                    } catch (err) {
+                        button.textContent = 'Failed';
+                        setTimeout(() => {
+                            button.textContent = 'Copy';
+                        }, 2000);
                     }
                 });
-            }, { rootMargin: '-80px 0px -80% 0px' });
-            
-            headings.forEach(heading => {
-                observer.observe(heading);
+                
+                wrapper.appendChild(button);
             });
         });
     </script>
