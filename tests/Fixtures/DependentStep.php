@@ -20,7 +20,7 @@ class DependentStep extends AbstractStep
             canSkip: false
         );
     }
-    
+
     public function getDependencies(): array
     {
         return ['personal-info', 'contact-details'];
