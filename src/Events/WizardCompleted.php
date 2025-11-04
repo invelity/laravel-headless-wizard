@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Events;
+namespace Invelity\WizardPackage\Events;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Events\Dispatchable;

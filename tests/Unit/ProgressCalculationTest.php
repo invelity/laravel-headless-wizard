@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit;
+namespace Invelity\WizardPackage\Tests\Unit;
 
-use WebSystem\WizardPackage\Tests\TestCase;
-use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 class ProgressCalculationTest extends TestCase
 {

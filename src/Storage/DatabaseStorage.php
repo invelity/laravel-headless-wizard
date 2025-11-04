@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Storage;
+namespace Invelity\WizardPackage\Storage;
 
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
-use WebSystem\WizardPackage\Models\WizardProgress;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Models\WizardProgress;
 
 class DatabaseStorage implements WizardStorageInterface
 {

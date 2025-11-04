@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Contracts;
+namespace Invelity\WizardPackage\Contracts;
 
 interface WizardStorageInterface
 {

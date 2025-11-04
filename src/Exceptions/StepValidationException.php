@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Exceptions;
+namespace Invelity\WizardPackage\Exceptions;
 
 use Exception;
 

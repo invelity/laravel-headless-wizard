@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Core;
+namespace Invelity\WizardPackage\Core;
 
 use Illuminate\Support\Facades\Event;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
-use WebSystem\WizardPackage\Contracts\WizardNavigationInterface;
-use WebSystem\WizardPackage\Contracts\WizardStepInterface;
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
-use WebSystem\WizardPackage\Events\StepCompleted;
-use WebSystem\WizardPackage\Events\StepSkipped;
-use WebSystem\WizardPackage\Events\WizardCompleted;
-use WebSystem\WizardPackage\Events\WizardStarted;
-use WebSystem\WizardPackage\Exceptions\InvalidStepException;
-use WebSystem\WizardPackage\Models\WizardProgress;
-use WebSystem\WizardPackage\Steps\StepFactory;
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
-use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
+use Invelity\WizardPackage\Contracts\WizardStepInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Events\StepCompleted;
+use Invelity\WizardPackage\Events\StepSkipped;
+use Invelity\WizardPackage\Events\WizardCompleted;
+use Invelity\WizardPackage\Events\WizardStarted;
+use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Models\WizardProgress;
+use Invelity\WizardPackage\Steps\StepFactory;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 class WizardManager implements WizardManagerInterface
 {

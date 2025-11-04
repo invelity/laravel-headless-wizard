@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Http\Middleware;
+namespace Invelity\WizardPackage\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 
 final readonly class StepAccess
 {

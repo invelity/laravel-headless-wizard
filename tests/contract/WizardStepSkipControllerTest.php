@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Contract;
+namespace Invelity\WizardPackage\Tests\Contract;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class WizardStepSkipControllerTest extends TestCase
 {
@@ -15,9 +15,9 @@ class WizardStepSkipControllerTest extends TestCase
     public function it_skips_optional_step_and_redirects_to_next(): void
     {
         config(['wizard.wizards.test-wizard.steps' => [
-            \WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-            \WebSystem\WizardPackage\Tests\Fixtures\OptionalStep::class,
-            \WebSystem\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\OptionalStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
         ]]);
 
         session()->put('test-wizard', [
@@ -42,8 +42,8 @@ class WizardStepSkipControllerTest extends TestCase
     public function it_redirects_to_completion_when_skipping_last_step(): void
     {
         config(['wizard.wizards.test-wizard.steps' => [
-            \WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-            \WebSystem\WizardPackage\Tests\Fixtures\OptionalStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\OptionalStep::class,
         ]]);
 
         session()->put('test-wizard', [
@@ -63,8 +63,8 @@ class WizardStepSkipControllerTest extends TestCase
     /** @test */
     public function it_has_only_invoke_method(): void
     {
-        $controller = new \WebSystem\WizardPackage\Http\Controllers\WizardStepSkipController(
-            app(\WebSystem\WizardPackage\Contracts\WizardManagerInterface::class)
+        $controller = new \Invelity\WizardPackage\Http\Controllers\WizardStepSkipController(
+            app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class)
         );
 
         $reflection = new \ReflectionClass($controller);

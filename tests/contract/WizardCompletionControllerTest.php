@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Contract;
+namespace Invelity\WizardPackage\Tests\Contract;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class WizardCompletionControllerTest extends TestCase
 {
@@ -15,7 +15,7 @@ class WizardCompletionControllerTest extends TestCase
     public function it_displays_completion_page_when_wizard_is_complete(): void
     {
         config(['wizard.wizards.test-wizard.steps' => [
-            \WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
         ]]);
 
         $this->withoutExceptionHandling();
@@ -44,8 +44,8 @@ class WizardCompletionControllerTest extends TestCase
     public function it_returns_error_when_wizard_not_complete(): void
     {
         config(['wizard.wizards.test-wizard.steps' => [
-            \WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-            \WebSystem\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
         ]]);
 
         session()->put('test-wizard', [
@@ -66,8 +66,8 @@ class WizardCompletionControllerTest extends TestCase
     /** @test */
     public function it_has_only_invoke_method(): void
     {
-        $controller = new \WebSystem\WizardPackage\Http\Controllers\WizardCompletionController(
-            app(\WebSystem\WizardPackage\Contracts\WizardManagerInterface::class)
+        $controller = new \Invelity\WizardPackage\Http\Controllers\WizardCompletionController(
+            app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class)
         );
 
         $reflection = new \ReflectionClass($controller);

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Integration;
+namespace Invelity\WizardPackage\Tests\Integration;
 
-use WebSystem\WizardPackage\Contracts\WizardManagerInterface;
-use WebSystem\WizardPackage\Contracts\WizardStorageInterface;
-use WebSystem\WizardPackage\Core\WizardConfiguration;
-use WebSystem\WizardPackage\Storage\SessionStorage;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Core\WizardConfiguration;
+use Invelity\WizardPackage\Storage\SessionStorage;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class ServiceProviderTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit;
+namespace Invelity\WizardPackage\Tests\Unit;
 
-use WebSystem\WizardPackage\Steps\AbstractStep;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class AbstractStepTest extends TestCase
 {
@@ -34,7 +34,7 @@ class AbstractStepTest extends TestCase
         $stepFiles = glob(__DIR__.'/../../src/Steps/*.php');
 
         foreach ($stepFiles as $file) {
-            $className = 'WebSystem\\WizardPackage\\Steps\\'.basename($file, '.php');
+            $className = 'Invelity\\WizardPackage\\Steps\\'.basename($file, '.php');
 
             if (! class_exists($className)) {
                 continue;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Enums;
+namespace Invelity\WizardPackage\Enums;
 
 enum WizardMode: string
 {

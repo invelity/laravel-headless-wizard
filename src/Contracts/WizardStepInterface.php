@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Contracts;
+namespace Invelity\WizardPackage\Contracts;
 
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 interface WizardStepInterface
 {

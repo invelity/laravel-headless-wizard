@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Integration;
+namespace Invelity\WizardPackage\Tests\Integration;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class WizardCompletionFlowTest extends TestCase
 {
@@ -15,8 +15,8 @@ class WizardCompletionFlowTest extends TestCase
     public function it_completes_wizard_successfully_through_completion_route(): void
     {
         config(['wizard.wizards.test-wizard.steps' => [
-            \WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-            \WebSystem\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
         ]]);
 
         session()->put('test-wizard', [
@@ -49,8 +49,8 @@ class WizardCompletionFlowTest extends TestCase
     public function it_prevents_completion_when_steps_incomplete(): void
     {
         config(['wizard.wizards.test-wizard.steps' => [
-            \WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-            \WebSystem\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+            \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
         ]]);
 
         session()->put('test-wizard', [

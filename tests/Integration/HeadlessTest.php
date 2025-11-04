@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Integration;
+namespace Invelity\WizardPackage\Tests\Integration;
 
 use Illuminate\Support\Facades\Config;
-use WebSystem\WizardPackage\Tests\Fixtures\PersonalInfoStep;
-use WebSystem\WizardPackage\Tests\TestCase;
+use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
+use Invelity\WizardPackage\Tests\TestCase;
 
 class HeadlessTest extends TestCase
 {

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace WebSystem\WizardPackage\Tests\Unit\Php84;
+namespace Invelity\WizardPackage\Tests\Unit\Php84;
 
-use WebSystem\WizardPackage\Enums\StepStatus;
-use WebSystem\WizardPackage\ValueObjects\NavigationItem;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
-use WebSystem\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Enums\StepStatus;
+use Invelity\WizardPackage\ValueObjects\NavigationItem;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 test('StepResult has isSuccess computed property hook', function () {
     $success = StepResult::success(['name' => 'John']);
