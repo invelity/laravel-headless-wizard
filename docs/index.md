@@ -19,9 +19,21 @@ A powerful **headless** multi-step wizard package for Laravel applications. Buil
 
 ## 🚀 Quick Start
 
+Install the package:
+
 ```bash
 composer require invelity/laravel-headless-wizard
+```
+
+Publish the configuration:
+
+```bash
 php artisan vendor:publish --tag="wizard-config"
+```
+
+Create your first wizard:
+
+```bash
 php artisan wizard:make Onboarding
 ```
 
