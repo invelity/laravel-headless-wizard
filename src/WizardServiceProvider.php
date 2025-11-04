@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage;
 
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
@@ -15,6 +13,8 @@ use Invelity\WizardPackage\Http\Middleware\WizardSession;
 use Invelity\WizardPackage\Storage\CacheStorage;
 use Invelity\WizardPackage\Storage\DatabaseStorage;
 use Invelity\WizardPackage\Storage\SessionStorage;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class WizardServiceProvider extends PackageServiceProvider
 {
