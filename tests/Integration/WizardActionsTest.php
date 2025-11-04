@@ -45,7 +45,6 @@ test('UpdateWizardStepAction handles step processing', function () {
     expect($data['success'])->toBeTrue();
 });
 
-
 test('SkipWizardStepAction skips step successfully', function () {
     config(['wizard.wizards.checkout.steps' => [
         PersonalInfoStep::class,

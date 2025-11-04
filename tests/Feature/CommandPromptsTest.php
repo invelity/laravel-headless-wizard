@@ -9,14 +9,14 @@ beforeEach(function () {
     File::cleanDirectory(app_path('Http/Requests/Wizards'));
     File::ensureDirectoryExists(app_path('Wizards'));
     File::ensureDirectoryExists(app_path('Http/Requests/Wizards'));
-    
+
     $configPath = config_path('wizard-package.php');
     $configDir = dirname($configPath);
-    
+
     if (! File::isDirectory($configDir)) {
         File::makeDirectory($configDir, 0755, true);
     }
-    
+
     $config = [
         'storage' => ['driver' => 'session'],
         'wizards' => [
@@ -24,7 +24,7 @@ beforeEach(function () {
             'onboarding' => ['steps' => []],
         ],
     ];
-    
+
     File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
     
     config(['wizard-package.wizards' => $config['wizards']]);
@@ -52,7 +52,7 @@ test('MakeStepCommand prompts for wizard selection when option not provided', fu
         ->expectsQuestion('Which wizard should this step belong to?', 'checkout')
         ->expectsQuestion('What is the step title?', 'User Information')
         ->assertSuccessful();
-    
+
     expect(File::exists(app_path('Wizards/Steps/UserInfoStep.php')))->toBeTrue();
 });
 
@@ -61,14 +61,14 @@ test('MakeStepCommand validates empty step name', function () {
         'name' => '',
         '--wizard' => 'checkout',
     ]);
-    
+
     $result->assertFailed();
     expect($result->run())->toBe(1);
 });
 
 test('MakeStepCommand getLastStepOrder returns correct count', function () {
     $configPath = config_path('wizard-package.php');
-    
+
     $config = [
         'storage' => ['driver' => 'session'],
         'wizards' => [
@@ -81,9 +81,9 @@ test('MakeStepCommand getLastStepOrder returns correct count', function () {
             ],
         ],
     ];
-    
+
     File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
-    
+
     $this->artisan('wizard:make-step', [
         'name' => 'Step4',
         '--wizard' => 'checkout',
@@ -92,7 +92,7 @@ test('MakeStepCommand getLastStepOrder returns correct count', function () {
         ->expectsQuestion('What is the step order?', '4')
         ->expectsConfirmation('Is this step optional?', false)
         ->assertSuccessful();
-    
+
     $updatedConfig = require $configPath;
     expect($updatedConfig['wizards']['checkout']['steps'])->toHaveCount(4);
     expect($updatedConfig['wizards']['checkout']['steps'][3])->toBe('App\\Wizards\\Steps\\Step4Step');
@@ -104,7 +104,6 @@ test('MakeStepCommand handles step name validation errors', function () {
         '--wizard' => 'checkout',
     ])
         ->assertFailed();
-    
+
     expect(File::exists(app_path('Wizards/Steps/invalid-nameStep.php')))->toBeFalse();
 });
-
