@@ -12,6 +12,7 @@
     failOnRisky="false"
     failOnEmptyTestSuite="true"
     beStrictAboutOutputDuringTests="false"
+    beStrictAboutChangesToGlobalState="false"
     beStrictAboutCoverageMetadata="false"
     cacheDirectory=".phpunit.cache"
     backupStaticProperties="false"

@@ -2,63 +2,54 @@
 
 declare(strict_types=1);
 
-namespace Invelity\WizardPackage\Tests\Unit;
-
 use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\Tests\TestCase;
 
-class AbstractStepTest extends TestCase
-{
-    public function test_render_method_does_not_exist(): void
-    {
-        $reflection = new \ReflectionClass(AbstractStep::class);
+test('render method does not exist', function () {
+    $reflection = new ReflectionClass(AbstractStep::class);
 
-        $this->assertFalse(
-            $reflection->hasMethod('render'),
-            'AbstractStep should not have render() method in headless architecture'
-        );
-    }
+    expect($reflection->hasMethod('render'))->toBeFalse();
+});
 
-    public function test_get_view_name_method_does_not_exist(): void
-    {
-        $reflection = new \ReflectionClass(AbstractStep::class);
+test('get view name method does not exist', function () {
+    $reflection = new ReflectionClass(AbstractStep::class);
 
-        $this->assertFalse(
-            $reflection->hasMethod('getViewName'),
-            'AbstractStep should not have getViewName() method in headless architecture'
-        );
-    }
+    expect($reflection->hasMethod('getViewName'))->toBeFalse();
+});
 
-    public function test_steps_do_not_return_views(): void
-    {
-        $stepFiles = glob(__DIR__.'/../../src/Steps/*.php');
+test('steps do not return views', function () {
+    $stepFiles = glob(__DIR__.'/../../src/Steps/*.php');
 
-        foreach ($stepFiles as $file) {
-            $className = 'Invelity\\WizardPackage\\Steps\\'.basename($file, '.php');
+    expect($stepFiles)->not->toBeEmpty();
 
-            if (! class_exists($className)) {
+    foreach ($stepFiles as $file) {
+        $className = 'Invelity\\WizardPackage\\Steps\\'.basename($file, '.php');
+
+        if (! class_exists($className)) {
+            continue;
+        }
+
+        $reflection = new ReflectionClass($className);
+
+        if ($reflection->isAbstract()) {
+            continue;
+        }
+
+        foreach ($reflection->getMethods() as $method) {
+            if ($method->class !== $className) {
                 continue;
             }
 
-            $reflection = new \ReflectionClass($className);
+            $returnType = $method->getReturnType();
 
-            if ($reflection->isAbstract()) {
+            if ($returnType === null) {
                 continue;
             }
 
-            foreach ($reflection->getMethods() as $method) {
-                if ($method->class !== $className) {
-                    continue;
-                }
-
-                $returnType = $method->getReturnType();
-
-                if ($returnType instanceof \ReflectionNamedType) {
-                    $returnTypeName = $returnType->getName();
-                    $this->assertNotEquals('Illuminate\View\View', $returnTypeName, "$className::{$method->name}() should not return View");
-                    $this->assertNotEquals('Illuminate\Contracts\View\View', $returnTypeName, "$className::{$method->name}() should not return View");
-                }
+            if ($returnType instanceof ReflectionNamedType) {
+                $returnTypeName = $returnType->getName();
+                expect($returnTypeName)->not->toBe('Illuminate\View\View');
+                expect($returnTypeName)->not->toBe('Illuminate\Contracts\View\View');
             }
         }
     }
-}
+});

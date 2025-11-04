@@ -13,7 +13,10 @@ class DatabaseStorage implements WizardStorageInterface
     {
         WizardProgress::updateOrCreate(
             ['wizard_id' => $key],
-            ['step_data' => $data]
+            [
+                'step_data' => $data,
+                'completed_steps' => [],
+            ]
         );
     }
 
