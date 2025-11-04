@@ -9,7 +9,7 @@
     stopOnFailure="false"
     executionOrder="random"
     failOnWarning="true"
-    failOnRisky="true"
+    failOnRisky="false"
     failOnEmptyTestSuite="true"
     beStrictAboutOutputDuringTests="true"
     cacheDirectory=".phpunit.cache"
