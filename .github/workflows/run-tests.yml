@@ -50,7 +50,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          if [ "${{ matrix.laravel }}" == "12.*" ]; then
+            composer require "laravel/framework:^12.23.2" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          elif [ "${{ matrix.laravel }}" == "11.*" ]; then
+            composer require "laravel/framework:^11.31" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          else
+            composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          fi
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
