@@ -14,7 +14,7 @@ beforeEach(function () {
 
 test('ProcessWizardStepAction catches validation exception', function () {
     $action = app(ProcessWizardStepAction::class);
-    
+
     try {
         $response = $action->execute('test', 'personal-info', []);
         expect($response->status())->toBe(422);
@@ -28,9 +28,9 @@ test('UpdateWizardStepAction catches validation exception', function () {
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
     $wizardId = session('test.wizard_id') ?? 1;
-    
+
     $action = app(UpdateWizardStepAction::class);
-    
+
     try {
         $response = $action->execute('test', $wizardId, 'personal-info', []);
         expect($response->status())->toBe(422);

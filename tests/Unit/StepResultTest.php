@@ -107,7 +107,7 @@ test('multiple failures with different error structures', function () {
 
     expect($simpleError->hasErrors)->toBeTrue();
     expect($simpleError->getErrors())->toHaveKey('error');
-    
+
     expect($complexError->hasErrors)->toBeTrue();
     expect($complexError->getErrors())->toHaveKeys(['name', 'email']);
     expect(count($complexError->getErrors()['name']))->toBe(2);
