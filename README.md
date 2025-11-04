@@ -6,7 +6,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/invelity/laravel-headless-wizard.svg?style=flat-square)](https://packagist.org/packages/invelity/laravel-headless-wizard)
 ![Code Coverage](https://img.shields.io/badge/coverage-98.6%25-brightgreen?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-375%20passing-brightgreen?style=flat-square)
-![PHPStan](https://img.shields.io/badge/PHPStan-level%209-brightgreen?style=flat-square)
+![PHPStan](https://img.shields.io/badge/PHPStan-level%205-brightgreen?style=flat-square)
 ![Cyclomatic Complexity](https://img.shields.io/badge/complexity-4.37-brightgreen?style=flat-square)
 ![PHP Version](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat-square&logo=php)
 ![Laravel](https://img.shields.io/badge/Laravel-11%20%7C%2012-FF2D20?style=flat-square&logo=laravel)
@@ -32,7 +32,7 @@ This package maintains exceptional code quality standards:
 
 - **98.6% Test Coverage** - 375 comprehensive Pest tests with 1,305 assertions
 - **Cyclomatic Complexity: 4.37** - Well below the recommended threshold of 10
-- **PHPStan Level 9** - Strictest static analysis with zero errors
+- **PHPStan Level 5** - Static analysis with zero errors
 - **100% Type Coverage** - Full type declarations on all methods
 - **Strict Types Enabled** - Every file uses `declare(strict_types=1)`
 - **Zero Critical Violations** - Clean PHPMetrics report
