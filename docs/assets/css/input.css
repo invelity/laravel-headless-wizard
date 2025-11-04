@@ -37,3 +37,7 @@
     @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
   }
 }
+
+pre[class*="language-"] {
+  @apply !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !border !border-slate-700;
+}
