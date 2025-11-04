@@ -12,23 +12,18 @@ class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
+        if (method_exists(\Illuminate\Foundation\Bootstrap\HandleExceptions::class, 'flushState')) {
+            try {
+                \Illuminate\Foundation\Bootstrap\HandleExceptions::flushState();
+            } catch (\TypeError $e) {
+            }
+        }
+
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'Invelity\\WizardPackage\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
-    }
-
-    protected function refreshApplication()
-    {
-        try {
-            parent::refreshApplication();
-        } catch (\TypeError $e) {
-            if (str_contains($e->getMessage(), 'PHPUnit\Runner\ErrorHandler::enable')) {
-                return;
-            }
-            throw $e;
-        }
     }
 
     protected function resolveApplicationExceptionHandler($app)
