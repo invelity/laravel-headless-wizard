@@ -6,6 +6,8 @@ nav_order: 1
 
 # Laravel Multi-Step Wizard Package (Headless)
 
+![Laravel Headless Wizard]({{ site.baseurl }}/assets/images/featured.png)
+
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6" markdown="0">
   <a href="https://packagist.org/packages/invelity/laravel-headless-wizard" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
     <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Version</span>
