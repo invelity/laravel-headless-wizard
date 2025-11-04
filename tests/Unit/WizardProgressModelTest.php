@@ -156,3 +156,16 @@ test('metadata is cast to array', function () {
     expect($progress->metadata)->toBeArray()
         ->and($progress->metadata['source'])->toBe('web');
 });
+
+test('wizard progress has user relationship', function () {
+    $progress = WizardProgress::create([
+        'wizard_id' => 'user-wizard',
+        'current_step' => 'step1',
+        'status' => 'in_progress',
+        'completed_steps' => [],
+        'step_data' => [],
+    ]);
+
+    $relation = $progress->user();
+    expect($relation)->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
+});
