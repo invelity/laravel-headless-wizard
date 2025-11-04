@@ -1,0 +1,39 @@
+title: Laravel Headless Wizard
+description: A powerful headless multi-step wizard package for Laravel applications
+theme: jekyll-theme-cayman
+baseurl: "/laravel-headless-wizard"
+url: "https://invelity.github.io"
+
+# Build settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .sass-cache
+  - .jekyll-cache
+
+# Collections
+collections:
+  pages:
+    output: true
+    permalink: /:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# GitHub metadata
+repository: invelity/laravel-headless-wizard
+github:
+  is_project_page: true
+  repository_url: https://github.com/invelity/laravel-headless-wizard
