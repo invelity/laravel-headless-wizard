@@ -17,6 +17,8 @@ class MakeWizardCommandTest extends TestCase
         $this->cleanupGeneratedFiles();
         $this->setupConfigFile();
         Artisan::call('config:clear');
+        
+        $this->app['config']->set('wizard-package', require config_path('wizard-package.php'));
     }
 
     protected function tearDown(): void

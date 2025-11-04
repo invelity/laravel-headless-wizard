@@ -17,6 +17,8 @@ class FormRequestValidationTest extends TestCase
         $this->cleanupGeneratedFiles();
         $this->setupWizardConfig();
         Artisan::call('config:clear');
+        
+        $this->app['config']->set('wizard-package', require config_path('wizard-package.php'));
     }
 
     protected function tearDown(): void
