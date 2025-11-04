@@ -8,7 +8,7 @@ All notable changes to `wizard-package` will be documented in this file.
 
 **Complete architectural rewrite from view-based to headless/API-first design.**
 
-This release removes all view layer dependencies and implements a frontend-agnostic JSON API. Migration from v1.x requires significant changes. See [Migration Guide](docs/migration-v1-to-v2.md).
+This release removes all view layer dependencies and implements a frontend-agnostic JSON API. Migration from v1.x requires significant changes. See [Migration Guide](markdowns/migration-v1-to-v2.md).
 
 #### Removed Features
 - **Views**: All Blade templates removed - package is now headless
@@ -115,7 +115,7 @@ New documentation structure in `/docs`:
 6. Build frontend UI using React/Vue/Alpine/etc
 7. Update routes to use new API endpoints
 
-See complete migration guide: [docs/migration-v1-to-v2.md](docs/migration-v1-to-v2.md)
+See complete migration guide: [docs/migration-v1-to-v2.md](markdowns/migration-v1-to-v2.md)
 
 ### 📊 Package Metadata
 
