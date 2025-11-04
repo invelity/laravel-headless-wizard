@@ -53,7 +53,7 @@ test('user can submit valid step data', function () {
 
 test('user receives validation errors for invalid data', function () {
     $this->withoutExceptionHandling();
-    
+
     expect(fn () => $this->post(route('wizard.store', [
         'wizard' => 'registration',
         'step' => 'personal-info',
@@ -130,7 +130,7 @@ test('user is redirected when accessing inaccessible step', function () {
 test('user data persists across steps', function () {
     $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
     $manager->initialize('registration');
-    
+
     $manager->processStep('personal-info', ['name' => 'Jane Doe']);
     $manager->processStep('optional-step', ['optional_field' => 'test value']);
 
@@ -157,7 +157,7 @@ test('user can navigate back to edit completed steps', function () {
     ]));
 
     $response->assertOk();
-    
+
     $json = $response->json();
     expect($json['data']['step']['id'])->toBe('personal-info');
 });
