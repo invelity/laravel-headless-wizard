@@ -49,6 +49,7 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Install dependencies
+        shell: bash
         run: |
           if [ "${{ matrix.laravel }}" == "12.*" ]; then
             composer require "laravel/framework:^12.23.2" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
