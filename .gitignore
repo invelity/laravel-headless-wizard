@@ -32,9 +32,9 @@ testbench.yaml
 /coverage
 
 # Speckit & AI Tools
-.specify/
-specs/
-.claude/
+/.specify
+/specs
+/.claude
 *.ai-temp
 *.anthropic-tmp
 CLAUDE.md
