@@ -2,7 +2,7 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
-## [2.0.0] - 2025-11-03
+## [2.0.0] - 2025-11-04
 
 ### ⚠️ BREAKING CHANGES
 
@@ -79,10 +79,12 @@ New JSON API endpoints (default prefix `/wizard`):
 - **Modern Arrays**: Using `array_find()` and `array_any()` for cleaner code
 
 #### Code Quality
-- **Tests**: 117 tests passing (65 original + 52 new for headless features)
+- **Tests**: 131 tests passing with full CI/CD integration
 - **PHPStan**: Level 5 with zero errors
 - **Laravel Pint**: All files formatted to Laravel standards
 - **Architecture Tests**: Enforces SOLID principles and coding standards
+- **Test Isolation**: Fixed config cache clearing for reliable test execution
+- **GitHub Actions**: Multi-matrix testing (PHP 8.4, Laravel 11/12, Ubuntu/Windows)
 
 #### Developer Experience
 - **Stub Publishing**: Customize code generation templates
@@ -117,9 +119,12 @@ See complete migration guide: [docs/migration-v1-to-v2.md](docs/migration-v1-to-
 
 ### 📊 Package Metadata
 
+- **Package Name**: Changed from `websystem-studio/wizard-package` to `invelity/laravel-headless-wizard`
+- **Namespace**: Migrated from `WebSystemStudio\WizardPackage` to `Invelity\WizardPackage`
 - **Description**: Updated to reflect headless architecture
 - **Keywords**: Added `headless`, `api`, `multi-step-form`, `form-wizard`, `formrequest`
 - **Requirements**: PHP 8.4+, Laravel 11.0+ or 12.0+
+- **Repository**: Moved to github.com/invelity/laravel-headless-wizard
 
 ---
 
