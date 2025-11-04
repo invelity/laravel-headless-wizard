@@ -42,3 +42,4 @@ add_strict_types.sh
 
 # Backup files
 .backups/
+/.playwright-mcp/
