@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage;
 
-use Invelity\WizardPackage\Contracts\FormRequestResolverInterface;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
@@ -12,7 +11,6 @@ use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardManager;
 use Invelity\WizardPackage\Http\Middleware\StepAccess;
 use Invelity\WizardPackage\Http\Middleware\WizardSession;
-use Invelity\WizardPackage\Services\Validation\FormRequestResolver;
 use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
 use Invelity\WizardPackage\Storage\CacheStorage;
 use Invelity\WizardPackage\Storage\DatabaseStorage;
@@ -52,8 +50,7 @@ class WizardServiceProvider extends PackageServiceProvider
             };
         });
 
-        // Register validation services
-        $this->app->singleton(FormRequestResolverInterface::class, FormRequestResolver::class);
+        // Register validation service
         $this->app->singleton(FormRequestValidatorInterface::class, FormRequestValidator::class);
 
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);

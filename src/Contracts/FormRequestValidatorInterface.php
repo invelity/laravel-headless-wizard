@@ -15,5 +15,5 @@ interface FormRequestValidatorInterface
      *
      * @throws StepValidationException
      */
-    public function validate(string $formRequestClass, array $data): array;
+    public function validate(?string $formRequestClass, array $data): array;
 }
