@@ -61,7 +61,6 @@ class MakeWizardCommandTest extends TestCase
                 'driver' => 'session',
                 'ttl' => 3600,
             ],
-            'wizards' => [],
             'routes' => [
                 'enabled' => true,
                 'prefix' => 'wizard',
@@ -76,19 +75,21 @@ class MakeWizardCommandTest extends TestCase
     {
         $this->artisan('wizard:make')
             ->expectsQuestion('What is the wizard name?', 'Onboarding')
-            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => 'Onboarding']))
+            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => 'Onboarding', 'class' => 'Onboarding']))
             ->assertSuccessful();
 
-        $this->assertFileExists(app_path('Wizards/Onboarding.php'));
+        $this->assertFileExists(app_path('Wizards/OnboardingWizard/Onboarding.php'));
+        $this->assertDirectoryExists(app_path('Wizards/OnboardingWizard/Steps'));
     }
 
     public function test_command_accepts_wizard_name_as_argument(): void
     {
         $this->artisan('wizard:make', ['name' => 'Registration'])
-            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => 'Registration']))
+            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => 'Registration', 'class' => 'Registration']))
             ->assertSuccessful();
 
-        $this->assertFileExists(app_path('Wizards/Registration.php'));
+        $this->assertFileExists(app_path('Wizards/RegistrationWizard/Registration.php'));
+        $this->assertDirectoryExists(app_path('Wizards/RegistrationWizard/Steps'));
     }
 
     public function test_command_validates_pascal_case_wizard_name(): void
@@ -112,24 +113,23 @@ class MakeWizardCommandTest extends TestCase
         $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
 
         $this->artisan('wizard:make', ['name' => 'Onboarding', '--force' => true])
-            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => 'Onboarding']))
+            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => 'Onboarding', 'class' => 'Onboarding']))
             ->assertSuccessful();
     }
 
-    public function test_command_registers_wizard_in_config(): void
+    public function test_command_creates_wizard_directory_structure(): void
     {
         $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
 
-        $config = require config_path('wizard.php');
-
-        $this->assertArrayHasKey('onboarding', $config['wizards']);
-        $this->assertEquals('App\Wizards\Onboarding', $config['wizards']['onboarding']['class']);
+        $this->assertDirectoryExists(app_path('Wizards/OnboardingWizard'));
+        $this->assertDirectoryExists(app_path('Wizards/OnboardingWizard/Steps'));
+        $this->assertFileExists(app_path('Wizards/OnboardingWizard/Onboarding.php'));
     }
 
-    public function test_command_clears_config_cache_after_registration(): void
+    public function test_command_shows_next_steps_instructions(): void
     {
         $this->artisan('wizard:make', ['name' => 'Onboarding'])
-            ->expectsOutput('✓ Config cache cleared')
+            ->expectsOutput(__('  • Generate first step: php artisan wizard:make-step {wizard}', ['wizard' => 'Onboarding']))
             ->assertSuccessful();
     }
 
@@ -137,9 +137,9 @@ class MakeWizardCommandTest extends TestCase
     {
         $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
 
-        $content = File::get(app_path('Wizards/Onboarding.php'));
+        $content = File::get(app_path('Wizards/OnboardingWizard/Onboarding.php'));
 
-        $this->assertStringContainsString('namespace App\Wizards;', $content);
+        $this->assertStringContainsString('namespace App\\Wizards\\OnboardingWizard;', $content);
         $this->assertStringContainsString('class Onboarding', $content);
         $this->assertStringContainsString("return 'onboarding'", $content);
         $this->assertStringContainsString("return 'Onboarding'", $content);
