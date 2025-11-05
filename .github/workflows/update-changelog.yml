@@ -29,4 +29,5 @@ jobs:
         with:
           branch: main
           commit_message: Update CHANGELOG
-          file_pattern: CHANGELOG.markdowns
+          file_pattern: CHANGELOG.md
+          commit_author: Martin-1182 <halaj@invelity.com>
