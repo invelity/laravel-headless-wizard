@@ -21,11 +21,9 @@ class PersonalInfoStep extends AbstractStep
         );
     }
 
-    public function rules(): array
+    public function getFormRequest(): ?string
     {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-        ];
+        return PersonalInfoRequest::class;
     }
 
     public function process(StepData $data): StepResult

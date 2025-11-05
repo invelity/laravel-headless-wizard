@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Services\Validation;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Validator;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
 use Invelity\WizardPackage\Exceptions\StepValidationException;
 
@@ -14,6 +14,7 @@ final readonly class FormRequestValidator implements FormRequestValidatorInterfa
 {
     public function __construct(
         private Container $container,
+        private ValidationFactory $validationFactory,
     ) {}
 
     /**
@@ -21,23 +22,39 @@ final readonly class FormRequestValidator implements FormRequestValidatorInterfa
      *
      * @throws StepValidationException
      */
-    public function validate(string $formRequestClass, array $data): array
+    public function validate(?string $formRequestClass, array $data): array
     {
-        // Resolve FormRequest from container
-        /** @var FormRequest $request */
-        $request = $this->container->make($formRequestClass);
+        // If no FormRequest provided, return data as-is (no validation)
+        if ($formRequestClass === null) {
+            return $data;
+        }
 
-        // Merge data into request
-        $request->merge($data);
+        // Create a new instance without resolving through container
+        // to avoid triggering authorization and other middleware
+        /** @var FormRequest $formRequest */
+        $formRequest = new $formRequestClass;
 
-        // Get validation rules from FormRequest
-        $rules = $request->rules();
+        // Set the container on the form request
+        $formRequest->setContainer($this->container);
 
-        // Run validation
-        $validator = Validator::make($data, $rules, $request->messages(), $request->attributes());
+        // Get validation rules
+        $rules = $formRequest->rules();
+
+        // If no rules defined, return data as-is
+        if (empty($rules)) {
+            return $data;
+        }
+
+        // Create validator using the validation factory
+        $validator = $this->validationFactory->make(
+            $data,
+            $rules,
+            $formRequest->messages(),
+            $formRequest->attributes()
+        );
 
         if ($validator->fails()) {
-            throw new StepValidationException($validator->errors()->toArray());
+            throw new StepValidationException($validator);
         }
 
         return $validator->validated();
