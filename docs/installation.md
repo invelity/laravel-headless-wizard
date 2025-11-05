@@ -67,6 +67,20 @@ Next steps:
 
 ---
 
+## Quick Setup Guide
+
+For a complete step-by-step guide with Blade and Vue examples, see the [Setup Guide](https://github.com/invelity/laravel-headless-wizard/blob/main/SETUP.md) in the demo repository.
+
+This includes:
+- Complete wizard structure setup
+- Blade implementation with views
+- Vue.js SPA implementation
+- CSRF configuration
+- Environment setup
+- Troubleshooting
+
+---
+
 ## Next Steps
 
 - [Configure your wizard](configuration)
