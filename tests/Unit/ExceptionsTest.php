@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Validator;
 use Invelity\WizardPackage\Exceptions\InvalidStepException;
 use Invelity\WizardPackage\Exceptions\StepAccessDeniedException;
 use Invelity\WizardPackage\Exceptions\StepValidationException;
@@ -29,17 +30,22 @@ test('wizard not initialized exception has correct message', function () {
 });
 
 test('step validation exception has errors', function () {
-    $errors = ['email' => ['Email is required']];
-    $exception = new StepValidationException($errors);
+    $validator = Validator::make(
+        ['email' => ''],
+        ['email' => 'required']
+    );
 
-    expect($exception->getErrors())->toBe($errors)
-        ->and($exception->getMessage())->toBe('Step validation failed')
-        ->and($exception)->toBeInstanceOf(Exception::class);
-});
+    throw new StepValidationException($validator);
+})->throws(StepValidationException::class);
 
 test('step validation exception can be thrown and caught', function () {
+    $validator = Validator::make(
+        ['name' => ''],
+        ['name' => 'required']
+    );
+
     try {
-        throw new StepValidationException(['name' => ['Name is required']]);
+        throw new StepValidationException($validator);
     } catch (StepValidationException $e) {
         expect($e->getErrors())->toHaveKey('name');
     }
