@@ -64,6 +64,7 @@ class WizardServiceProvider extends PackageServiceProvider
     {
         $this->registerMiddleware();
         $this->registerPublishableStubs();
+        $this->discoverWizards();
     }
 
     protected function registerPublishableStubs(): void
@@ -79,5 +80,69 @@ class WizardServiceProvider extends PackageServiceProvider
     {
         $this->app['router']->aliasMiddleware('wizard.session', WizardSession::class);
         $this->app['router']->aliasMiddleware('wizard.step-access', StepAccess::class);
+    }
+
+    protected function discoverWizards(): void
+    {
+        $wizardsPath = app_path('Wizards');
+
+        if (! is_dir($wizardsPath)) {
+            return;
+        }
+
+        $wizards = [];
+        $directories = glob($wizardsPath.'/*Wizard', GLOB_ONLYDIR);
+
+        foreach ($directories as $wizardDir) {
+            $wizardFolderName = basename($wizardDir);
+            $wizardClassName = str_replace('Wizard', '', $wizardFolderName);
+            $wizardFile = $wizardDir.'/'.$wizardClassName.'.php';
+
+            if (! file_exists($wizardFile)) {
+                continue;
+            }
+
+            $wizardClass = "App\\Wizards\\{$wizardFolderName}\\{$wizardClassName}";
+
+            if (! class_exists($wizardClass)) {
+                continue;
+            }
+
+            $steps = $this->discoverStepsForWizard($wizardDir);
+
+            $wizardInstance = new $wizardClass;
+            $wizardId = method_exists($wizardInstance, 'getId') ? $wizardInstance->getId() : str($wizardClassName)->kebab()->toString();
+
+            $wizards[$wizardId] = [
+                'class' => $wizardClass,
+                'steps' => $steps,
+            ];
+        }
+
+        config(['wizard.wizards' => $wizards]);
+    }
+
+    protected function discoverStepsForWizard(string $wizardDir): array
+    {
+        $stepsDir = $wizardDir.'/Steps';
+
+        if (! is_dir($stepsDir)) {
+            return [];
+        }
+
+        $stepFiles = glob($stepsDir.'/*Step.php');
+        $steps = [];
+
+        foreach ($stepFiles as $stepFile) {
+            $stepClassName = basename($stepFile, '.php');
+            $wizardFolderName = basename($wizardDir);
+            $stepClass = "App\\Wizards\\{$wizardFolderName}\\Steps\\{$stepClassName}";
+
+            if (class_exists($stepClass)) {
+                $steps[] = $stepClass;
+            }
+        }
+
+        return $steps;
     }
 }
