@@ -77,22 +77,6 @@ return [
     'validation' => [
         'validate_on_navigate' => true, // Validate when navigating back
         'allow_skip_optional' => true,
-
-        /*
-        | FormRequest Mapping (Optional)
-        |
-        | Override the default convention-based FormRequest discovery.
-        | Convention: App\Wizards\Steps\PersonalInfoStep
-        |          → App\Http\Requests\Wizards\PersonalInfoRequest
-        |
-        | Example:
-        | 'form_requests' => [
-        |     \App\Wizards\Steps\CustomStep::class => \App\Http\Requests\CustomFormRequest::class,
-        | ],
-        */
-        'form_requests' => [
-            // Add your custom Step → FormRequest mappings here
-        ],
     ],
 
     /*
