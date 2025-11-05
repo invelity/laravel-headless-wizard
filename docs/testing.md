@@ -16,6 +16,8 @@ This package uses [Pest PHP](https://pestphp.com/) for testing. All tests use mo
 
 ### Basic Test Structure
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 <?php
 
@@ -36,11 +38,15 @@ test('wizard completes successfully', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Complete Wizard Flows
 
 Test a wizard from start to finish:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -83,11 +89,15 @@ test('complete wizard flow from start to finish', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Step Validation
 
 Test that validation rules work correctly:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -117,11 +127,15 @@ test('step validates email format', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Navigation
 
 Test wizard navigation behavior:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -163,11 +177,15 @@ test('getNextStep returns null when on last step', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Optional Steps
 
 Test optional and skippable steps:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -189,11 +207,15 @@ test('optional step can be skipped', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Conditional Steps
 
 Test steps that should be skipped based on data:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -212,11 +234,15 @@ test('payment step is skipped for free plan', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing with Different Storage Drivers
 
 Test with session storage:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -236,7 +262,11 @@ test('wizard data persists in session', function () {
 });
 ```
 
+</div>
+
 Test with database storage:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -262,11 +292,15 @@ test('wizard data persists in database', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing HTTP Endpoints
 
 Test wizard controller endpoints:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -313,11 +347,15 @@ test('validation errors are returned correctly', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Events
 
 Test that wizard events are fired:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -365,11 +403,15 @@ test('WizardCompleted event is fired on wizard completion', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Custom Steps
 
 Test your custom step implementations:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -412,11 +454,15 @@ test('PaymentStep has dependencies on previous steps', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Artisan Commands
 
 Test wizard generation commands:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -452,11 +498,15 @@ test('wizard:make-step creates step class and form request', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Testing Progress Tracking
 
 Test progress calculation:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -492,11 +542,15 @@ test('progress tracks completed steps', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Mock External Services
 
 Mock external dependencies in step processing:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -525,11 +579,15 @@ test('payment step handles gateway failures gracefully', function () {
 });
 ```
 
+</div>
+
 ---
 
 ## Architecture Tests
 
 Test architecture constraints with Pest:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -553,33 +611,51 @@ arch('events are final')
     ->toBeFinal();
 ```
 
+</div>
+
 ---
 
 ## Running Tests
 
 ### Run all tests
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```bash
 composer test
 ```
 
+</div>
+
 ### Run specific test file
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```bash
 vendor/bin/pest tests/Unit/WizardManagerTest.php
 ```
 
+</div>
+
 ### Run with coverage
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```bash
 vendor/bin/pest --coverage
 ```
 
+</div>
+
 ### Run specific test by name
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```bash
 vendor/bin/pest --filter="wizard completes successfully"
 ```
+
+</div>
 
 ---
 
