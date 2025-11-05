@@ -34,14 +34,18 @@
 @layer components {
   /* Prism.js code blocks with dark background */
   pre[class*="language-"] {
-    @apply !m-6 !rounded-xl overflow-hidden;
+    @apply !m-6 !rounded-xl;
     background: #272B33 !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
   }
   
   code[class*="language-"],
   pre[class*="language-"] code {
     @apply !p-6;
     background: transparent !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
   }
   
   /* Syntax highlighting tokens */
