@@ -16,8 +16,6 @@ A complete 3-step user onboarding flow with profile creation, preferences, and e
 
 ### Step 1: Personal Information
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 <?php
 
@@ -62,13 +60,9 @@ class PersonalInfoStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ### Step 2: Preferences (Optional)
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -116,13 +110,9 @@ class PreferencesStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ### Step 3: Email Verification
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -189,8 +179,6 @@ class EmailVerificationStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ## E-Commerce Checkout Wizard
@@ -198,8 +186,6 @@ class EmailVerificationStep extends AbstractStep
 A complete checkout flow with cart, shipping, payment, and confirmation.
 
 ### Step 1: Cart Review
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -255,13 +241,9 @@ class CartReviewStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ### Step 2: Shipping Address
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -310,13 +292,9 @@ class ShippingAddressStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ### Step 3: Payment
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -381,8 +359,6 @@ class PaymentStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ## Survey Wizard with Conditional Logic
@@ -390,8 +366,6 @@ class PaymentStep extends AbstractStep
 A dynamic survey that shows/hides questions based on previous answers.
 
 ### Step 1: Basic Info
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -430,13 +404,9 @@ class BasicInfoStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ### Step 2: Employment Details (Conditional)
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -481,8 +451,6 @@ class EmploymentDetailsStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ## Complete Demo: Registration Wizard
@@ -490,8 +458,6 @@ class EmploymentDetailsStep extends AbstractStep
 This is a complete working example from the demo application showing both Blade and Vue implementations.
 
 ### Project Structure
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```
 app/
@@ -511,13 +477,9 @@ app/Http/
         └── PreferencesRequest.php
 ```
 
-</div>
-
 ### Steps Implementation
 
 #### PersonalInfoStep.php
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -556,11 +518,7 @@ class PersonalInfoStep extends AbstractStep
 }
 ```
 
-</div>
-
 #### PreferencesStep.php
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -599,11 +557,7 @@ class PreferencesStep extends AbstractStep
 }
 ```
 
-</div>
-
 #### SummaryStep.php
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -642,13 +596,9 @@ class SummaryStep extends AbstractStep
 }
 ```
 
-</div>
-
 ### FormRequest Validators
 
 #### PersonalInfoRequest.php
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -675,11 +625,7 @@ class PersonalInfoRequest extends FormRequest
 }
 ```
 
-</div>
-
 #### PreferencesRequest.php
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -707,11 +653,7 @@ class PreferencesRequest extends FormRequest
 }
 ```
 
-</div>
-
 ### Controller (Supports Both Blade and Vue)
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -788,11 +730,7 @@ class WizardViewController extends Controller
 }
 ```
 
-</div>
-
 ### Routes
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 // routes/web.php
@@ -820,11 +758,7 @@ Route::get('/vue/demo', function () {
 });
 ```
 
-</div>
-
 ### CSRF Configuration (for Vue/API)
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 // bootstrap/app.php
@@ -836,26 +770,18 @@ Route::get('/vue/demo', function () {
 })
 ```
 
-</div>
-
 ### Environment Configuration
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```env
 # Use file-based sessions for wizard state persistence
 SESSION_DRIVER=file
 ```
 
-</div>
-
 ---
 
 ## Frontend Integration Examples
 
 ### React + Axios
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -911,13 +837,9 @@ function OnboardingWizard() {
 }
 ```
 
-</div>
-
 ---
 
 ### Vue 3 + Composition API
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```vue
 <template>
@@ -1000,13 +922,9 @@ const goBack = async () => {
 </script>
 ```
 
-</div>
-
 ---
 
 ### Livewire Component
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -1059,8 +977,6 @@ class OnboardingWizard extends Component
     }
 }
 ```
-
-</div>
 
 ---
 
