@@ -39,5 +39,9 @@
 }
 
 pre[class*="language-"] {
-  @apply !bg-gradient-to-br !from-slate-900 !via-slate-800 !to-slate-900 !border !border-slate-700;
+  @apply !bg-transparent !border !border-slate-200;
+}
+
+pre[class*="language-"] code {
+  @apply !text-slate-800;
 }

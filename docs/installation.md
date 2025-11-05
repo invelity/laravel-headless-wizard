@@ -31,7 +31,7 @@ composer require invelity/laravel-headless-wizard
 php artisan vendor:publish --tag="wizard-config"
 ```
 
-This creates `config/wizard-package.php` where you can configure storage, routes, and behavior.
+This creates `config/wizard.php` where you can configure storage, routes, and behavior.
 
 ---
 
@@ -56,14 +56,28 @@ php artisan wizard:make Onboarding
 
 You should see:
 ```
-✓ Wizard class created: app/Wizards/Onboarding.php
-✓ Registered in config: config/wizard-package.php
-✓ Config cache cleared
+✓ Wizard class created: app/Wizards/OnboardingWizard/Onboarding.php
+✓ Wizard directory created: app/Wizards/OnboardingWizard/
+✓ Wizard will be auto-discovered on next request
 
 Next steps:
-  • Generate first step: php artisan wizard:make-step --wizard=onboarding
-  • View wizard config: config/wizard-package.php
+  • Generate first step: php artisan wizard:make-step Onboarding
+  • Wizard will be automatically discovered - no config needed!
 ```
+
+---
+
+## Quick Setup Guide
+
+For a complete step-by-step guide with Blade and Vue examples, see the [Setup Guide](https://github.com/invelity/laravel-headless-wizard/blob/main/SETUP.md) in the demo repository.
+
+This includes:
+- Complete wizard structure setup
+- Blade implementation with views
+- Vue.js SPA implementation
+- CSRF configuration
+- Environment setup
+- Troubleshooting
 
 ---
 

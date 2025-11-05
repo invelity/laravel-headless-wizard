@@ -21,15 +21,15 @@ php artisan wizard:make Onboarding
 **Interactive prompt:**
 ```
 ✔ What is the wizard name? › Onboarding
-✓ Wizard class created: app/Wizards/Onboarding.php
-✓ Registered in config: config/wizard-package.php
-✓ Config cache cleared
+✓ Wizard class created: app/Wizards/OnboardingWizard/Onboarding.php
+✓ Wizard directory created: app/Wizards/OnboardingWizard/
+✓ Wizard will be auto-discovered on next request
 ```
 
 ### 2. Generate Steps
 
 ```bash
-php artisan wizard:make-step --wizard=onboarding
+php artisan wizard:make-step Onboarding
 ```
 
 **Interactive prompts:**
@@ -39,9 +39,9 @@ php artisan wizard:make-step --wizard=onboarding
 ✔ What is the step order? › 1
 ✔ Is this step optional? › No
 
-✓ Step class created: app/Wizards/Steps/PersonalInfoStep.php
+✓ Step class created: app/Wizards/OnboardingWizard/Steps/PersonalInfoStep.php
 ✓ FormRequest created: app/Http/Requests/Wizards/PersonalInfoRequest.php
-✓ Registered in wizard: onboarding
+✓ Step will be auto-discovered
 ```
 
 ---
@@ -50,10 +50,10 @@ php artisan wizard:make-step --wizard=onboarding
 
 A wizard consists of:
 
-1. **Wizard Class** - Orchestrates the overall flow
-2. **Step Classes** - Individual wizard steps
-3. **Form Requests** - Laravel validation for each step
-4. **Configuration** - Wizard settings in config file
+1. **Wizard Class** - Orchestrates the overall flow (`app/Wizards/{Name}Wizard/{Name}.php`)
+2. **Step Classes** - Individual wizard steps (`app/Wizards/{Name}Wizard/Steps/`)
+3. **Form Requests** - Laravel validation for each step (`app/Http/Requests/Wizards/`)
+4. **Auto-Discovery** - Wizards are automatically discovered, no config registration needed
 
 ---
 
@@ -64,7 +64,7 @@ A wizard consists of:
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use Invelity\WizardPackage\Steps\AbstractStep;
 use Invelity\WizardPackage\ValueObjects\StepData;
@@ -78,8 +78,14 @@ class PersonalInfoStep extends AbstractStep
             id: 'personal-info',
             title: 'Personal Information',
             order: 1,
-            optional: false
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
     }
 
     public function process(StepData $data): StepResult
@@ -157,8 +163,14 @@ public function __construct()
         id: 'newsletter',
         title: 'Newsletter Preferences',
         order: 3,
-        optional: true // Users can skip this step
+        isOptional: true, // Users can skip this step
+        canSkip: true
     );
+}
+
+public function getFormRequest(): ?string
+{
+    return null; // No validation for optional step
 }
 ```
 

@@ -19,7 +19,7 @@ A complete 3-step user onboarding flow with profile creation, preferences, and e
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\User;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -34,17 +34,14 @@ class PersonalInfoStep extends AbstractStep
             id: 'personal-info',
             title: 'Personal Information',
             order: 1,
-            isOptional: false
+            isOptional: false,
+            canSkip: false
         );
     }
 
-    public function rules(): array
+    public function getFormRequest(): ?string
     {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'date_of_birth' => ['required', 'date', 'before:today'],
-        ];
+        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
     }
 
     public function process(StepData $data): StepResult
@@ -70,7 +67,7 @@ class PersonalInfoStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\UserPreferences;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -90,13 +87,9 @@ class PreferencesStep extends AbstractStep
         );
     }
 
-    public function rules(): array
+    public function getFormRequest(): ?string
     {
-        return [
-            'newsletter' => ['boolean'],
-            'notifications' => ['boolean'],
-            'theme' => ['required', 'in:light,dark'],
-        ];
+        return \App\Http\Requests\Wizards\PreferencesRequest::class;
     }
 
     public function process(StepData $data): StepResult
@@ -124,7 +117,7 @@ class PreferencesStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Mail\VerificationEmail;
 use App\Models\User;
@@ -141,8 +134,14 @@ class EmailVerificationStep extends AbstractStep
             id: 'email-verification',
             title: 'Verify Your Email',
             order: 3,
-            isOptional: false
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\EmailVerificationRequest::class;
     }
 
     public function getDependencies(): array
@@ -150,12 +149,6 @@ class EmailVerificationStep extends AbstractStep
         return ['personal-info'];
     }
 
-    public function rules(): array
-    {
-        return [
-            'verification_code' => ['required', 'string', 'size:6'],
-        ];
-    }
 
     public function beforeProcess(StepData $data): void
     {
@@ -197,7 +190,7 @@ A complete checkout flow with cart, shipping, payment, and confirmation.
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\Cart;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -211,8 +204,15 @@ class CartReviewStep extends AbstractStep
         parent::__construct(
             id: 'cart-review',
             title: 'Review Cart',
-            order: 1
+            order: 1,
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\CartReviewRequest::class;
     }
 
     public function shouldSkip(array $wizardData): bool
@@ -221,14 +221,6 @@ class CartReviewStep extends AbstractStep
         return $cart?->items()->count() === 0;
     }
 
-    public function rules(): array
-    {
-        return [
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.id' => ['required', 'exists:products,id'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -256,7 +248,7 @@ class CartReviewStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\ShippingAddress;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -270,19 +262,15 @@ class ShippingAddressStep extends AbstractStep
         parent::__construct(
             id: 'shipping-address',
             title: 'Shipping Address',
-            order: 2
+            order: 2,
+            isOptional: false,
+            canSkip: false
         );
     }
 
-    public function rules(): array
+    public function getFormRequest(): ?string
     {
-        return [
-            'street' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:100'],
-            'state' => ['required', 'string', 'size:2'],
-            'zip' => ['required', 'string', 'regex:/^\d{5}$/'],
-            'country' => ['required', 'string', 'in:US,CA'],
-        ];
+        return \App\Http\Requests\Wizards\ShippingAddressRequest::class;
     }
 
     public function process(StepData $data): StepResult
@@ -311,7 +299,7 @@ class ShippingAddressStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Services\PaymentGateway;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -326,8 +314,15 @@ class PaymentStep extends AbstractStep
         parent::__construct(
             id: 'payment',
             title: 'Payment',
-            order: 3
+            order: 3,
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PaymentRequest::class;
     }
 
     public function getDependencies(): array
@@ -335,15 +330,6 @@ class PaymentStep extends AbstractStep
         return ['cart-review', 'shipping-address'];
     }
 
-    public function rules(): array
-    {
-        return [
-            'payment_method' => ['required', 'in:card,paypal'],
-            'card_number' => ['required_if:payment_method,card', 'string'],
-            'card_exp' => ['required_if:payment_method,card', 'string'],
-            'card_cvv' => ['required_if:payment_method,card', 'string', 'size:3'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -384,7 +370,7 @@ A dynamic survey that shows/hides questions based on previous answers.
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use Invelity\WizardPackage\Steps\AbstractStep;
 use Invelity\WizardPackage\ValueObjects\StepData;
@@ -397,17 +383,15 @@ class BasicInfoStep extends AbstractStep
         parent::__construct(
             id: 'basic-info',
             title: 'Basic Information',
-            order: 1
+            order: 1,
+            isOptional: false,
+            canSkip: false
         );
     }
 
-    public function rules(): array
+    public function getFormRequest(): ?string
     {
-        return [
-            'name' => ['required', 'string'],
-            'age' => ['required', 'integer', 'min:18'],
-            'employment_status' => ['required', 'in:employed,unemployed,student'],
-        ];
+        return \App\Http\Requests\Wizards\BasicInfoRequest::class;
     }
 
     public function process(StepData $data): StepResult
@@ -427,7 +411,7 @@ class BasicInfoStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use Invelity\WizardPackage\Steps\AbstractStep;
 use Invelity\WizardPackage\ValueObjects\StepData;
@@ -440,8 +424,15 @@ class EmploymentDetailsStep extends AbstractStep
         parent::__construct(
             id: 'employment-details',
             title: 'Employment Details',
-            order: 2
+            order: 2,
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\EmploymentDetailsRequest::class;
     }
 
     public function shouldSkip(array $wizardData): bool
@@ -449,14 +440,6 @@ class EmploymentDetailsStep extends AbstractStep
         return $wizardData['basic-info']['employment_status'] !== 'employed';
     }
 
-    public function rules(): array
-    {
-        return [
-            'company' => ['required', 'string'],
-            'position' => ['required', 'string'],
-            'salary' => ['required', 'numeric', 'min:0'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -466,6 +449,332 @@ class EmploymentDetailsStep extends AbstractStep
         );
     }
 }
+```
+
+---
+
+## Complete Demo: Registration Wizard
+
+This is a complete working example from the demo application showing both Blade and Vue implementations.
+
+### Project Structure
+
+```
+app/
+└── Wizards/
+    └── RegistrationWizard/
+        └── Steps/
+            ├── PersonalInfoStep.php
+            ├── PreferencesStep.php
+            └── SummaryStep.php
+            
+app/Http/
+├── Controllers/
+│   └── WizardViewController.php
+└── Requests/
+    └── Wizards/
+        ├── PersonalInfoRequest.php
+        └── PreferencesRequest.php
+```
+
+### Steps Implementation
+
+#### PersonalInfoStep.php
+
+```php
+<?php
+
+namespace App\Wizards\RegistrationWizard\Steps;
+
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+
+class PersonalInfoStep extends AbstractStep
+{
+    public function __construct()
+    {
+        parent::__construct(
+            id: 'personal-info',
+            title: 'Personal Info',
+            order: 1,
+            isOptional: false,
+            canSkip: false
+        );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
+    }
+
+    public function process(StepData $data): StepResult
+    {
+        return StepResult::success(
+            data: $data->all(),
+            message: 'Step completed successfully'
+        );
+    }
+}
+```
+
+#### PreferencesStep.php
+
+```php
+<?php
+
+namespace App\Wizards\RegistrationWizard\Steps;
+
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+
+class PreferencesStep extends AbstractStep
+{
+    public function __construct()
+    {
+        parent::__construct(
+            id: 'preferences',
+            title: 'Preferences',
+            order: 2,
+            isOptional: false,
+            canSkip: false
+        );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PreferencesRequest::class;
+    }
+
+    public function process(StepData $data): StepResult
+    {
+        return StepResult::success(
+            data: $data->all(),
+            message: 'Step completed successfully'
+        );
+    }
+}
+```
+
+#### SummaryStep.php
+
+```php
+<?php
+
+namespace App\Wizards\RegistrationWizard\Steps;
+
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+
+class SummaryStep extends AbstractStep
+{
+    public function __construct()
+    {
+        parent::__construct(
+            id: 'summary',
+            title: 'Summary',
+            order: 3,
+            isOptional: false,
+            canSkip: false
+        );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return null; // No validation needed for summary
+    }
+
+    public function process(StepData $data): StepResult
+    {
+        return StepResult::success(
+            data: $data->all(),
+            message: 'Ready to complete'
+        );
+    }
+}
+```
+
+### FormRequest Validators
+
+#### PersonalInfoRequest.php
+
+```php
+<?php
+
+namespace App\Http\Requests\Wizards;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class PersonalInfoRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'age' => ['required', 'integer', 'min:18'],
+        ];
+    }
+}
+```
+
+#### PreferencesRequest.php
+
+```php
+<?php
+
+namespace App\Http\Requests\Wizards;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class PreferencesRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'theme' => ['required', 'in:light,dark,auto'],
+            'notifications' => ['required', 'array'],
+            'notifications.email' => ['required', 'boolean'],
+            'notifications.sms' => ['required', 'boolean'],
+        ];
+    }
+}
+```
+
+### Controller (Supports Both Blade and Vue)
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+
+class WizardViewController extends Controller
+{
+    public function __construct(
+        private readonly WizardManagerInterface $wizardManager
+    ) {}
+
+    public function show(string $wizard, string $step)
+    {
+        $this->wizardManager->initialize($wizard);
+        
+        $wizardData = $this->wizardManager->getAllData();
+        
+        return view("wizards.steps.{$step}", [
+            'wizardData' => $wizardData,
+        ]);
+    }
+
+    public function store(Request $request, string $wizard, string $step)
+    {
+        $this->wizardManager->initialize($wizard);
+        
+        $result = $this->wizardManager->processStep($step, $request->all());
+        
+        if (!$result->success) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $result->errors,
+                ], 422);
+            }
+            return back()->withErrors($result->errors)->withInput();
+        }
+        
+        $currentStep = $this->wizardManager->getCurrentStep();
+        
+        if ($request->expectsJson()) {
+            if ($currentStep) {
+                return response()->json([
+                    'success' => true,
+                    'completed' => false,
+                    'next_step' => $currentStep->getId(),
+                    'data' => $result->data,
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'completed' => true,
+                'data' => $result->data,
+            ]);
+        }
+        
+        if ($currentStep) {
+            return redirect()->route('wizard.show', [
+                'wizard' => $wizard,
+                'step' => $currentStep->getId(),
+            ]);
+        }
+        
+        return redirect()->route('wizard.show', [
+            'wizard' => $wizard,
+            'step' => 'summary',
+        ]);
+    }
+}
+```
+
+### Routes
+
+```php
+// routes/web.php
+
+use App\Http\Controllers\WizardViewController;
+
+Route::prefix('wizard')->group(function () {
+    Route::get('/{wizard}/{step}', [WizardViewController::class, 'show'])
+        ->name('wizard.show');
+    
+    Route::post('/{wizard}/{step}', [WizardViewController::class, 'store'])
+        ->name('wizard.store');
+});
+
+// Demo routes
+Route::get('/blade/demo', function () {
+    return redirect()->route('wizard.show', [
+        'wizard' => 'registration',
+        'step' => 'personal-info'
+    ]);
+});
+
+Route::get('/vue/demo', function () {
+    return view('vue-demo');
+});
+```
+
+### CSRF Configuration (for Vue/API)
+
+```php
+// bootstrap/app.php
+
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->validateCsrfTokens(except: [
+        'wizard/*',
+    ]);
+})
+```
+
+### Environment Configuration
+
+```env
+# Use file-based sessions for wizard state persistence
+SESSION_DRIVER=file
 ```
 
 ---

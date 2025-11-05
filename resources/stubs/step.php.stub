@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace {{ namespace }};
 
-use WebSystem\WizardPackage\Steps\AbstractStep;
-use WebSystem\WizardPackage\ValueObjects\StepData;
-use WebSystem\WizardPackage\ValueObjects\StepResult;
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
 
 class {{ class }} extends AbstractStep
 {
@@ -21,9 +21,14 @@ class {{ class }} extends AbstractStep
         );
     }
 
+    public function getFormRequest(): ?string
+    {
+        return \{{ formRequestNamespace }}\{{ formRequestClass }}::class;
+    }
+
     public function process(StepData $data): StepResult
     {
-        // Data is already validated by {{ class }}Request
+        // Data is already validated using FormRequest
         // Implement your business logic here
 
         return StepResult::success(
