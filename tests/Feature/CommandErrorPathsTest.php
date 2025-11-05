@@ -4,24 +4,15 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\File;
 
-test('MakeWizardCommand exception handler shows error when config missing', function () {
+test('MakeWizardCommand creates wizard successfully', function () {
     File::cleanDirectory(app_path('Wizards'));
     File::ensureDirectoryExists(app_path('Wizards'));
 
-    $configPath = config_path('wizard.php');
-    $backupPath = $configPath.'.backup_test';
+    $this->artisan('wizard:make', ['name' => 'TestWizard'])
+        ->assertSuccessful();
 
-    if (File::exists($configPath)) {
-        File::move($configPath, $backupPath);
-    }
+    expect(File::exists(app_path('Wizards/TestWizardWizard/TestWizard.php')))->toBeTrue();
+    expect(File::isDirectory(app_path('Wizards/TestWizardWizard/Steps')))->toBeTrue();
 
-    try {
-        $this->artisan('wizard:make', ['name' => 'TestWizard'])
-            ->assertFailed();
-    } finally {
-        if (File::exists($backupPath)) {
-            File::move($backupPath, $configPath);
-        }
-        File::cleanDirectory(app_path('Wizards'));
-    }
+    File::cleanDirectory(app_path('Wizards'));
 });

@@ -49,23 +49,20 @@ class FormRequestValidationTest extends TestCase
 
         $config = [
             'storage' => ['driver' => 'session', 'ttl' => 3600],
-            'wizards' => [
-                'test-wizard' => [
-                    'class' => 'App\Wizards\TestWizard',
-                    'steps' => [],
-                ],
-            ],
             'routes' => ['enabled' => true, 'prefix' => 'wizard', 'middleware' => ['web']],
         ];
 
         File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
+
+        File::makeDirectory(app_path('Wizards/TestWizardWizard'), 0755, true);
+        File::put(app_path('Wizards/TestWizardWizard/TestWizard.php'), "<?php\n\nnamespace App\\Wizards\\TestWizardWizard;\n\nclass TestWizard {\n    public function getId(): string { return 'test-wizard'; }\n}\n");
     }
 
     public function test_validation_occurs_through_form_request(): void
     {
         $this->artisan('wizard:make-step', [
+            'wizard' => 'TestWizard',
             'name' => 'ContactInfo',
-            '--wizard' => 'test-wizard',
             '--order' => 1,
             '--optional' => false,
         ])
@@ -83,20 +80,19 @@ class FormRequestValidationTest extends TestCase
     public function test_step_class_returns_form_request(): void
     {
         $this->artisan('wizard:make-step', [
+            'wizard' => 'TestWizard',
             'name' => 'PersonalInfo',
-            '--wizard' => 'test-wizard',
             '--order' => 1,
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Personal Information')
             ->assertSuccessful();
 
-        $stepPath = app_path('Wizards/Steps/PersonalInfoStep.php');
+        $stepPath = app_path('Wizards/TestWizardWizard/Steps/PersonalInfoStep.php');
         $this->assertFileExists($stepPath);
 
         $stepContent = File::get($stepPath);
 
-        // Step should have getFormRequest() method that returns FormRequest class
         $this->assertStringContainsString('public function getFormRequest()', $stepContent);
         $this->assertStringContainsString('PersonalInfoRequest::class', $stepContent);
     }
@@ -104,8 +100,8 @@ class FormRequestValidationTest extends TestCase
     public function test_form_request_validation_rules_are_customizable(): void
     {
         $this->artisan('wizard:make-step', [
+            'wizard' => 'TestWizard',
             'name' => 'EmailVerification',
-            '--wizard' => 'test-wizard',
             '--order' => 1,
             '--optional' => false,
         ])
@@ -132,8 +128,8 @@ class FormRequestValidationTest extends TestCase
     public function test_generated_form_request_has_correct_namespace(): void
     {
         $this->artisan('wizard:make-step', [
+            'wizard' => 'TestWizard',
             'name' => 'AccountSetup',
-            '--wizard' => 'test-wizard',
             '--order' => 1,
             '--optional' => false,
         ])
@@ -143,8 +139,8 @@ class FormRequestValidationTest extends TestCase
         $requestPath = app_path('Http/Requests/Wizards/AccountSetupRequest.php');
         $requestContent = File::get($requestPath);
 
-        $this->assertStringContainsString('namespace App\Http\Requests\Wizards;', $requestContent);
-        $this->assertStringContainsString('use Illuminate\Foundation\Http\FormRequest;', $requestContent);
+        $this->assertStringContainsString('namespace App\\Http\\Requests\\Wizards;', $requestContent);
+        $this->assertStringContainsString('use Illuminate\\Foundation\\Http\\FormRequest;', $requestContent);
         $this->assertStringContainsString('class AccountSetupRequest extends FormRequest', $requestContent);
     }
 }
