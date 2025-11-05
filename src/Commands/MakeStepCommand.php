@@ -6,10 +6,8 @@ namespace Invelity\WizardPackage\Commands;
 
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Invelity\WizardPackage\Commands\Concerns\WritesConfig;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\select;
@@ -17,11 +15,9 @@ use function Laravel\Prompts\text;
 
 class MakeStepCommand extends Command
 {
-    use WritesConfig;
-
     protected $signature = 'wizard:make-step
+                            {wizard? : The wizard name}
                             {name? : The name of the step}
-                            {--wizard= : The wizard ID to add step to}
                             {--order= : Step order number}
                             {--optional= : Mark step as optional (true/false)}
                             {--force : Overwrite existing step}';
@@ -39,12 +35,12 @@ class MakeStepCommand extends Command
             return self::FAILURE;
         }
 
-        if ($this->option('wizard')) {
-            $wizardId = $this->option('wizard');
+        if ($this->argument('wizard')) {
+            $wizardName = $this->argument('wizard');
         } else {
-            $wizardId = select(
+            $wizardName = select(
                 label: 'Which wizard should this step belong to?',
-                options: array_combine(array_keys($wizards), array_map(fn ($id) => Str::title(str_replace('-', ' ', $id)), array_keys($wizards)))
+                options: $wizards
             );
         }
 
@@ -67,7 +63,7 @@ class MakeStepCommand extends Command
         $stepId = Str::kebab($name);
         $force = $this->option('force');
 
-        if ($this->stepExists($stepClass) && ! $force) {
+        if ($this->stepExists($stepClass, $wizardName) && ! $force) {
             $this->error(__('Step \':class\' already exists. Use --force to overwrite.', ['class' => $stepClass]));
 
             return self::FAILURE;
@@ -83,7 +79,7 @@ class MakeStepCommand extends Command
         $order = $this->option('order') ?? text(
             label: 'What is the step order?',
             placeholder: '1',
-            default: (string) ($this->getLastStepOrder($wizardId) + 1),
+            default: (string) ($this->getLastStepOrder($wizardName) + 1),
             required: true,
             validate: fn (string $value) => ! is_numeric($value) ? 'Order must be a number' : null,
             hint: 'Numeric order for step sequence. Lower numbers appear first.'
@@ -97,31 +93,27 @@ class MakeStepCommand extends Command
         );
 
         try {
-            $this->createStepClass($stepClass, $stepId, $title, (int) $order, $optional);
+            $this->createStepClass($wizardName, $stepClass, $stepId, $title, (int) $order, $optional);
             $this->createFormRequestClass($stepClass);
-            $this->registerInConfig($wizardId, $stepClass);
-            $this->clearConfigCache();
 
             $requestClass = str_replace('Step', '', $stepClass).'Request';
 
-            $this->info(__('✓ Step class created: app/Wizards/Steps/{class}.php', ['class' => $stepClass]));
+            $this->info(__('✓ Step class created: app/Wizards/{wizard}Wizard/Steps/{class}.php', ['wizard' => $wizardName, 'class' => $stepClass]));
             $this->info(__('✓ FormRequest created: app/Http/Requests/Wizards/{class}.php', ['class' => $requestClass]));
-            $this->info(__('✓ Registered in wizard: {wizard}', ['wizard' => $wizardId]));
-            $this->info(__('✓ Config cache cleared'));
+            $this->info(__('✓ Step will be auto-discovered'));
             $this->newLine();
             $this->comment(__('Next steps:'));
             $this->comment(__('  • Add validation rules: app/Http/Requests/Wizards/{class}.php', ['class' => $requestClass]));
-            $this->comment(__('  • Implement business logic: app/Wizards/Steps/{class}.php', ['class' => $stepClass]));
-            $this->comment(__('  • Generate another step: php artisan wizard:make-step --wizard={wizard}', ['wizard' => $wizardId]));
+            $this->comment(__('  • Implement business logic: app/Wizards/{wizard}Wizard/Steps/{class}.php', ['wizard' => $wizardName, 'class' => $stepClass]));
+            $this->comment(__('  • Generate another step: php artisan wizard:make-step {wizard}', ['wizard' => $wizardName]));
 
             return self::SUCCESS;
         } catch (Exception $e) {
-            $this->error(__('Failed to create step: {message}', ['message' => $e->getMessage()]));
+            $this->error('Failed to create step: '.$e->getMessage());
             $this->newLine();
             $this->comment(__('Troubleshooting:'));
-            $this->comment(__('  • Check directory permissions for app/Wizards/Steps/'));
+            $this->comment(__('  • Check directory permissions for app/Wizards/'));
             $this->comment(__('  • Check directory permissions for app/Http/Requests/Wizards/'));
-            $this->comment(__('  • Ensure config/wizard-package.php is writable'));
 
             return self::FAILURE;
         }
@@ -129,7 +121,24 @@ class MakeStepCommand extends Command
 
     protected function getAvailableWizards(): array
     {
-        return config('wizard-package.wizards', []);
+        $wizardsPath = app_path('Wizards');
+
+        if (! File::isDirectory($wizardsPath)) {
+            return [];
+        }
+
+        $wizards = [];
+        $directories = File::directories($wizardsPath);
+
+        foreach ($directories as $dir) {
+            $name = basename($dir);
+            if (Str::endsWith($name, 'Wizard')) {
+                $wizardName = Str::replaceLast('Wizard', '', $name);
+                $wizards[$wizardName] = $wizardName;
+            }
+        }
+
+        return $wizards;
     }
 
     protected function validateStepName(string $value): ?string
@@ -145,22 +154,27 @@ class MakeStepCommand extends Command
         return null;
     }
 
-    protected function stepExists(string $stepClass): bool
+    protected function stepExists(string $stepClass, string $wizardName): bool
     {
-        return File::exists(app_path("Wizards/Steps/{$stepClass}.php"));
+        return File::exists(app_path("Wizards/{$wizardName}Wizard/Steps/{$stepClass}.php"));
     }
 
-    protected function getLastStepOrder(string $wizardId): int
+    protected function getLastStepOrder(string $wizardName): int
     {
-        $config = config('wizard-package.wizards', []);
-        $steps = $config[$wizardId]['steps'] ?? [];
+        $stepsPath = app_path("Wizards/{$wizardName}Wizard/Steps");
 
-        return count($steps);
+        if (! File::isDirectory($stepsPath)) {
+            return 0;
+        }
+
+        $files = File::files($stepsPath);
+
+        return count($files);
     }
 
-    protected function createStepClass(string $stepClass, string $stepId, string $title, int $order, bool $optional): void
+    protected function createStepClass(string $wizardName, string $stepClass, string $stepId, string $title, int $order, bool $optional): void
     {
-        $directory = app_path('Wizards/Steps');
+        $directory = app_path("Wizards/{$wizardName}Wizard/Steps");
 
         if (! File::isDirectory($directory)) {
             File::makeDirectory($directory, 0755, true);
@@ -168,13 +182,33 @@ class MakeStepCommand extends Command
 
         $stub = File::get(__DIR__.'/../../resources/stubs/step.php.stub');
 
+        $requestClass = str_replace('Step', '', $stepClass).'Request';
+
         $content = str_replace(
-            ['{{ namespace }}', '{{ class }}', '{{ stepId }}', '{{ title }}', '{{ order }}', '{{ optional }}'],
-            ['App\Wizards\Steps', $stepClass, $stepId, $title, (string) $order, $optional ? 'true' : 'false'],
+            [
+                '{{ namespace }}',
+                '{{ class }}',
+                '{{ stepId }}',
+                '{{ title }}',
+                '{{ order }}',
+                '{{ optional }}',
+                '{{ formRequestNamespace }}',
+                '{{ formRequestClass }}',
+            ],
+            [
+                "App\\Wizards\\{$wizardName}Wizard\\Steps",
+                $stepClass,
+                $stepId,
+                $title,
+                (string) $order,
+                $optional ? 'true' : 'false',
+                'App\\Http\\Requests\\Wizards',
+                $requestClass,
+            ],
             $stub
         );
 
-        File::put(app_path("Wizards/Steps/{$stepClass}.php"), $content);
+        File::put(app_path("Wizards/{$wizardName}Wizard/Steps/{$stepClass}.php"), $content);
     }
 
     protected function createFormRequestClass(string $stepClass): void
@@ -196,24 +230,5 @@ class MakeStepCommand extends Command
         );
 
         File::put(app_path("Http/Requests/Wizards/{$requestClass}.php"), $content);
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function registerInConfig(string $wizardId, string $stepClass): void
-    {
-        $configPath = config_path('wizard-package.php');
-
-        $this->writeConfigSafely($configPath, function (array $config) use ($wizardId, $stepClass) {
-            $config['wizards'][$wizardId]['steps'][] = "App\\Wizards\\Steps\\{$stepClass}";
-
-            return $config;
-        });
-    }
-
-    protected function clearConfigCache(): void
-    {
-        Artisan::call('config:clear');
     }
 }

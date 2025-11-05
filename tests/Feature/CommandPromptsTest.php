@@ -10,7 +10,7 @@ beforeEach(function () {
     File::ensureDirectoryExists(app_path('Wizards'));
     File::ensureDirectoryExists(app_path('Http/Requests/Wizards'));
 
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
     $configDir = dirname($configPath);
 
     if (! File::isDirectory($configDir)) {
@@ -19,15 +19,15 @@ beforeEach(function () {
 
     $config = [
         'storage' => ['driver' => 'session'],
-        'wizards' => [
-            'checkout' => ['steps' => []],
-            'onboarding' => ['steps' => []],
-        ],
     ];
 
     File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
-    
-    config(['wizard-package.wizards' => $config['wizards']]);
+
+    File::makeDirectory(app_path('Wizards/CheckoutWizard'), 0755, true);
+    File::put(app_path('Wizards/CheckoutWizard/Checkout.php'), "<?php\n\nnamespace App\\Wizards\\CheckoutWizard;\n\nclass Checkout {\n    public function getId(): string { return 'checkout'; }\n}\n");
+
+    File::makeDirectory(app_path('Wizards/OnboardingWizard'), 0755, true);
+    File::put(app_path('Wizards/OnboardingWizard/Onboarding.php'), "<?php\n\nnamespace App\\Wizards\\OnboardingWizard;\n\nclass Onboarding {\n    public function getId(): string { return 'onboarding'; }\n}\n");
 });
 
 afterEach(function () {
@@ -35,31 +35,23 @@ afterEach(function () {
     File::cleanDirectory(app_path('Http/Requests/Wizards'));
 });
 
-test('MakeStepCommand prompts for wizard selection when option not provided', function () {
-    $wizards = config('wizard-package.wizards');
-    expect($wizards)->toBeArray();
-    expect($wizards)->not->toBeEmpty();
-    
-    if (empty($wizards)) {
-        $this->markTestSkipped('Config not loaded properly in CI environment');
-    }
-    
+test('MakeStepCommand prompts for wizard selection when argument not provided', function () {
     $this->artisan('wizard:make-step', [
         'name' => 'UserInfo',
         '--order' => 1,
         '--optional' => false,
     ])
-        ->expectsQuestion('Which wizard should this step belong to?', 'checkout')
+        ->expectsQuestion('Which wizard should this step belong to?', 'Checkout')
         ->expectsQuestion('What is the step title?', 'User Information')
         ->assertSuccessful();
 
-    expect(File::exists(app_path('Wizards/Steps/UserInfoStep.php')))->toBeTrue();
+    expect(File::exists(app_path('Wizards/CheckoutWizard/Steps/UserInfoStep.php')))->toBeTrue();
 });
 
 test('MakeStepCommand validates empty step name', function () {
     $result = $this->artisan('wizard:make-step', [
+        'wizard' => 'Checkout',
         'name' => '',
-        '--wizard' => 'checkout',
     ]);
 
     $result->assertFailed();
@@ -67,43 +59,31 @@ test('MakeStepCommand validates empty step name', function () {
 });
 
 test('MakeStepCommand getLastStepOrder returns correct count', function () {
-    $configPath = config_path('wizard-package.php');
-
-    $config = [
-        'storage' => ['driver' => 'session'],
-        'wizards' => [
-            'checkout' => [
-                'steps' => [
-                    'App\\Wizards\\Steps\\Step1',
-                    'App\\Wizards\\Steps\\Step2',
-                    'App\\Wizards\\Steps\\Step3',
-                ],
-            ],
-        ],
-    ];
-
-    File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
+    File::makeDirectory(app_path('Wizards/CheckoutWizard/Steps'), 0755, true);
+    File::put(app_path('Wizards/CheckoutWizard/Steps/Step1Step.php'), "<?php\n\nnamespace App\\Wizards\\CheckoutWizard\\Steps;\n\nclass Step1Step {}\n");
+    File::put(app_path('Wizards/CheckoutWizard/Steps/Step2Step.php'), "<?php\n\nnamespace App\\Wizards\\CheckoutWizard\\Steps;\n\nclass Step2Step {}\n");
+    File::put(app_path('Wizards/CheckoutWizard/Steps/Step3Step.php'), "<?php\n\nnamespace App\\Wizards\\CheckoutWizard\\Steps;\n\nclass Step3Step {}\n");
 
     $this->artisan('wizard:make-step', [
+        'wizard' => 'Checkout',
         'name' => 'Step4',
-        '--wizard' => 'checkout',
     ])
         ->expectsQuestion('What is the step title?', 'Step 4')
         ->expectsQuestion('What is the step order?', '4')
         ->expectsConfirmation('Is this step optional?', false)
         ->assertSuccessful();
 
-    $updatedConfig = require $configPath;
-    expect($updatedConfig['wizards']['checkout']['steps'])->toHaveCount(4);
-    expect($updatedConfig['wizards']['checkout']['steps'][3])->toBe('App\\Wizards\\Steps\\Step4Step');
+    expect(File::exists(app_path('Wizards/CheckoutWizard/Steps/Step4Step.php')))->toBeTrue();
+    $files = File::files(app_path('Wizards/CheckoutWizard/Steps'));
+    expect(count($files))->toBe(4);
 });
 
 test('MakeStepCommand handles step name validation errors', function () {
     $this->artisan('wizard:make-step', [
+        'wizard' => 'Checkout',
         'name' => 'invalid-name',
-        '--wizard' => 'checkout',
     ])
         ->assertFailed();
 
-    expect(File::exists(app_path('Wizards/Steps/invalid-nameStep.php')))->toBeFalse();
+    expect(File::exists(app_path('Wizards/CheckoutWizard/Steps/invalid-nameStep.php')))->toBeFalse();
 });

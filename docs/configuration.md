@@ -12,7 +12,7 @@ Learn how to configure Laravel Headless Wizard for your application.
 
 ## Configuration File
 
-After publishing the config, you'll find `config/wizard-package.php` with the following options:
+After publishing the config, you'll find `config/wizard.php` with the following options:
 
 ```php
 return [
@@ -38,14 +38,18 @@ return [
     ],
 
     'events' => [
-        'fire_events' => true, // Fire lifecycle events
+        'dispatch' => true, // Fire lifecycle events
+        'log_progress' => false,
     ],
 
-    'wizards' => [
-        // Your wizards will be registered here automatically
+    'cleanup' => [
+        'abandoned_after_days' => 30,
+        'auto_cleanup' => false, // Enable scheduled cleanup
     ],
 ];
 ```
+
+**Note:** Wizards and steps are **auto-discovered** from `app/Wizards/*Wizard/` directories. No manual registration needed!
 
 ---
 
@@ -59,6 +63,13 @@ Stores wizard data in the user's session. Best for simple wizards.
 'storage' => [
     'driver' => 'session',
 ],
+```
+
+**Important:** Ensure your `.env` uses a persistent session driver:
+
+```env
+SESSION_DRIVER=file  # or database, redis
+# DO NOT use 'array' - state will be lost between requests
 ```
 
 **Pros:**
@@ -95,6 +106,15 @@ Stores wizard data in the database. Best for persistent wizards.
 php artisan vendor:publish --tag="wizard-migrations"
 php artisan migrate
 ```
+
+{: .important }
+> **Security Note:** Step data in the `wizard_progress` table is automatically **encrypted** using Laravel's `encrypted:array` cast with your `APP_KEY`. This protects sensitive user data while the wizard is in progress. Data is automatically decrypted when retrieved. The `step_data` column uses `TEXT` type (not `JSON`) to store the encrypted string.
+>
+> **Important for Production:**
+> - Keep your `APP_KEY` secure and backed up
+> - If you rotate `APP_KEY`, existing wizard progress will become unreadable
+> - Consider clearing old wizard progress before key rotation
+> - For guest users, wizard data is tied to session - no `user_id` foreign key constraint
 
 ### Cache Storage
 
@@ -209,7 +229,8 @@ Control whether lifecycle events are fired:
 
 ```php
 'events' => [
-    'fire_events' => false, // Disable all events
+    'dispatch' => false, // Disable all events
+    'log_progress' => true, // Log wizard progress
 ],
 ```
 

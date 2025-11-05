@@ -13,12 +13,12 @@ return new class extends Migration
         Schema::create('wizard_progress', function (Blueprint $table) {
             $table->id();
             $table->string('wizard_id')->index();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('session_id')->nullable()->index();
             $table->string('current_step')->nullable();
             $table->string('current_step_id')->nullable();
             $table->json('completed_steps');
-            $table->json('step_data');
+            $table->text('step_data');
             $table->enum('status', ['in_progress', 'completed', 'abandoned'])->default('in_progress')->index();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
