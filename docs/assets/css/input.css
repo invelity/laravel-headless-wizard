@@ -40,7 +40,7 @@
   
   code[class*="language-"],
   pre[class*="language-"] code {
-    @apply !p-6 overflow-x-auto;
+    @apply !p-6;
     background: transparent !important;
   }
   
