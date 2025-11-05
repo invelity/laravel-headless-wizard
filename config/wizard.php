@@ -19,28 +19,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Registered Wizards
-    |--------------------------------------------------------------------------
-    |
-    | Register your wizards here. Each wizard should have a unique key,
-    | a class, and an array of step classes in the order they should execute.
-    |
-    | Example:
-    | 'onboarding' => [
-    |     'class' => App\Wizards\Onboarding::class,
-    |     'steps' => [
-    |         App\Wizards\Steps\PersonalInfoStep::class,
-    |         App\Wizards\Steps\PreferencesStep::class,
-    |     ],
-    | ],
-    |
-    */
-    'wizards' => [
-        // Auto-registered wizards will appear here
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Route Configuration
     |--------------------------------------------------------------------------
     */
