@@ -116,12 +116,12 @@ class MakeStepCommand extends Command
 
             return self::SUCCESS;
         } catch (Exception $e) {
-            $this->error(__('Failed to create step: {message}', ['message' => $e->getMessage()]));
+            $this->error('Failed to create step: '.$e->getMessage());
             $this->newLine();
             $this->comment(__('Troubleshooting:'));
             $this->comment(__('  • Check directory permissions for app/Wizards/Steps/'));
             $this->comment(__('  • Check directory permissions for app/Http/Requests/Wizards/'));
-            $this->comment(__('  • Ensure config/wizard-package.php is writable'));
+            $this->comment(__('  • Ensure config/wizard.php is writable'));
 
             return self::FAILURE;
         }
@@ -129,7 +129,7 @@ class MakeStepCommand extends Command
 
     protected function getAvailableWizards(): array
     {
-        return config('wizard-package.wizards', []);
+        return config('wizard.wizards', []);
     }
 
     protected function validateStepName(string $value): ?string
@@ -152,7 +152,7 @@ class MakeStepCommand extends Command
 
     protected function getLastStepOrder(string $wizardId): int
     {
-        $config = config('wizard-package.wizards', []);
+        $config = config('wizard.wizards', []);
         $steps = $config[$wizardId]['steps'] ?? [];
 
         return count($steps);
@@ -203,7 +203,7 @@ class MakeStepCommand extends Command
      */
     protected function registerInConfig(string $wizardId, string $stepClass): void
     {
-        $configPath = config_path('wizard-package.php');
+        $configPath = config_path('wizard.php');
 
         $this->writeConfigSafely($configPath, function (array $config) use ($wizardId, $stepClass) {
             $config['wizards'][$wizardId]['steps'][] = "App\\Wizards\\Steps\\{$stepClass}";
