@@ -6,42 +6,97 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    @apply scroll-smooth;
   }
   
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    @apply font-sans min-h-screen;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold mt-8 mb-4;
+  }
+  
+  h1 {
+    @apply text-5xl font-black mb-6;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  code {
+    @apply bg-slate-100 text-primary-700 px-1.5 py-0.5 rounded text-sm font-mono;
   }
 }
 
 @layer components {
-  .glass-nav {
-    @apply bg-white/90 backdrop-blur-md border-b border-slate-200;
+  /* Prism.js code blocks with dark background */
+  pre[class*="language-"] {
+    @apply !m-6 !rounded-xl overflow-hidden;
+    background: #272B33 !important;
   }
   
-  .nav-link {
-    @apply flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200;
+  code[class*="language-"],
+  pre[class*="language-"] code {
+    @apply !p-6 overflow-x-auto;
+    background: transparent !important;
   }
   
-  .nav-link-active {
-    @apply bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 shadow-sm;
+  /* Syntax highlighting tokens */
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    @apply !text-slate-500;
   }
   
-  .nav-link-inactive {
-    @apply text-slate-700 hover:bg-slate-100 hover:text-slate-900;
+  .token.punctuation {
+    @apply !text-slate-400;
   }
-}
-
-@layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+  
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    @apply !text-blue-400;
   }
-}
-
-pre[class*="language-"] {
-  @apply !bg-transparent !border !border-slate-200;
-}
-
-pre[class*="language-"] code {
-  @apply !text-slate-800;
+  
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin,
+  .token.inserted {
+    @apply !text-emerald-400;
+  }
+  
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    @apply !text-amber-500;
+  }
+  
+  .token.atrule,
+  .token.attr-value,
+  .token.keyword {
+    @apply !text-purple-400;
+  }
+  
+  .token.function,
+  .token.class-name {
+    @apply !text-amber-400;
+  }
+  
+  .token.regex,
+  .token.important,
+  .token.variable {
+    @apply !text-red-400;
+  }
 }
