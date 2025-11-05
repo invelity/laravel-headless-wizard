@@ -31,7 +31,7 @@ composer require invelity/laravel-headless-wizard
 php artisan vendor:publish --tag="wizard-config"
 ```
 
-This creates `config/wizard-package.php` where you can configure storage, routes, and behavior.
+This creates `config/wizard.php` where you can configure storage, routes, and behavior.
 
 ---
 
@@ -57,12 +57,12 @@ php artisan wizard:make Onboarding
 You should see:
 ```
 ✓ Wizard class created: app/Wizards/Onboarding.php
-✓ Registered in config: config/wizard-package.php
+✓ Registered in config: config/wizard.php
 ✓ Config cache cleared
 
 Next steps:
   • Generate first step: php artisan wizard:make-step --wizard=onboarding
-  • View wizard config: config/wizard-package.php
+  • View wizard config: config/wizard.php
 ```
 
 ---

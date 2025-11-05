@@ -55,20 +55,20 @@ class MakeWizardCommand extends Command
             $this->clearConfigCache();
 
             $this->info(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => $wizardClass]));
-            $this->info(__('✓ Registered in config: config/wizard-package.php'));
+            $this->info(__('✓ Registered in config: config/wizard.php'));
             $this->info(__('✓ Config cache cleared'));
             $this->newLine();
             $this->comment(__('Next steps:'));
             $this->comment(__('  • Generate first step: php artisan wizard:make-step --wizard={wizard}', ['wizard' => $wizardId]));
-            $this->comment(__('  • View wizard config: config/wizard-package.php'));
+            $this->comment(__('  • View wizard config: config/wizard.php'));
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error(__('Failed to create wizard: {message}', ['message' => $e->getMessage()]));
+            $this->error('Failed to create wizard: '.$e->getMessage());
             $this->newLine();
             $this->comment(__('Troubleshooting:'));
             $this->comment(__('  • Check directory permissions for app/Wizards/'));
-            $this->comment(__('  • Ensure config/wizard-package.php is writable'));
+            $this->comment(__('  • Ensure config/wizard.php is writable'));
 
             return self::FAILURE;
         }
@@ -113,7 +113,7 @@ class MakeWizardCommand extends Command
 
     protected function registerInConfig(string $wizardId, string $wizardClass): void
     {
-        $configPath = config_path('wizard-package.php');
+        $configPath = config_path('wizard.php');
 
         $this->writeConfigSafely($configPath, function (array $config) use ($wizardId, $wizardClass) {
             $config['wizards'][$wizardId] = [

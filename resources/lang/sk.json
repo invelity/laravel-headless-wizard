@@ -27,7 +27,7 @@
     "Troubleshooting:": "Riešenie problémov:",
     "  • Check directory permissions for app/Wizards/Steps/": "  • Skontrolujte oprávnenia priečinka app/Wizards/Steps/",
     "  • Check directory permissions for app/Http/Requests/Wizards/": "  • Skontrolujte oprávnenia priečinka app/Http/Requests/Wizards/",
-    "  • Ensure config/wizard-package.php is writable": "  • Uistite sa, že config/wizard-package.php je zapisovateľný",
+    "  • Ensure config/wizard.php is writable": "  • Uistite sa, že config/wizard.php je zapisovateľný",
     "  • Check directory permissions for app/Wizards/": "  • Skontrolujte oprávnenia priečinka app/Wizards/",
     "✓ Step class created: app/Wizards/Steps/{class}.php": "✓ Trieda kroku vytvorená: app/Wizards/Steps/{class}.php",
     "✓ FormRequest created: app/Http/Requests/Wizards/{class}.php": "✓ FormRequest vytvorený: app/Http/Requests/Wizards/{class}.php",
@@ -38,7 +38,7 @@
     "  • Implement business logic: app/Wizards/Steps/{class}.php": "  • Implementujte biznis logiku: app/Wizards/Steps/{class}.php",
     "  • Generate another step: php artisan wizard:make-step --wizard={wizard}": "  • Vygenerujte ďalší krok: php artisan wizard:make-step --wizard={wizard}",
     "✓ Wizard class created: app/Wizards/{class}.php": "✓ Trieda wizardu vytvorená: app/Wizards/{class}.php",
-    "✓ Registered in config: config/wizard-package.php": "✓ Zaregistrovaný v konfigurácii: config/wizard-package.php",
+    "✓ Registered in config: config/wizard.php": "✓ Zaregistrovaný v konfigurácii: config/wizard.php",
     "  • Generate first step: php artisan wizard:make-step --wizard={wizard}": "  • Vygenerujte prvý krok: php artisan wizard:make-step --wizard={wizard}",
-    "  • View wizard config: config/wizard-package.php": "  • Zobraziť konfiguráciu wizardu: config/wizard-package.php"
+    "  • View wizard config: config/wizard.php": "  • Zobraziť konfiguráciu wizardu: config/wizard.php"
 }

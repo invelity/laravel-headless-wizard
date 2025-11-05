@@ -16,8 +16,8 @@ class MakeStepCommandTest extends TestCase
         $this->cleanupGeneratedFiles();
         $this->setupConfigFile();
 
-        $config = require config_path('wizard-package.php');
-        config(['wizard-package' => $config]);
+        $config = require config_path('wizard.php');
+        config(['wizard' => $config]);
     }
 
     protected function tearDown(): void
@@ -38,7 +38,7 @@ class MakeStepCommandTest extends TestCase
             File::deleteDirectory(app_path('Http/Requests/Wizards'));
         }
 
-        $configPath = config_path('wizard-package.php');
+        $configPath = config_path('wizard.php');
         if (File::exists($configPath.'.backup')) {
             File::delete($configPath.'.backup');
         }
@@ -46,7 +46,7 @@ class MakeStepCommandTest extends TestCase
 
     protected function setupConfigFile(): void
     {
-        $configPath = config_path('wizard-package.php');
+        $configPath = config_path('wizard.php');
         $configDir = dirname($configPath);
 
         if (! File::isDirectory($configDir)) {
@@ -79,9 +79,9 @@ class MakeStepCommandTest extends TestCase
             'routes' => ['enabled' => true, 'prefix' => 'wizard', 'middleware' => ['web']],
         ];
 
-        File::put(config_path('wizard-package.php'), "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
+        File::put(config_path('wizard.php'), "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
 
-        $this->app['config']->set('wizard-package', $config);
+        $this->app['config']->set('wizard', $config);
 
         $this->artisan('wizard:make-step')
             ->expectsOutput('No wizards found. Create a wizard first:')
@@ -125,7 +125,7 @@ class MakeStepCommandTest extends TestCase
             ->expectsQuestion('What is the step title?', 'Personal Information')
             ->assertSuccessful();
 
-        $config = require config_path('wizard-package.php');
+        $config = require config_path('wizard.php');
 
         $this->assertArrayHasKey('onboarding', $config['wizards']);
         $this->assertContains('App\Wizards\Steps\PersonalInfoStep', $config['wizards']['onboarding']['steps']);

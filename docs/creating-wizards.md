@@ -22,7 +22,7 @@ php artisan wizard:make Onboarding
 ```
 ✔ What is the wizard name? › Onboarding
 ✓ Wizard class created: app/Wizards/Onboarding.php
-✓ Registered in config: config/wizard-package.php
+✓ Registered in config: config/wizard.php
 ✓ Config cache cleared
 ```
 

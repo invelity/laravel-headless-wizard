@@ -8,7 +8,7 @@ test('MakeWizardCommand exception handler shows error when config missing', func
     File::cleanDirectory(app_path('Wizards'));
     File::ensureDirectoryExists(app_path('Wizards'));
 
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
     $backupPath = $configPath.'.backup_test';
 
     if (File::exists($configPath)) {
