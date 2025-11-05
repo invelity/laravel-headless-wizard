@@ -38,14 +38,18 @@ return [
     ],
 
     'events' => [
-        'fire_events' => true, // Fire lifecycle events
+        'dispatch' => true, // Fire lifecycle events
+        'log_progress' => false,
     ],
 
-    'wizards' => [
-        // Your wizards will be registered here automatically
+    'cleanup' => [
+        'abandoned_after_days' => 30,
+        'auto_cleanup' => false, // Enable scheduled cleanup
     ],
 ];
 ```
+
+**Note:** Wizards and steps are **auto-discovered** from `app/Wizards/*Wizard/` directories. No manual registration needed!
 
 ---
 
@@ -209,7 +213,8 @@ Control whether lifecycle events are fired:
 
 ```php
 'events' => [
-    'fire_events' => false, // Disable all events
+    'dispatch' => false, // Disable all events
+    'log_progress' => true, // Log wizard progress
 ],
 ```
 

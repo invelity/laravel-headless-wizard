@@ -56,13 +56,13 @@ php artisan wizard:make Onboarding
 
 You should see:
 ```
-✓ Wizard class created: app/Wizards/Onboarding.php
-✓ Registered in config: config/wizard.php
-✓ Config cache cleared
+✓ Wizard class created: app/Wizards/OnboardingWizard/Onboarding.php
+✓ Wizard directory created: app/Wizards/OnboardingWizard/
+✓ Wizard will be auto-discovered on next request
 
 Next steps:
-  • Generate first step: php artisan wizard:make-step --wizard=onboarding
-  • View wizard config: config/wizard.php
+  • Generate first step: php artisan wizard:make-step Onboarding
+  • Wizard will be automatically discovered - no config needed!
 ```
 
 ---
