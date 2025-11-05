@@ -134,7 +134,7 @@ code {
 
 // Prism.js code blocks - wrapper div has background
 div.highlight,
-div[style*="background: #272B33"] {
+div[style*="background"] {
   background: #272B33 !important;
   border-radius: 0.75rem;
   overflow: hidden;
