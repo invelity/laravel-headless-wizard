@@ -13,28 +13,8 @@ beforeEach(function () {
         File::deleteDirectory(app_path('Http/Requests/Wizards'));
     }
 
-    $configPath = config_path('wizard.php');
-    $configDir = dirname($configPath);
-
-    if (! File::isDirectory($configDir)) {
-        File::makeDirectory($configDir, 0755, true);
-    }
-
-    $config = [
-        'storage' => ['driver' => 'session', 'ttl' => 3600],
-        'wizards' => [
-            'test-wizard' => [
-                'class' => 'App\Wizards\TestWizard',
-                'steps' => [],
-            ],
-        ],
-        'routes' => ['enabled' => true, 'prefix' => 'wizard', 'middleware' => ['web']],
-    ];
-
-    File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
-
-    $loadedConfig = require $configPath;
-    config(['wizard-package' => $loadedConfig]);
+    // Create test wizard directory structure
+    $this->artisan('wizard:make', ['name' => 'TestWizard'])->assertSuccessful();
 });
 
 afterEach(function () {
@@ -49,8 +29,8 @@ afterEach(function () {
 
 test('form request has rules method', function () {
     $this->artisan('wizard:make-step', [
+        'wizard' => 'TestWizard',
         'name' => 'UserInfo',
-        '--wizard' => 'test-wizard',
         '--order' => 1,
         '--optional' => false,
     ])
@@ -68,8 +48,8 @@ test('form request has rules method', function () {
 
 test('form request authorize defaults to true', function () {
     $this->artisan('wizard:make-step', [
+        'wizard' => 'TestWizard',
         'name' => 'ProfileInfo',
-        '--wizard' => 'test-wizard',
         '--order' => 1,
         '--optional' => false,
     ])
@@ -84,8 +64,8 @@ test('form request authorize defaults to true', function () {
 
 test('form request rules returns array', function () {
     $this->artisan('wizard:make-step', [
+        'wizard' => 'TestWizard',
         'name' => 'ContactDetails',
-        '--wizard' => 'test-wizard',
         '--order' => 1,
         '--optional' => false,
     ])
@@ -104,8 +84,8 @@ test('form request rules returns array', function () {
 
 test('form request extends laravel form request', function () {
     $this->artisan('wizard:make-step', [
+        'wizard' => 'TestWizard',
         'name' => 'AddressInfo',
-        '--wizard' => 'test-wizard',
         '--order' => 1,
         '--optional' => false,
     ])

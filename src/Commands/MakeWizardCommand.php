@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Invelity\WizardPackage\Commands\Concerns\WritesConfig;
 
 use function Laravel\Prompts\text;
 
 class MakeWizardCommand extends Command
 {
-    use WritesConfig;
 
     protected $signature = 'wizard:make 
                             {name? : The name of the wizard}
@@ -29,7 +26,7 @@ class MakeWizardCommand extends Command
             placeholder: 'e.g., Onboarding, Registration',
             required: true,
             validate: fn (string $value) => $this->validateWizardName($value),
-            hint: 'Must be PascalCase. This will create app/Wizards/{Name}.php'
+            hint: 'Must be PascalCase. This will create app/Wizards/{Name}Wizard/{Name}.php'
         );
 
         $validationError = $this->validateWizardName($name);
@@ -51,16 +48,13 @@ class MakeWizardCommand extends Command
 
         try {
             $this->createWizardClass($wizardClass, $wizardId);
-            $this->registerInConfig($wizardId, $wizardClass);
-            $this->clearConfigCache();
 
-            $this->info(__('✓ Wizard class created: app/Wizards/{class}.php', ['class' => $wizardClass]));
-            $this->info(__('✓ Registered in config: config/wizard.php'));
-            $this->info(__('✓ Config cache cleared'));
+            $this->info(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => $wizardClass, 'class' => $wizardClass]));
+            $this->info(__('✓ Wizard directory created: app/Wizards/{wizard}Wizard/', ['wizard' => $wizardClass]));
             $this->newLine();
             $this->comment(__('Next steps:'));
-            $this->comment(__('  • Generate first step: php artisan wizard:make-step --wizard={wizard}', ['wizard' => $wizardId]));
-            $this->comment(__('  • View wizard config: config/wizard.php'));
+            $this->comment(__('  • Generate first step: php artisan wizard:make-step {wizard}', ['wizard' => $wizardClass]));
+            $this->comment(__('  • Wizard will be auto-discovered on next request'));
 
             return self::SUCCESS;
         } catch (\Exception $e) {
@@ -68,7 +62,6 @@ class MakeWizardCommand extends Command
             $this->newLine();
             $this->comment(__('Troubleshooting:'));
             $this->comment(__('  • Check directory permissions for app/Wizards/'));
-            $this->comment(__('  • Ensure config/wizard.php is writable'));
 
             return self::FAILURE;
         }
@@ -89,44 +82,30 @@ class MakeWizardCommand extends Command
 
     protected function wizardExists(string $wizardClass): bool
     {
-        return File::exists(app_path("Wizards/{$wizardClass}.php"));
+        return File::exists(app_path("Wizards/{$wizardClass}Wizard/{$wizardClass}.php"));
     }
 
     protected function createWizardClass(string $wizardClass, string $wizardId): void
     {
-        $directory = app_path('Wizards');
+        $directory = app_path("Wizards/{$wizardClass}Wizard");
 
         if (! File::isDirectory($directory)) {
             File::makeDirectory($directory, 0755, true);
+        }
+
+        $stepsDirectory = "{$directory}/Steps";
+        if (! File::isDirectory($stepsDirectory)) {
+            File::makeDirectory($stepsDirectory, 0755, true);
         }
 
         $stub = File::get(__DIR__.'/../../resources/stubs/wizard.php.stub');
 
         $content = str_replace(
             ['{{ namespace }}', '{{ class }}', '{{ id }}', '{{ name }}'],
-            ['App\\Wizards', $wizardClass, $wizardId, $wizardClass],
+            ["App\\Wizards\\{$wizardClass}Wizard", $wizardClass, $wizardId, $wizardClass],
             $stub
         );
 
-        File::put(app_path("Wizards/{$wizardClass}.php"), $content);
-    }
-
-    protected function registerInConfig(string $wizardId, string $wizardClass): void
-    {
-        $configPath = config_path('wizard.php');
-
-        $this->writeConfigSafely($configPath, function (array $config) use ($wizardId, $wizardClass) {
-            $config['wizards'][$wizardId] = [
-                'class' => "App\\Wizards\\{$wizardClass}",
-                'steps' => [],
-            ];
-
-            return $config;
-        });
-    }
-
-    protected function clearConfigCache(): void
-    {
-        Artisan::call('config:clear');
+        File::put("{$directory}/{$wizardClass}.php", $content);
     }
 }
