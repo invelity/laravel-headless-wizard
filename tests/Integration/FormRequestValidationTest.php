@@ -80,7 +80,7 @@ class FormRequestValidationTest extends TestCase
         $this->assertStringContainsString('public function authorize()', $requestContent);
     }
 
-    public function test_step_class_does_not_contain_rules_method(): void
+    public function test_step_class_contains_rules_method_for_bc(): void
     {
         $this->artisan('wizard:make-step', [
             'name' => 'PersonalInfo',
@@ -96,7 +96,10 @@ class FormRequestValidationTest extends TestCase
 
         $stepContent = File::get($stepPath);
 
-        $this->assertStringNotContainsString('public function rules()', $stepContent);
+        // Step should have rules() for backward compatibility
+        // But validation happens through FormRequest when available
+        $this->assertStringContainsString('public function rules()', $stepContent);
+        $this->assertStringContainsString('return [', $stepContent);
     }
 
     public function test_form_request_validation_rules_are_customizable(): void
