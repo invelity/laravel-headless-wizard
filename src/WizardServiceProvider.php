@@ -41,7 +41,8 @@ class WizardServiceProvider extends PackageServiceProvider
         });
 
         $this->app->singleton(WizardStorageInterface::class, function ($app) {
-            $storage = config('wizard.storage', 'session');
+            $storageConfig = config('wizard.storage', 'session');
+            $storage = is_array($storageConfig) ? ($storageConfig['driver'] ?? 'session') : $storageConfig;
 
             return match ($storage) {
                 'database' => $app->make(DatabaseStorage::class),
