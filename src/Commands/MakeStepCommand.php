@@ -122,14 +122,14 @@ class MakeStepCommand extends Command
     protected function getAvailableWizards(): array
     {
         $wizardsPath = app_path('Wizards');
-        
-        if (!File::isDirectory($wizardsPath)) {
+
+        if (! File::isDirectory($wizardsPath)) {
             return [];
         }
-        
+
         $wizards = [];
         $directories = File::directories($wizardsPath);
-        
+
         foreach ($directories as $dir) {
             $name = basename($dir);
             if (Str::endsWith($name, 'Wizard')) {
@@ -137,7 +137,7 @@ class MakeStepCommand extends Command
                 $wizards[$wizardName] = $wizardName;
             }
         }
-        
+
         return $wizards;
     }
 
@@ -162,12 +162,13 @@ class MakeStepCommand extends Command
     protected function getLastStepOrder(string $wizardName): int
     {
         $stepsPath = app_path("Wizards/{$wizardName}Wizard/Steps");
-        
-        if (!File::isDirectory($stepsPath)) {
+
+        if (! File::isDirectory($stepsPath)) {
             return 0;
         }
-        
+
         $files = File::files($stepsPath);
+
         return count($files);
     }
 
@@ -230,5 +231,4 @@ class MakeStepCommand extends Command
 
         File::put(app_path("Http/Requests/Wizards/{$requestClass}.php"), $content);
     }
-
 }

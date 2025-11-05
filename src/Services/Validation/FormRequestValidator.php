@@ -38,6 +38,7 @@ final readonly class FormRequestValidator implements FormRequestValidatorInterfa
         $formRequest->setContainer($this->container);
 
         // Get validation rules
+        /** @phpstan-ignore-next-line - FormRequest::rules() exists but PHPStan doesn't recognize it */
         $rules = $formRequest->rules();
 
         // If no rules defined, return data as-is
