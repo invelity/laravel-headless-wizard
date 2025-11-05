@@ -34,10 +34,15 @@ class PersonalInfoStep extends AbstractStep
             id: 'personal-info',
             title: 'Personal Information',
             order: 1,
-            isOptional: false
+            isOptional: false,
+            canSkip: false
         );
     }
 
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
+    }
 
     public function process(StepData $data): StepResult
     {
@@ -82,6 +87,10 @@ class PreferencesStep extends AbstractStep
         );
     }
 
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PreferencesRequest::class;
+    }
 
     public function process(StepData $data): StepResult
     {
@@ -125,8 +134,14 @@ class EmailVerificationStep extends AbstractStep
             id: 'email-verification',
             title: 'Verify Your Email',
             order: 3,
-            isOptional: false
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\EmailVerificationRequest::class;
     }
 
     public function getDependencies(): array
@@ -189,8 +204,15 @@ class CartReviewStep extends AbstractStep
         parent::__construct(
             id: 'cart-review',
             title: 'Review Cart',
-            order: 1
+            order: 1,
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\CartReviewRequest::class;
     }
 
     public function shouldSkip(array $wizardData): bool
@@ -240,10 +262,16 @@ class ShippingAddressStep extends AbstractStep
         parent::__construct(
             id: 'shipping-address',
             title: 'Shipping Address',
-            order: 2
+            order: 2,
+            isOptional: false,
+            canSkip: false
         );
     }
 
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\ShippingAddressRequest::class;
+    }
 
     public function process(StepData $data): StepResult
     {
@@ -286,8 +314,15 @@ class PaymentStep extends AbstractStep
         parent::__construct(
             id: 'payment',
             title: 'Payment',
-            order: 3
+            order: 3,
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PaymentRequest::class;
     }
 
     public function getDependencies(): array
@@ -348,10 +383,16 @@ class BasicInfoStep extends AbstractStep
         parent::__construct(
             id: 'basic-info',
             title: 'Basic Information',
-            order: 1
+            order: 1,
+            isOptional: false,
+            canSkip: false
         );
     }
 
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\BasicInfoRequest::class;
+    }
 
     public function process(StepData $data): StepResult
     {
@@ -383,8 +424,15 @@ class EmploymentDetailsStep extends AbstractStep
         parent::__construct(
             id: 'employment-details',
             title: 'Employment Details',
-            order: 2
+            order: 2,
+            isOptional: false,
+            canSkip: false
         );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\EmploymentDetailsRequest::class;
     }
 
     public function shouldSkip(array $wizardData): bool
