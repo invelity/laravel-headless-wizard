@@ -132,6 +132,26 @@ code {
   font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
 }
 
+// Prism.js code blocks - wrapper div has background
+div.highlight,
+div[style*="background: #272B33"] {
+  background: #272B33 !important;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+// Remove background from pre and code inside Prism blocks
+code[class*="language-"],
+pre[class*="language-"] {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 1.5rem !important;
+  margin: 0 !important;
+  overflow-x: auto;
+}
+
 pre {
   background: transparent !important;
   border: 1px solid var(--slate-200);
