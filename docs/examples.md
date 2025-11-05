@@ -453,6 +453,332 @@ class EmploymentDetailsStep extends AbstractStep
 
 ---
 
+## Complete Demo: Registration Wizard
+
+This is a complete working example from the demo application showing both Blade and Vue implementations.
+
+### Project Structure
+
+```
+app/
+└── Wizards/
+    └── RegistrationWizard/
+        └── Steps/
+            ├── PersonalInfoStep.php
+            ├── PreferencesStep.php
+            └── SummaryStep.php
+            
+app/Http/
+├── Controllers/
+│   └── WizardViewController.php
+└── Requests/
+    └── Wizards/
+        ├── PersonalInfoRequest.php
+        └── PreferencesRequest.php
+```
+
+### Steps Implementation
+
+#### PersonalInfoStep.php
+
+```php
+<?php
+
+namespace App\Wizards\RegistrationWizard\Steps;
+
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+
+class PersonalInfoStep extends AbstractStep
+{
+    public function __construct()
+    {
+        parent::__construct(
+            id: 'personal-info',
+            title: 'Personal Info',
+            order: 1,
+            isOptional: false,
+            canSkip: false
+        );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
+    }
+
+    public function process(StepData $data): StepResult
+    {
+        return StepResult::success(
+            data: $data->all(),
+            message: 'Step completed successfully'
+        );
+    }
+}
+```
+
+#### PreferencesStep.php
+
+```php
+<?php
+
+namespace App\Wizards\RegistrationWizard\Steps;
+
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+
+class PreferencesStep extends AbstractStep
+{
+    public function __construct()
+    {
+        parent::__construct(
+            id: 'preferences',
+            title: 'Preferences',
+            order: 2,
+            isOptional: false,
+            canSkip: false
+        );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return \App\Http\Requests\Wizards\PreferencesRequest::class;
+    }
+
+    public function process(StepData $data): StepResult
+    {
+        return StepResult::success(
+            data: $data->all(),
+            message: 'Step completed successfully'
+        );
+    }
+}
+```
+
+#### SummaryStep.php
+
+```php
+<?php
+
+namespace App\Wizards\RegistrationWizard\Steps;
+
+use Invelity\WizardPackage\Steps\AbstractStep;
+use Invelity\WizardPackage\ValueObjects\StepData;
+use Invelity\WizardPackage\ValueObjects\StepResult;
+
+class SummaryStep extends AbstractStep
+{
+    public function __construct()
+    {
+        parent::__construct(
+            id: 'summary',
+            title: 'Summary',
+            order: 3,
+            isOptional: false,
+            canSkip: false
+        );
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return null; // No validation needed for summary
+    }
+
+    public function process(StepData $data): StepResult
+    {
+        return StepResult::success(
+            data: $data->all(),
+            message: 'Ready to complete'
+        );
+    }
+}
+```
+
+### FormRequest Validators
+
+#### PersonalInfoRequest.php
+
+```php
+<?php
+
+namespace App\Http\Requests\Wizards;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class PersonalInfoRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'age' => ['required', 'integer', 'min:18'],
+        ];
+    }
+}
+```
+
+#### PreferencesRequest.php
+
+```php
+<?php
+
+namespace App\Http\Requests\Wizards;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class PreferencesRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'theme' => ['required', 'in:light,dark,auto'],
+            'notifications' => ['required', 'array'],
+            'notifications.email' => ['required', 'boolean'],
+            'notifications.sms' => ['required', 'boolean'],
+        ];
+    }
+}
+```
+
+### Controller (Supports Both Blade and Vue)
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+
+class WizardViewController extends Controller
+{
+    public function __construct(
+        private readonly WizardManagerInterface $wizardManager
+    ) {}
+
+    public function show(string $wizard, string $step)
+    {
+        $this->wizardManager->initialize($wizard);
+        
+        $wizardData = $this->wizardManager->getAllData();
+        
+        return view("wizards.steps.{$step}", [
+            'wizardData' => $wizardData,
+        ]);
+    }
+
+    public function store(Request $request, string $wizard, string $step)
+    {
+        $this->wizardManager->initialize($wizard);
+        
+        $result = $this->wizardManager->processStep($step, $request->all());
+        
+        if (!$result->success) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $result->errors,
+                ], 422);
+            }
+            return back()->withErrors($result->errors)->withInput();
+        }
+        
+        $currentStep = $this->wizardManager->getCurrentStep();
+        
+        if ($request->expectsJson()) {
+            if ($currentStep) {
+                return response()->json([
+                    'success' => true,
+                    'completed' => false,
+                    'next_step' => $currentStep->getId(),
+                    'data' => $result->data,
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'completed' => true,
+                'data' => $result->data,
+            ]);
+        }
+        
+        if ($currentStep) {
+            return redirect()->route('wizard.show', [
+                'wizard' => $wizard,
+                'step' => $currentStep->getId(),
+            ]);
+        }
+        
+        return redirect()->route('wizard.show', [
+            'wizard' => $wizard,
+            'step' => 'summary',
+        ]);
+    }
+}
+```
+
+### Routes
+
+```php
+// routes/web.php
+
+use App\Http\Controllers\WizardViewController;
+
+Route::prefix('wizard')->group(function () {
+    Route::get('/{wizard}/{step}', [WizardViewController::class, 'show'])
+        ->name('wizard.show');
+    
+    Route::post('/{wizard}/{step}', [WizardViewController::class, 'store'])
+        ->name('wizard.store');
+});
+
+// Demo routes
+Route::get('/blade/demo', function () {
+    return redirect()->route('wizard.show', [
+        'wizard' => 'registration',
+        'step' => 'personal-info'
+    ]);
+});
+
+Route::get('/vue/demo', function () {
+    return view('vue-demo');
+});
+```
+
+### CSRF Configuration (for Vue/API)
+
+```php
+// bootstrap/app.php
+
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->validateCsrfTokens(except: [
+        'wizard/*',
+    ]);
+})
+```
+
+### Environment Configuration
+
+```env
+# Use file-based sessions for wizard state persistence
+SESSION_DRIVER=file
+```
+
+---
+
 ## Frontend Integration Examples
 
 ### React + Axios

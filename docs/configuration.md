@@ -65,6 +65,13 @@ Stores wizard data in the user's session. Best for simple wizards.
 ],
 ```
 
+**Important:** Ensure your `.env` uses a persistent session driver:
+
+```env
+SESSION_DRIVER=file  # or database, redis
+# DO NOT use 'array' - state will be lost between requests
+```
+
 **Pros:**
 - No database setup required
 - Fast access
