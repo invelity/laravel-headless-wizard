@@ -23,11 +23,11 @@ All notable changes to `wizard-package` will be documented in this file.
 
 **Author:** Martin-1182 <halaj@invelity.com>
 
-## [2.0.0] - 2025-11-04
+## [1.0.0] - 2025-11-04
 
-### ⚠️ BREAKING CHANGES
+### Initial Release
 
-**Complete architectural rewrite from view-based to headless/API-first design.**
+**Complete headless/API-first wizard package for Laravel.**
 
 This release removes all view layer dependencies and implements a frontend-agnostic JSON API. Migration from v1.x requires significant changes. See [Migration Guide](markdowns/migration-v1-to-v2.md).
 
