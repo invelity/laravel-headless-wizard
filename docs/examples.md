@@ -19,7 +19,7 @@ A complete 3-step user onboarding flow with profile creation, preferences, and e
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\User;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -38,14 +38,6 @@ class PersonalInfoStep extends AbstractStep
         );
     }
 
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'date_of_birth' => ['required', 'date', 'before:today'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -70,7 +62,7 @@ class PersonalInfoStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\UserPreferences;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -90,14 +82,6 @@ class PreferencesStep extends AbstractStep
         );
     }
 
-    public function rules(): array
-    {
-        return [
-            'newsletter' => ['boolean'],
-            'notifications' => ['boolean'],
-            'theme' => ['required', 'in:light,dark'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -124,7 +108,7 @@ class PreferencesStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Mail\VerificationEmail;
 use App\Models\User;
@@ -150,12 +134,6 @@ class EmailVerificationStep extends AbstractStep
         return ['personal-info'];
     }
 
-    public function rules(): array
-    {
-        return [
-            'verification_code' => ['required', 'string', 'size:6'],
-        ];
-    }
 
     public function beforeProcess(StepData $data): void
     {
@@ -197,7 +175,7 @@ A complete checkout flow with cart, shipping, payment, and confirmation.
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\Cart;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -221,14 +199,6 @@ class CartReviewStep extends AbstractStep
         return $cart?->items()->count() === 0;
     }
 
-    public function rules(): array
-    {
-        return [
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.id' => ['required', 'exists:products,id'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -256,7 +226,7 @@ class CartReviewStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Models\ShippingAddress;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -274,16 +244,6 @@ class ShippingAddressStep extends AbstractStep
         );
     }
 
-    public function rules(): array
-    {
-        return [
-            'street' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:100'],
-            'state' => ['required', 'string', 'size:2'],
-            'zip' => ['required', 'string', 'regex:/^\d{5}$/'],
-            'country' => ['required', 'string', 'in:US,CA'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -311,7 +271,7 @@ class ShippingAddressStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use App\Services\PaymentGateway;
 use Invelity\WizardPackage\Steps\AbstractStep;
@@ -335,15 +295,6 @@ class PaymentStep extends AbstractStep
         return ['cart-review', 'shipping-address'];
     }
 
-    public function rules(): array
-    {
-        return [
-            'payment_method' => ['required', 'in:card,paypal'],
-            'card_number' => ['required_if:payment_method,card', 'string'],
-            'card_exp' => ['required_if:payment_method,card', 'string'],
-            'card_cvv' => ['required_if:payment_method,card', 'string', 'size:3'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -384,7 +335,7 @@ A dynamic survey that shows/hides questions based on previous answers.
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use Invelity\WizardPackage\Steps\AbstractStep;
 use Invelity\WizardPackage\ValueObjects\StepData;
@@ -401,14 +352,6 @@ class BasicInfoStep extends AbstractStep
         );
     }
 
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string'],
-            'age' => ['required', 'integer', 'min:18'],
-            'employment_status' => ['required', 'in:employed,unemployed,student'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
@@ -427,7 +370,7 @@ class BasicInfoStep extends AbstractStep
 ```php
 <?php
 
-namespace App\Wizards\Steps;
+namespace App\Wizards\OnboardingWizard\Steps;
 
 use Invelity\WizardPackage\Steps\AbstractStep;
 use Invelity\WizardPackage\ValueObjects\StepData;
@@ -449,14 +392,6 @@ class EmploymentDetailsStep extends AbstractStep
         return $wizardData['basic-info']['employment_status'] !== 'employed';
     }
 
-    public function rules(): array
-    {
-        return [
-            'company' => ['required', 'string'],
-            'position' => ['required', 'string'],
-            'salary' => ['required', 'numeric', 'min:0'],
-        ];
-    }
 
     public function process(StepData $data): StepResult
     {
