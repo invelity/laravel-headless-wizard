@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Core;
 
 use Illuminate\Support\Facades\Event;
+use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
@@ -37,6 +38,7 @@ class WizardManager implements WizardManagerInterface
         private readonly WizardConfiguration $configuration,
         private readonly WizardStorageInterface $storage,
         private readonly StepFactory $stepFactory,
+        private readonly FormRequestValidatorInterface $formRequestValidator,
     ) {}
 
     public function initialize(string $wizardId, array $config = []): void
@@ -116,7 +118,11 @@ class WizardManager implements WizardManagerInterface
 
         $step = $this->getStep($stepId);
 
-        $validated = $step->validate($data);
+        // Get FormRequest from step
+        $formRequestClass = $step->getFormRequest();
+
+        // Validate using FormRequest
+        $validated = $this->formRequestValidator->validate($formRequestClass, $data);
 
         $stepData = new StepData(
             stepId: $stepId,

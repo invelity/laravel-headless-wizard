@@ -7,7 +7,6 @@ namespace Invelity\WizardPackage\Steps;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Traits\HasWizardSteps;
 use Invelity\WizardPackage\Traits\PersistsStepData;
-use Invelity\WizardPackage\Traits\ValidatesStepData;
 use Invelity\WizardPackage\ValueObjects\StepData;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 
@@ -15,7 +14,6 @@ abstract class AbstractStep implements WizardStepInterface
 {
     use HasWizardSteps;
     use PersistsStepData;
-    use ValidatesStepData;
 
     public function __construct(
         protected readonly string $id,
@@ -48,6 +46,11 @@ abstract class AbstractStep implements WizardStepInterface
     public function canSkip(): bool
     {
         return $this->canSkip;
+    }
+
+    public function getFormRequest(): ?string
+    {
+        return null;
     }
 
     abstract public function process(StepData $data): StepResult;

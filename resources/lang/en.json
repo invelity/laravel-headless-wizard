@@ -27,7 +27,7 @@
     "Troubleshooting:": "Troubleshooting:",
     "  • Check directory permissions for app/Wizards/Steps/": "  • Check directory permissions for app/Wizards/Steps/",
     "  • Check directory permissions for app/Http/Requests/Wizards/": "  • Check directory permissions for app/Http/Requests/Wizards/",
-    "  • Ensure config/wizard-package.php is writable": "  • Ensure config/wizard-package.php is writable",
+    "  • Ensure config/wizard.php is writable": "  • Ensure config/wizard.php is writable",
     "  • Check directory permissions for app/Wizards/": "  • Check directory permissions for app/Wizards/",
     "✓ Step class created: app/Wizards/Steps/{class}.php": "✓ Step class created: app/Wizards/Steps/{class}.php",
     "✓ FormRequest created: app/Http/Requests/Wizards/{class}.php": "✓ FormRequest created: app/Http/Requests/Wizards/{class}.php",
@@ -38,7 +38,7 @@
     "  • Implement business logic: app/Wizards/Steps/{class}.php": "  • Implement business logic: app/Wizards/Steps/{class}.php",
     "  • Generate another step: php artisan wizard:make-step --wizard={wizard}": "  • Generate another step: php artisan wizard:make-step --wizard={wizard}",
     "✓ Wizard class created: app/Wizards/{class}.php": "✓ Wizard class created: app/Wizards/{class}.php",
-    "✓ Registered in config: config/wizard-package.php": "✓ Registered in config: config/wizard-package.php",
+    "✓ Registered in config: config/wizard.php": "✓ Registered in config: config/wizard.php",
     "  • Generate first step: php artisan wizard:make-step --wizard={wizard}": "  • Generate first step: php artisan wizard:make-step --wizard={wizard}",
-    "  • View wizard config: config/wizard-package.php": "  • View wizard config: config/wizard-package.php"
+    "  • View wizard config: config/wizard.php": "  • View wizard config: config/wizard.php"
 }

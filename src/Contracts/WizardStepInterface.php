@@ -19,10 +19,7 @@ interface WizardStepInterface
 
     public function canSkip(): bool;
 
-    /**
-     * @return array<string, string|array>
-     */
-    public function rules(): array;
+    public function getFormRequest(): ?string;
 
     public function process(StepData $data): StepResult;
 
@@ -36,9 +33,4 @@ interface WizardStepInterface
      * @return string[]
      */
     public function getDependencies(): array;
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function validate(array $data): array;
 }
