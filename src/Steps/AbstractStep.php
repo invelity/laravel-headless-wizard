@@ -50,6 +50,11 @@ abstract class AbstractStep implements WizardStepInterface
         return $this->canSkip;
     }
 
+    public function rules(): array
+    {
+        return [];
+    }
+
     abstract public function process(StepData $data): StepResult;
 
     public function beforeProcess(StepData $data): void

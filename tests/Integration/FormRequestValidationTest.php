@@ -16,8 +16,8 @@ class FormRequestValidationTest extends TestCase
         $this->cleanupGeneratedFiles();
         $this->setupWizardConfig();
 
-        $config = require config_path('wizard-package.php');
-        config(['wizard-package' => $config]);
+        $config = require config_path('wizard.php');
+        config(['wizard' => $config]);
     }
 
     protected function tearDown(): void
@@ -40,7 +40,7 @@ class FormRequestValidationTest extends TestCase
 
     protected function setupWizardConfig(): void
     {
-        $configPath = config_path('wizard-package.php');
+        $configPath = config_path('wizard.php');
         $configDir = dirname($configPath);
 
         if (! File::isDirectory($configDir)) {

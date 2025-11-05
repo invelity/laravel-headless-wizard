@@ -10,7 +10,7 @@ beforeEach(function () {
     File::ensureDirectoryExists(app_path('Wizards'));
     File::ensureDirectoryExists(app_path('Http/Requests/Wizards'));
 
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
     $configDir = dirname($configPath);
 
     if (! File::isDirectory($configDir)) {
@@ -26,8 +26,8 @@ beforeEach(function () {
     ];
 
     File::put($configPath, "<?php\n\ndeclare(strict_types=1);\n\nreturn ".var_export($config, true).";\n");
-    
-    config(['wizard-package.wizards' => $config['wizards']]);
+
+    config(['wizard.wizards' => $config['wizards']]);
 });
 
 afterEach(function () {
@@ -36,14 +36,14 @@ afterEach(function () {
 });
 
 test('MakeStepCommand prompts for wizard selection when option not provided', function () {
-    $wizards = config('wizard-package.wizards');
+    $wizards = config('wizard.wizards');
     expect($wizards)->toBeArray();
     expect($wizards)->not->toBeEmpty();
-    
+
     if (empty($wizards)) {
         $this->markTestSkipped('Config not loaded properly in CI environment');
     }
-    
+
     $this->artisan('wizard:make-step', [
         'name' => 'UserInfo',
         '--order' => 1,
@@ -67,7 +67,7 @@ test('MakeStepCommand validates empty step name', function () {
 });
 
 test('MakeStepCommand getLastStepOrder returns correct count', function () {
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
 
     $config = [
         'storage' => ['driver' => 'session'],

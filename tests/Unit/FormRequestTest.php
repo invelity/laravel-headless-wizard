@@ -13,7 +13,7 @@ beforeEach(function () {
         File::deleteDirectory(app_path('Http/Requests/Wizards'));
     }
 
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
     $configDir = dirname($configPath);
 
     if (! File::isDirectory($configDir)) {

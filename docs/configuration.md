@@ -12,7 +12,7 @@ Learn how to configure Laravel Headless Wizard for your application.
 
 ## Configuration File
 
-After publishing the config, you'll find `config/wizard-package.php` with the following options:
+After publishing the config, you'll find `config/wizard.php` with the following options:
 
 ```php
 return [
