@@ -23,6 +23,6 @@ class {{ class }}
 
     public function getSteps(): array
     {
-        return config('wizard-package.wizards.{{ id }}.steps', []);
+        return config('wizard.wizards.{{ id }}.steps', []);
     }
 }

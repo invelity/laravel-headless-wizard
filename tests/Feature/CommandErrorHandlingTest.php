@@ -8,7 +8,7 @@ beforeEach(function () {
     File::cleanDirectory(app_path('Wizards'));
     File::cleanDirectory(app_path('Http/Requests/Wizards'));
 
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
     $configDir = dirname($configPath);
 
     if (! File::isDirectory($configDir)) {
@@ -28,13 +28,13 @@ afterEach(function () {
     File::cleanDirectory(app_path('Wizards'));
     File::cleanDirectory(app_path('Http/Requests/Wizards'));
 
-    if (File::exists(config_path('wizard-package.php.backup'))) {
-        File::delete(config_path('wizard-package.php.backup'));
+    if (File::exists(config_path('wizard.php.backup'))) {
+        File::delete(config_path('wizard.php.backup'));
     }
 });
 
 test('MakeStepCommand handles missing wizards error', function () {
-    config(['wizard-package.wizards' => []]);
+    config(['wizard.wizards' => []]);
 
     $this->artisan('wizard:make-step')
         ->expectsOutput('No wizards found. Create a wizard first:')
@@ -43,7 +43,7 @@ test('MakeStepCommand handles missing wizards error', function () {
 });
 
 test('MakeStepCommand validates step name is PascalCase', function () {
-    config(['wizard-package.wizards' => ['test' => ['steps' => []]]]);
+    config(['wizard.wizards' => ['test' => ['steps' => []]]]);
 
     $this->artisan('wizard:make-step', ['name' => 'invalid_step', '--wizard' => 'test'])
         ->expectsOutput('Step name must be PascalCase (e.g., PersonalInfo)')
@@ -57,7 +57,7 @@ test('MakeWizardCommand validates wizard name is required', function () {
 });
 
 test('WritesConfig creates backup before modification', function () {
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
     $backupPath = $configPath.'.backup';
 
     expect(File::exists($configPath))->toBeTrue();
@@ -69,7 +69,7 @@ test('WritesConfig creates backup before modification', function () {
 });
 
 test('writeWithLock handles file locking', function () {
-    $configPath = config_path('wizard-package.php');
+    $configPath = config_path('wizard.php');
 
     expect(File::exists($configPath))->toBeTrue();
 

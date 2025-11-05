@@ -16,8 +16,8 @@ class MakeWizardCommandTest extends TestCase
         $this->cleanupGeneratedFiles();
         $this->setupConfigFile();
 
-        $config = require config_path('wizard-package.php');
-        config(['wizard-package' => $config]);
+        $config = require config_path('wizard.php');
+        config(['wizard' => $config]);
     }
 
     protected function tearDown(): void
@@ -41,7 +41,7 @@ class MakeWizardCommandTest extends TestCase
             File::deleteDirectory(app_path('Wizards'));
         }
 
-        $configPath = config_path('wizard-package.php');
+        $configPath = config_path('wizard.php');
         if (File::exists($configPath.'.backup')) {
             File::delete($configPath.'.backup');
         }
@@ -49,7 +49,7 @@ class MakeWizardCommandTest extends TestCase
 
     protected function setupConfigFile(): void
     {
-        $configPath = config_path('wizard-package.php');
+        $configPath = config_path('wizard.php');
         $configDir = dirname($configPath);
 
         if (! File::isDirectory($configDir)) {
@@ -120,7 +120,7 @@ class MakeWizardCommandTest extends TestCase
     {
         $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
 
-        $config = require config_path('wizard-package.php');
+        $config = require config_path('wizard.php');
 
         $this->assertArrayHasKey('onboarding', $config['wizards']);
         $this->assertEquals('App\Wizards\Onboarding', $config['wizards']['onboarding']['class']);

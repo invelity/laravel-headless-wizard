@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 use Invelity\WizardPackage\Commands\MakeWizardCommand;
 
 beforeEach(function () {
-    $this->configPath = config_path('wizard-package.php');
+    $this->configPath = config_path('wizard.php');
     $this->backupPath = $this->configPath.'.backup';
 
     File::ensureDirectoryExists(config_path());
