@@ -14,11 +14,17 @@ Learn how to create multi-step wizards from scratch.
 
 ### 1. Generate a Wizard
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```bash
 php artisan wizard:make Onboarding
 ```
 
+</div>
+
 **Interactive prompt:**
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```
 ✔ What is the wizard name? › Onboarding
 ✓ Wizard class created: app/Wizards/OnboardingWizard/Onboarding.php
@@ -26,13 +32,21 @@ php artisan wizard:make Onboarding
 ✓ Wizard will be auto-discovered on next request
 ```
 
+</div>
+
 ### 2. Generate Steps
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```bash
 php artisan wizard:make-step Onboarding
 ```
 
+</div>
+
 **Interactive prompts:**
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```
 ✔ What is the step name? › PersonalInfo
 ✔ What is the step title? › Personal Information  
@@ -43,6 +57,8 @@ php artisan wizard:make-step Onboarding
 ✓ FormRequest created: app/Http/Requests/Wizards/PersonalInfoRequest.php
 ✓ Step will be auto-discovered
 ```
+
+</div>
 
 ---
 
@@ -60,6 +76,8 @@ A wizard consists of:
 ## Creating Custom Steps
 
 ### Step Class Example
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -114,7 +132,11 @@ class PersonalInfoStep extends AbstractStep
 }
 ```
 
+</div>
+
 ### Form Request Example
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -150,11 +172,15 @@ class PersonalInfoRequest extends FormRequest
 }
 ```
 
+</div>
+
 ---
 
 ## Optional Steps
 
 Make a step optional by passing `optional: true`:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function __construct()
@@ -174,11 +200,15 @@ public function getFormRequest(): ?string
 }
 ```
 
+</div>
+
 ---
 
 ## Conditional Steps
 
 Skip steps based on wizard data:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function shouldSkip(array $wizardData): bool
@@ -188,11 +218,15 @@ public function shouldSkip(array $wizardData): bool
 }
 ```
 
+</div>
+
 ---
 
 ## Step Dependencies
 
 Require other steps to be completed first:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function getDependencies(): array
@@ -202,11 +236,15 @@ public function getDependencies(): array
 }
 ```
 
+</div>
+
 ---
 
 ## Processing Step Data
 
 The `process()` method is called after validation:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function process(StepData $data): StepResult
@@ -232,7 +270,11 @@ public function process(StepData $data): StepResult
 }
 ```
 
+</div>
+
 ### StepResult Options
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 // Success
@@ -250,11 +292,15 @@ return StepResult::failure('Validation failed', [
 ]);
 ```
 
+</div>
+
 ---
 
 ## Accessing Wizard Data
 
 Get data from previous steps:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 use Invelity\WizardPackage\Traits\HasWizardSteps;
@@ -277,11 +323,15 @@ class PaymentStep extends AbstractStep
 }
 ```
 
+</div>
+
 ---
 
 ## Step Lifecycle Events
 
 Listen to step events:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 // In your EventServiceProvider
@@ -295,6 +345,8 @@ protected $listen = [
 ];
 ```
 
+</div>
+
 Available events:
 - `WizardStarted` - When wizard is initialized
 - `StepCompleted` - When a step is successfully completed
@@ -306,6 +358,8 @@ Available events:
 ## Using the Facade
 
 ### Initialize a Wizard
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 use Invelity\WizardPackage\Facades\Wizard;
@@ -334,11 +388,15 @@ echo $progress->completionPercentage(); // 33%
 Wizard::complete();
 ```
 
+</div>
+
 ---
 
 ## Frontend Integration
 
 ### React/Vue/Inertia Example
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```javascript
 // Fetch wizard state
@@ -358,7 +416,11 @@ const result = await fetch('/wizard/onboarding/personal-info', {
 const { success, next_step, errors } = await result.json();
 ```
 
+</div>
+
 ### API Response Format
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```json
 {
@@ -390,11 +452,15 @@ const { success, next_step, errors } = await result.json();
 }
 ```
 
+</div>
+
 ---
 
 ## Advanced: Custom Wizard Class
 
 You can extend the base wizard for custom behavior:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 <?php
@@ -424,6 +490,8 @@ class OnboardingWizard extends Wizard
     }
 }
 ```
+
+</div>
 
 ---
 

@@ -14,6 +14,8 @@ Learn how to configure Laravel Headless Wizard for your application.
 
 After publishing the config, you'll find `config/wizard.php` with the following options:
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 return [
     'storage' => [
@@ -49,6 +51,8 @@ return [
 ];
 ```
 
+</div>
+
 **Note:** Wizards and steps are **auto-discovered** from `app/Wizards/*Wizard/` directories. No manual registration needed!
 
 ---
@@ -59,18 +63,26 @@ return [
 
 Stores wizard data in the user's session. Best for simple wizards.
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 'storage' => [
     'driver' => 'session',
 ],
 ```
 
+</div>
+
 **Important:** Ensure your `.env` uses a persistent session driver:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```env
 SESSION_DRIVER=file  # or database, redis
 # DO NOT use 'array' - state will be lost between requests
 ```
+
+</div>
 
 **Pros:**
 - No database setup required
@@ -86,11 +98,15 @@ SESSION_DRIVER=file  # or database, redis
 
 Stores wizard data in the database. Best for persistent wizards.
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 'storage' => [
     'driver' => 'database',
 ],
 ```
+
+</div>
 
 **Pros:**
 - Persistent across sessions
@@ -102,10 +118,14 @@ Stores wizard data in the database. Best for persistent wizards.
 - Slightly slower than session/cache
 
 **Setup:**
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```bash
 php artisan vendor:publish --tag="wizard-migrations"
 php artisan migrate
 ```
+
+</div>
 
 {: .important }
 > **Security Note:** Step data in the `wizard_progress` table is automatically **encrypted** using Laravel's `encrypted:array` cast with your `APP_KEY`. This protects sensitive user data while the wizard is in progress. Data is automatically decrypted when retrieved. The `step_data` column uses `TEXT` type (not `JSON`) to store the encrypted string.
@@ -120,12 +140,16 @@ php artisan migrate
 
 Stores wizard data in your cache driver. Best for high-performance needs.
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 'storage' => [
     'driver' => 'cache',
     'ttl' => 3600, // Time to live in seconds
 ],
 ```
+
+</div>
 
 **Pros:**
 - Very fast (especially with Redis/Memcached)
@@ -145,21 +169,29 @@ Stores wizard data in your cache driver. Best for high-performance needs.
 
 Allow users to jump to any completed step:
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 'navigation' => [
     'allow_jump' => true,
 ],
 ```
 
+</div>
+
 ### Show All Steps
 
 Control whether all steps are visible in navigation:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 'navigation' => [
     'show_all_steps' => false, // Only show accessible steps
 ],
 ```
+
+</div>
 
 ---
 
@@ -169,21 +201,29 @@ Control whether all steps are visible in navigation:
 
 Require validation when navigating to previous steps:
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 'validation' => [
     'validate_on_navigate' => true,
 ],
 ```
 
+</div>
+
 ### Mark as Completed
 
 Automatically mark steps as completed after successful validation:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 'validation' => [
     'marks_completed' => true,
 ],
 ```
+
+</div>
 
 ---
 
@@ -193,15 +233,21 @@ Automatically mark steps as completed after successful validation:
 
 Change the URL prefix for wizard routes:
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 'routes' => [
     'prefix' => 'my-wizard', // /my-wizard/checkout/step-1
 ],
 ```
 
+</div>
+
 ### Middleware
 
 Add middleware to wizard routes:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 'routes' => [
@@ -209,15 +255,21 @@ Add middleware to wizard routes:
 ],
 ```
 
+</div>
+
 ### Disable Routes
 
 If you want to handle routing yourself:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 'routes' => [
     'enabled' => false,
 ],
 ```
+
+</div>
 
 ---
 
@@ -227,12 +279,16 @@ If you want to handle routing yourself:
 
 Control whether lifecycle events are fired:
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```php
 'events' => [
     'dispatch' => false, // Disable all events
     'log_progress' => true, // Log wizard progress
 ],
 ```
+
+</div>
 
 Available events:
 - `WizardStarted`
@@ -246,19 +302,27 @@ Available events:
 
 You can override configuration in your `.env` file:
 
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
+
 ```env
 WIZARD_STORAGE_DRIVER=database
 WIZARD_ALLOW_JUMP_NAVIGATION=true
 WIZARD_FIRE_EVENTS=false
 ```
 
+</div>
+
 Then reference in config:
+
+<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 'storage' => [
     'driver' => env('WIZARD_STORAGE_DRIVER', 'session'),
 ],
 ```
+
+</div>
 
 ---
 
