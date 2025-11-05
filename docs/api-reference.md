@@ -16,13 +16,9 @@ The main interface for managing wizard state and navigation.
 
 ### Initialize a Wizard
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function initialize(string $wizardId, array $config = []): void
 ```
-
-</div>
 
 Initialize a new wizard instance.
 
@@ -31,51 +27,35 @@ Initialize a new wizard instance.
 - `$config` - Optional configuration overrides
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 use Invelity\WizardPackage\Facades\Wizard;
 
 Wizard::initialize('onboarding');
 ```
 
-</div>
-
 ---
 
 ### Get Current Step
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function getCurrentStep(): ?WizardStepInterface
 ```
 
-</div>
-
 Returns the current active step, or null if not set.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $step = Wizard::getCurrentStep();
 echo $step?->getTitle(); // "Personal Information"
 ```
 
-</div>
-
 ---
 
 ### Get Specific Step
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function getStep(string $stepId): WizardStepInterface
 ```
-
-</div>
 
 Get a step by its ID.
 
@@ -85,25 +65,17 @@ Get a step by its ID.
 **Throws:** `\InvalidArgumentException` if step not found
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $step = Wizard::getStep('personal-info');
 ```
-
-</div>
 
 ---
 
 ### Process Step
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function processStep(string $stepId, array $data): StepResult
 ```
-
-</div>
 
 Process and validate step data.
 
@@ -114,8 +86,6 @@ Process and validate step data.
 **Returns:** `StepResult` - Contains success/failure status and messages
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $result = Wizard::processStep('personal-info', [
     'name' => 'John Doe',
@@ -127,13 +97,9 @@ if ($result->isSuccess()) {
 }
 ```
 
-</div>
-
 ---
 
 ### Navigation Methods
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function navigateToStep(string $stepId): void
@@ -142,11 +108,7 @@ public function getPreviousStep(): ?WizardStepInterface
 public function canAccessStep(string $stepId): bool
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $next = Wizard::getNextStep();
 $prev = Wizard::getPreviousStep();
@@ -156,25 +118,17 @@ if (Wizard::canAccessStep('payment')) {
 }
 ```
 
-</div>
-
 ---
 
 ### Get Progress
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function getProgress(): WizardProgressValue
 ```
 
-</div>
-
 Returns wizard completion progress.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $progress = Wizard::getProgress();
 
@@ -184,25 +138,17 @@ echo $progress->totalSteps(); // 3
 echo $progress->isComplete() ? 'Done' : 'In Progress';
 ```
 
-</div>
-
 ---
 
 ### Get All Data
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function getAllData(): array
 ```
 
-</div>
-
 Returns all wizard data from completed steps.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $data = Wizard::getAllData();
 // [
@@ -211,25 +157,17 @@ $data = Wizard::getAllData();
 // ]
 ```
 
-</div>
-
 ---
 
 ### Complete Wizard
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function complete(): StepResult
 ```
 
-</div>
-
 Mark wizard as complete and trigger completion events.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $result = Wizard::complete();
 
@@ -238,53 +176,35 @@ if ($result->isSuccess()) {
 }
 ```
 
-</div>
-
 ---
 
 ### Reset Wizard
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function reset(): void
 ```
 
-</div>
-
 Reset wizard to initial state, clearing all progress.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 Wizard::reset();
 ```
-
-</div>
 
 ---
 
 ### Skip Step
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function skipStep(string $stepId): void
 ```
 
-</div>
-
 Skip an optional step.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 Wizard::skipStep('newsletter-preferences');
 ```
-
-</div>
 
 ---
 
@@ -294,8 +214,6 @@ Interface for individual wizard steps.
 
 ### Step Properties
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function getId(): string
 public function getTitle(): string
@@ -304,11 +222,7 @@ public function isOptional(): bool
 public function canSkip(): bool
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $step = Wizard::getCurrentStep();
 
@@ -318,25 +232,17 @@ echo $step->getOrder(); // 1
 echo $step->isOptional() ? 'Optional' : 'Required';
 ```
 
-</div>
-
 ---
 
 ### Validation Rules
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function rules(): array
 ```
 
-</div>
-
 Returns Laravel validation rules for the step.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 class PersonalInfoStep extends AbstractStep
 {
@@ -350,25 +256,17 @@ class PersonalInfoStep extends AbstractStep
 }
 ```
 
-</div>
-
 ---
 
 ### Process Step Data
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function process(StepData $data): StepResult
 ```
 
-</div>
-
 Process validated step data.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function process(StepData $data): StepResult
 {
@@ -384,24 +282,16 @@ public function process(StepData $data): StepResult
 }
 ```
 
-</div>
-
 ---
 
 ### Lifecycle Hooks
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function beforeProcess(StepData $data): void
 public function afterProcess(StepResult $result): void
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function beforeProcess(StepData $data): void
 {
@@ -416,25 +306,17 @@ public function afterProcess(StepResult $result): void
 }
 ```
 
-</div>
-
 ---
 
 ### Conditional Logic
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function shouldSkip(array $wizardData): bool
 ```
 
-</div>
-
 Determine if step should be skipped based on wizard data.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function shouldSkip(array $wizardData): bool
 {
@@ -443,33 +325,23 @@ public function shouldSkip(array $wizardData): bool
 }
 ```
 
-</div>
-
 ---
 
 ### Dependencies
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 public function getDependencies(): array
 ```
 
-</div>
-
 Return step IDs that must be completed first.
 
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function getDependencies(): array
 {
     return ['personal-info', 'contact-details'];
 }
 ```
-
-</div>
 
 ---
 
@@ -479,8 +351,6 @@ Value object representing step processing result.
 
 ### Success Result
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 StepResult::success(
     array $data = [],
@@ -489,11 +359,7 @@ StepResult::success(
 ): StepResult
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 return StepResult::success(
     data: ['user_id' => 123],
@@ -501,13 +367,9 @@ return StepResult::success(
 );
 ```
 
-</div>
-
 ---
 
 ### Failure Result
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 StepResult::failure(
@@ -516,11 +378,7 @@ StepResult::failure(
 ): StepResult
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 return StepResult::failure(
     message: 'Payment failed',
@@ -528,13 +386,9 @@ return StepResult::failure(
 );
 ```
 
-</div>
-
 ---
 
 ### Redirect Result
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 StepResult::redirect(
@@ -543,24 +397,16 @@ StepResult::redirect(
 ): StepResult
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 return StepResult::redirect('/external-payment', [
     'session_id' => 'abc123'
 ]);
 ```
 
-</div>
-
 ---
 
 ### Check Result
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 $result->isSuccess(): bool
@@ -571,8 +417,6 @@ $result->data(): array
 $result->errors(): array
 ```
 
-</div>
-
 ---
 
 ## StepData
@@ -581,19 +425,13 @@ Value object for accessing validated step data.
 
 ### Get Data
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $data->get(string $key, mixed $default = null): mixed
 $data->all(): array
 $data->has(string $key): bool
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function process(StepData $data): StepResult
 {
@@ -608,8 +446,6 @@ public function process(StepData $data): StepResult
 }
 ```
 
-</div>
-
 ---
 
 ## WizardProgressValue
@@ -617,8 +453,6 @@ public function process(StepData $data): StepResult
 Value object representing wizard completion state.
 
 ### Methods
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 $progress->completionPercentage(): int
@@ -628,11 +462,7 @@ $progress->isComplete(): bool
 $progress->remainingSteps(): int
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 $progress = Wizard::getProgress();
 
@@ -640,8 +470,6 @@ echo "Progress: {$progress->completionPercentage()}%";
 echo "Completed: {$progress->completedSteps()}/{$progress->totalSteps()}";
 echo "Remaining: {$progress->remainingSteps()} steps";
 ```
-
-</div>
 
 ---
 
@@ -651,8 +479,6 @@ Interface for wizard data persistence.
 
 ### Storage Methods
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 public function put(string $key, array $data): void
 public function get(string $key): ?array
@@ -661,11 +487,7 @@ public function forget(string $key): void
 public function update(string $key, string $field, mixed $value): void
 ```
 
-</div>
-
 **Example:**
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 
@@ -677,8 +499,6 @@ $storage->update('wizard.onboarding', 'step', 'contact-details');
 $storage->forget('wizard.onboarding');
 ```
 
-</div>
-
 ---
 
 ## Events
@@ -686,8 +506,6 @@ $storage->forget('wizard.onboarding');
 ### WizardStarted
 
 Fired when wizard is initialized.
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 use Invelity\WizardPackage\Events\WizardStarted;
@@ -705,15 +523,11 @@ class WizardStartedListener
 }
 ```
 
-</div>
-
 ---
 
 ### StepCompleted
 
 Fired when a step is successfully completed.
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 use Invelity\WizardPackage\Events\StepCompleted;
@@ -731,29 +545,21 @@ class StepCompletedListener
 }
 ```
 
-</div>
-
 ---
 
 ### StepSkipped
 
 Fired when an optional step is skipped.
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 use Invelity\WizardPackage\Events\StepSkipped;
 ```
-
-</div>
 
 ---
 
 ### WizardCompleted
 
 Fired when wizard is completed.
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 use Invelity\WizardPackage\Events\WizardCompleted;
@@ -783,8 +589,6 @@ class WizardCompletedListener
 }
 ```
 
-</div>
-
 ---
 
 ## Wizard Progress Status
@@ -809,8 +613,6 @@ The `wizard_progress` table tracks wizard state with three statuses:
 
 ### Managing Status
 
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
-
 ```php
 use Invelity\WizardPackage\Models\WizardProgress;
 
@@ -831,13 +633,9 @@ if ($progress->isAbandoned()) {
 }
 ```
 
-</div>
-
 ### Cleanup Command
 
 Create a scheduled command to clean up old abandoned wizards:
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```php
 // app/Console/Commands/CleanupAbandonedWizards.php
@@ -848,8 +646,6 @@ WizardProgress::where('status', 'in_progress')
     ->update(['status' => 'abandoned']);
 ```
 
-</div>
-
 ---
 
 ## HTTP Responses
@@ -857,8 +653,6 @@ WizardProgress::where('status', 'in_progress')
 All wizard routes return JSON responses in this format:
 
 ### Success Response
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```json
 {
@@ -895,13 +689,9 @@ All wizard routes return JSON responses in this format:
 }
 ```
 
-</div>
-
 ---
 
 ### Error Response
-
-<div style="background: #272B33; border-radius: 0.75rem; overflow: hidden; margin: 1.5rem 0;">
 
 ```json
 {
@@ -913,8 +703,6 @@ All wizard routes return JSON responses in this format:
     }
 }
 ```
-
-</div>
 
 ---
 
