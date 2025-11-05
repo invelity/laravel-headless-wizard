@@ -107,6 +107,15 @@ php artisan vendor:publish --tag="wizard-migrations"
 php artisan migrate
 ```
 
+{: .important }
+> **Security Note:** Step data in the `wizard_progress` table is automatically **encrypted** using Laravel's `encrypted:array` cast with your `APP_KEY`. This protects sensitive user data while the wizard is in progress. Data is automatically decrypted when retrieved. The `step_data` column uses `TEXT` type (not `JSON`) to store the encrypted string.
+>
+> **Important for Production:**
+> - Keep your `APP_KEY` secure and backed up
+> - If you rotate `APP_KEY`, existing wizard progress will become unreadable
+> - Consider clearing old wizard progress before key rotation
+> - For guest users, wizard data is tied to session - no `user_id` foreign key constraint
+
 ### Cache Storage
 
 Stores wizard data in your cache driver. Best for high-performance needs.
