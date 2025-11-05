@@ -12,7 +12,6 @@ use function Laravel\Prompts\text;
 
 class MakeWizardCommand extends Command
 {
-
     protected $signature = 'wizard:make 
                             {name? : The name of the wizard}
                             {--force : Overwrite existing wizard}';
