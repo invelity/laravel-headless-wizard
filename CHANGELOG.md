@@ -2,6 +2,27 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## [1.1.0] - 2025-11-05
+
+### Bug Fixes
+- Fixed database storage support for guest users (removed foreign key constraint)
+- Fixed encrypted step_data storage (changed from json to text column type)
+- Fixed migration to make current_step_id nullable
+- Fixed WizardServiceProvider to handle array config format for storage driver
+
+### Documentation
+- Added comprehensive security documentation for encrypted step data
+- Added wizard progress status documentation (in_progress, completed, abandoned)
+- Documented all wizard lifecycle events (WizardStarted, StepCompleted, StepSkipped, WizardCompleted)
+- Added cleanup command examples for abandoned wizards
+- Improved database storage configuration guide with production considerations
+
+### Improvements
+- Enhanced error handling for guest user workflows
+- Better MariaDB compatibility for encrypted data storage
+
+**Author:** Martin-1182 <halaj@invelity.com>
+
 ## [2.0.0] - 2025-11-04
 
 ### ⚠️ BREAKING CHANGES
