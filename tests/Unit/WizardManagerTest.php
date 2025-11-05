@@ -130,7 +130,6 @@ test('getNavigation throws when navigation is null after initialization', functi
         app(\Invelity\WizardPackage\Core\WizardConfiguration::class),
         app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class),
         app(\Invelity\WizardPackage\Steps\StepFactory::class),
-        app(\Invelity\WizardPackage\Contracts\FormRequestResolverInterface::class),
         app(\Invelity\WizardPackage\Contracts\FormRequestValidatorInterface::class)
     );
 

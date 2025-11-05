@@ -168,9 +168,29 @@ class MakeStepCommand extends Command
 
         $stub = File::get(__DIR__.'/../../resources/stubs/step.php.stub');
 
+        $requestClass = str_replace('Step', '', $stepClass).'Request';
+
         $content = str_replace(
-            ['{{ namespace }}', '{{ class }}', '{{ stepId }}', '{{ title }}', '{{ order }}', '{{ optional }}'],
-            ['App\Wizards\Steps', $stepClass, $stepId, $title, (string) $order, $optional ? 'true' : 'false'],
+            [
+                '{{ namespace }}',
+                '{{ class }}',
+                '{{ stepId }}',
+                '{{ title }}',
+                '{{ order }}',
+                '{{ optional }}',
+                '{{ formRequestNamespace }}',
+                '{{ formRequestClass }}',
+            ],
+            [
+                'App\Wizards\Steps',
+                $stepClass,
+                $stepId,
+                $title,
+                (string) $order,
+                $optional ? 'true' : 'false',
+                'App\Http\Requests\Wizards',
+                $requestClass,
+            ],
             $stub
         );
 

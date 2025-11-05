@@ -21,17 +21,14 @@ class {{ class }} extends AbstractStep
         );
     }
 
-    public function rules(): array
+    public function getFormRequest(): ?string
     {
-        return [
-            // Add your validation rules here
-            // Example: 'email' => ['required', 'email'],
-        ];
+        return \{{ formRequestNamespace }}\{{ formRequestClass }}::class;
     }
 
     public function process(StepData $data): StepResult
     {
-        // Data is already validated using rules() above
+        // Data is already validated using FormRequest
         // Implement your business logic here
 
         return StepResult::success(
