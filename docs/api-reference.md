@@ -563,6 +563,87 @@ Fired when wizard is completed.
 
 ```php
 use Invelity\WizardPackage\Events\WizardCompleted;
+
+class WizardCompletedListener
+{
+    public function handle(WizardCompleted $event): void
+    {
+        // All wizard data is available
+        $data = $event->allData;
+        
+        // Create final records with relationships
+        $user = User::create([
+            'name' => $data['steps']['personal-info']['name'],
+            'email' => $data['steps']['personal-info']['email'],
+        ]);
+        
+        $user->preferences()->create([
+            'theme' => $data['steps']['preferences']['theme'],
+        ]);
+        
+        Log::info('Wizard completed', [
+            'wizard_id' => $event->wizardId,
+            'completed_at' => $event->completedAt,
+        ]);
+    }
+}
+```
+
+---
+
+## Wizard Progress Status
+
+The `wizard_progress` table tracks wizard state with three statuses:
+
+### Status Values
+
+**`in_progress`** (default)
+- Set when wizard is initialized
+- Remains during step completion
+
+**`completed`**
+- Set when `complete()` is called
+- Triggers `WizardCompleted` event
+- Sets `completed_at` timestamp
+
+**`abandoned`**
+- Must be set manually via `markAsAbandoned()`
+- Used for analytics/cleanup
+- Not automatically triggered
+
+### Managing Status
+
+```php
+use Invelity\WizardPackage\Models\WizardProgress;
+
+// Mark as completed (automatic when wizard finishes)
+$progress = WizardProgress::where('wizard_id', 'registration')->first();
+$progress->markAsCompleted();
+
+// Mark as abandoned (manual)
+$progress->markAsAbandoned();
+
+// Check status
+if ($progress->isComplete()) {
+    // Wizard finished
+}
+
+if ($progress->isAbandoned()) {
+    // User left wizard
+}
+```
+
+### Cleanup Command
+
+Create a scheduled command to clean up old abandoned wizards:
+
+```php
+// app/Console/Commands/CleanupAbandonedWizards.php
+use Invelity\WizardPackage\Models\WizardProgress;
+
+WizardProgress::where('status', 'in_progress')
+    ->where('last_activity_at', '<', now()->subDays(30))
+    ->update(['status' => 'abandoned']);
 ```
 
 ---

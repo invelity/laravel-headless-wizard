@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Exceptions;
 
-use Exception;
+use Illuminate\Validation\ValidationException;
 
-class StepValidationException extends Exception
+class StepValidationException extends ValidationException
 {
-    public function __construct(
-        public readonly array $errors
-    ) {
-        parent::__construct('Step validation failed');
-    }
-
     public function getErrors(): array
     {
-        return $this->errors;
+        return $this->validator->errors()->toArray();
     }
 }
