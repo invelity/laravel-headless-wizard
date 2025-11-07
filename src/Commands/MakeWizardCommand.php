@@ -5,15 +5,22 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\note;
+use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
+use function Laravel\Prompts\warning;
 
 class MakeWizardCommand extends Command
 {
-    protected $signature = 'wizard:make 
+    protected $signature = 'wizard:make
                             {name? : The name of the wizard}
+                            {--type= : Wizard type (blade, api, livewire, inertia)}
                             {--force : Overwrite existing wizard}';
 
     protected $description = 'Create a new wizard class';
@@ -30,7 +37,7 @@ class MakeWizardCommand extends Command
 
         $validationError = $this->validateWizardName($name);
         if ($validationError !== null) {
-            $this->error($validationError);
+            error($validationError);
 
             return self::FAILURE;
         }
@@ -39,28 +46,59 @@ class MakeWizardCommand extends Command
         $wizardId = Str::kebab($name);
         $force = $this->option('force');
 
+        $type = $this->option('type') ?? select(
+            label: 'What type of wizard do you want to create?',
+            options: [
+                'blade' => 'Blade (Traditional server-side rendering)',
+                'api' => 'API (Headless JSON responses)',
+                'livewire' => 'Livewire (Reactive components)',
+                'inertia' => 'Inertia.js (SPA with Vue/React)',
+            ],
+            default: 'blade',
+            hint: 'Choose the frontend technology for your wizard'
+        );
+
         if ($this->wizardExists($wizardClass) && ! $force) {
-            $this->error(__('Wizard \':class\' already exists. Use --force to overwrite.', ['class' => $wizardClass]));
+            error(__('Wizard \':class\' already exists. Use --force to overwrite.', ['class' => $wizardClass]));
 
             return self::FAILURE;
         }
 
         try {
             $this->createWizardClass($wizardClass, $wizardId);
+            $this->createController($wizardClass, $wizardId, $type);
 
-            $this->info(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => $wizardClass, 'class' => $wizardClass]));
-            $this->info(__('✓ Wizard directory created: app/Wizards/{wizard}Wizard/', ['wizard' => $wizardClass]));
+            if ($type === 'blade') {
+                $this->createBladeViews($wizardClass, $wizardId);
+            }
+
+            info('Wizard created successfully!');
+            note("Wizard class: app/Wizards/{$wizardClass}Wizard/{$wizardClass}.php");
+            note("Controller: app/Http/Controllers/{$wizardClass}Controller.php");
+
+            if ($type === 'blade') {
+                note("Views: resources/views/wizards/{$wizardId}/");
+            }
+
+            if (in_array($type, ['api', 'livewire', 'inertia'])) {
+                $this->newLine();
+                warning('CSRF Protection Notice');
+                note('For API/SPA wizards, add wizard routes to CSRF exceptions:');
+                note('app/Http/Middleware/VerifyCsrfToken.php');
+                note("protected \$except = ['api/wizards/{$wizardId}/*'];");
+            }
+
             $this->newLine();
-            $this->comment(__('Next steps:'));
-            $this->comment(__('  • Generate first step: php artisan wizard:make-step {wizard}', ['wizard' => $wizardClass]));
-            $this->comment(__('  • Wizard will be auto-discovered on next request'));
+            note('Next steps:');
+            note("  • Generate first step: php artisan wizard:make-step {$wizardClass}");
+            note('  • Wizard will be auto-discovered on next request');
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('Failed to create wizard: '.$e->getMessage());
+            error('Failed to create wizard: '.$e->getMessage());
             $this->newLine();
-            $this->comment(__('Troubleshooting:'));
-            $this->comment(__('  • Check directory permissions for app/Wizards/'));
+            note(__('Troubleshooting:'));
+            note(__('  • Check directory permissions for app/Wizards/'));
 
             return self::FAILURE;
         }
@@ -106,5 +144,37 @@ class MakeWizardCommand extends Command
         );
 
         File::put("{$directory}/{$wizardClass}.php", $content);
+    }
+
+    /**
+     * @throws FileNotFoundException
+     */
+    protected function createController(string $wizardClass, string $wizardId, string $type): void
+    {
+        $stub = File::get(__DIR__.'/../../resources/stubs/controller.php.stub');
+        $kebabName = Str::kebab($wizardClass);
+
+        $content = str_replace(
+            ['{{ namespace }}', '{{ class }}', '{{ wizardId }}', '{{ wizardKebab }}'],
+            ['App\\Http\\Controllers', $wizardClass, $wizardId, $kebabName],
+            $stub
+        );
+
+        $controllerDirectory = app_path('Http/Controllers');
+        if (! File::isDirectory($controllerDirectory)) {
+            File::makeDirectory($controllerDirectory, 0755, true);
+        }
+
+        $controllerPath = app_path("Http/Controllers/{$wizardClass}Controller.php");
+        File::put($controllerPath, $content);
+    }
+
+    protected function createBladeViews(string $wizardClass, string $wizardId): void
+    {
+        $viewsDirectory = resource_path("views/wizards/{$wizardId}");
+        File::makeDirectory($viewsDirectory, 0755, true);
+
+        $stepsDirectory = "{$viewsDirectory}/steps";
+        File::makeDirectory($stepsDirectory, 0755, true);
     }
 }

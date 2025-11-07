@@ -583,6 +583,66 @@ vendor/bin/pest --filter="wizard completes successfully"
 
 ---
 
+## Testing Blade Components
+
+Test that components render correctly:
+
+```php
+<?php
+
+use Invelity\WizardPackage\Components\ProgressBar;
+
+test('progress bar calculates percentage correctly', function () {
+    $steps = [
+        ['id' => 'step1'],
+        ['id' => 'step2'],
+        ['id' => 'step3'],
+    ];
+    
+    $component = new ProgressBar($steps, 'step2');
+    
+    expect($component->percentage)->toBe(66); // 2/3 * 100
+});
+
+test('layout component accepts title', function () {
+    $component = new \Invelity\WizardPackage\Components\Layout('My Wizard');
+    
+    expect($component->title)->toBe('My Wizard');
+});
+```
+
+---
+
+## Testing Vue Composable
+
+Mock the composable for Vue component tests:
+
+```typescript
+import { vi } from 'vitest';
+import { useWizard } from '@/composables/useWizard';
+
+vi.mock('@/composables/useWizard');
+
+test('wizard component initializes on mount', async () => {
+    const mockInitialize = vi.fn();
+    
+    (useWizard as any).mockReturnValue({
+        state: { loading: false, steps: [] },
+        currentStep: null,
+        initialize: mockInitialize,
+        submitStep: vi.fn(),
+    });
+    
+    const wrapper = mount(WizardComponent);
+    
+    await wrapper.vm.$nextTick();
+    
+    expect(mockInitialize).toHaveBeenCalled();
+});
+```
+
+---
+
 ## Best Practices
 
 1. **Use Pest syntax** - Use `test()`, `expect()`, `beforeEach()` instead of PHPUnit classes
