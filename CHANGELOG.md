@@ -2,6 +2,25 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## [1.2.1] - 2025-11-07
+
+### Changed
+
+- Upgraded Pest from v3.8.4 to v4.1.3
+- Upgraded PHPUnit from 11.x to 12.x (transitive dependency)
+- Upgraded all Pest plugins to v4.0
+  - pestphp/pest-plugin-arch: v3.1.1 → v4.0.0
+  - pestphp/pest-plugin-laravel: v3.2.0 → v4.0.0
+  - pestphp/pest-plugin-mutate: v3.0.5 → v4.0.1
+
+### Developer Experience
+
+- All 399 tests passing with Pest 4
+- PHPStan Level 5 - 0 errors
+- Laravel Pint compliance maintained
+- No breaking changes in test syntax
+- Compatible with PHP 8.4
+
 ## [1.2.0] - 2025-11-07
 
 ### Added
