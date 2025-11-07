@@ -34,6 +34,9 @@ class ProgressBar extends Component
 
     public function render(): \Illuminate\Contracts\View\View
     {
-        return view('wizard-package::components.progress-bar');
+        /** @var view-string $viewPath */
+        $viewPath = 'wizard-package::components.progress-bar';
+
+        return view($viewPath);
     }
 }

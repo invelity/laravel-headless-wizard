@@ -15,6 +15,9 @@ class FormWrapper extends Component
 
     public function render(): \Illuminate\Contracts\View\View
     {
-        return view('wizard-package::components.form-wrapper');
+        /** @var view-string $viewPath */
+        $viewPath = 'wizard-package::components.form-wrapper';
+
+        return view($viewPath);
     }
 }

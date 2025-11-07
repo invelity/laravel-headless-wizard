@@ -14,6 +14,9 @@ class Layout extends Component
 
     public function render(): \Illuminate\Contracts\View\View
     {
-        return view('wizard-package::components.layout');
+        /** @var view-string $viewPath */
+        $viewPath = 'wizard-package::components.layout';
+
+        return view($viewPath);
     }
 }
