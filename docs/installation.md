@@ -46,6 +46,40 @@ php artisan migrate
 
 ---
 
+## Step 4: Publish Assets (Optional)
+
+### Blade Components
+
+Publish Blade components for customization:
+
+```bash
+php artisan vendor:publish --tag="wizard-components"
+```
+
+Components will be published to `resources/views/vendor/wizard-package/components/`.
+
+### Vue 3 Composable
+
+Publish Vue composable and TypeScript definitions:
+
+```bash
+php artisan vendor:publish --tag="wizard-assets"
+```
+
+Assets will be published to `resources/js/composables/` and `resources/js/types/`.
+
+### Command Stubs
+
+Publish command stubs for customization:
+
+```bash
+php artisan vendor:publish --tag="wizard-stubs"
+```
+
+Stubs will be published to `stubs/vendor/wizard/`.
+
+---
+
 ## Verify Installation
 
 Create your first wizard to verify everything is working:
@@ -54,15 +88,31 @@ Create your first wizard to verify everything is working:
 php artisan wizard:make Onboarding
 ```
 
-You should see:
+**Interactive prompts:**
 ```
-✓ Wizard class created: app/Wizards/OnboardingWizard/Onboarding.php
-✓ Wizard directory created: app/Wizards/OnboardingWizard/
-✓ Wizard will be auto-discovered on next request
+ What type of wizard do you want to create?
+  [blade] Blade (Traditional server-side rendering)
+  [api] API (Headless JSON responses)
+  [livewire] Livewire (Reactive components)
+  [inertia] Inertia.js (SPA with Vue/React)
+ > blade
 
-Next steps:
+ℹ Wizard created successfully!
+✎ Wizard class: app/Wizards/OnboardingWizard/Onboarding.php
+✎ Controller: app/Http/Controllers/OnboardingController.php
+✎ Views: resources/views/wizards/onboarding/
+
+✎ Next steps:
   • Generate first step: php artisan wizard:make-step Onboarding
-  • Wizard will be automatically discovered - no config needed!
+  • Wizard will be auto-discovered on next request
+```
+
+For API/SPA wizards, you'll also see:
+```
+⚠ CSRF Protection Notice
+✎ For API/SPA wizards, add wizard routes to CSRF exceptions:
+✎ app/Http/Middleware/VerifyCsrfToken.php
+✎ protected $except = ['api/wizards/onboarding/*'];
 ```
 
 ---

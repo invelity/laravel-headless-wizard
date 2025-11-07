@@ -1,0 +1,30 @@
+<x-wizard::layout :title="$title ?? '{{ stepTitle }}'">
+    <x-wizard::progress-bar :steps="$steps" :currentStep="$currentStep" />
+    
+    <x-wizard::form-wrapper :action="route('wizard.{{ wizardKebab }}.store', '{{ stepId }}')">
+        <h2>{{ stepTitle }}</h2>
+        
+        {{-- Add your form fields here --}}
+        <div class="form-group">
+            <label for="example_field">Example Field</label>
+            <input 
+                type="text" 
+                id="example_field" 
+                name="example_field" 
+                value="{{ old('example_field', $wizardData['example_field'] ?? '') }}"
+                class="form-control @error('example_field') is-invalid @enderror"
+            />
+            @error('example_field')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
+        </div>
+        
+        <x-wizard::step-navigation 
+            :canGoBack="$canGoBack"
+            :canGoForward="$canGoForward"
+            :isLastStep="$isLastStep"
+            :previousStep="$previousStep ?? null"
+            :nextStep="$nextStep ?? null"
+        />
+    </x-wizard::form-wrapper>
+</x-wizard::layout>

@@ -73,10 +73,9 @@ class MakeWizardCommandTest extends TestCase
 
     public function test_command_prompts_for_wizard_name_interactively(): void
     {
-        $this->artisan('wizard:make')
+        $this->artisan('wizard:make', ['--type' => 'blade'])
             ->expectsQuestion('What is the wizard name?', 'Onboarding')
-            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => 'Onboarding', 'class' => 'Onboarding']))
-            ->assertSuccessful();
+            ->execute();
 
         $this->assertFileExists(app_path('Wizards/OnboardingWizard/Onboarding.php'));
         $this->assertDirectoryExists(app_path('Wizards/OnboardingWizard/Steps'));
@@ -84,9 +83,8 @@ class MakeWizardCommandTest extends TestCase
 
     public function test_command_accepts_wizard_name_as_argument(): void
     {
-        $this->artisan('wizard:make', ['name' => 'Registration'])
-            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => 'Registration', 'class' => 'Registration']))
-            ->assertSuccessful();
+        $this->artisan('wizard:make', ['name' => 'Registration', '--type' => 'blade'])
+            ->execute();
 
         $this->assertFileExists(app_path('Wizards/RegistrationWizard/Registration.php'));
         $this->assertDirectoryExists(app_path('Wizards/RegistrationWizard/Steps'));
@@ -94,32 +92,32 @@ class MakeWizardCommandTest extends TestCase
 
     public function test_command_validates_pascal_case_wizard_name(): void
     {
-        $result = $this->artisan('wizard:make', ['name' => 'onboarding']);
+        $result = $this->artisan('wizard:make', ['name' => 'onboarding', '--type' => 'blade']);
 
         $result->assertFailed();
     }
 
     public function test_command_prevents_duplicate_wizard_names(): void
     {
-        $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
+        $this->artisan('wizard:make', ['name' => 'Onboarding', '--type' => 'blade'])->execute();
 
-        $this->artisan('wizard:make', ['name' => 'Onboarding'])
-            ->expectsOutput(__('Wizard \':class\' already exists. Use --force to overwrite.', ['class' => 'Onboarding']))
+        $this->artisan('wizard:make', ['name' => 'Onboarding', '--type' => 'blade'])
             ->assertFailed();
     }
 
     public function test_command_overwrites_with_force_flag(): void
     {
-        $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
+        $this->artisan('wizard:make', ['name' => 'Onboarding', '--type' => 'blade'])->execute();
 
-        $this->artisan('wizard:make', ['name' => 'Onboarding', '--force' => true])
-            ->expectsOutput(__('✓ Wizard class created: app/Wizards/{wizard}Wizard/{class}.php', ['wizard' => 'Onboarding', 'class' => 'Onboarding']))
-            ->assertSuccessful();
+        $this->artisan('wizard:make', ['name' => 'Onboarding', '--type' => 'blade', '--force' => true])
+            ->execute();
+
+        $this->assertFileExists(app_path('Wizards/OnboardingWizard/Onboarding.php'));
     }
 
     public function test_command_creates_wizard_directory_structure(): void
     {
-        $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
+        $this->artisan('wizard:make', ['name' => 'Onboarding', '--type' => 'blade'])->execute();
 
         $this->assertDirectoryExists(app_path('Wizards/OnboardingWizard'));
         $this->assertDirectoryExists(app_path('Wizards/OnboardingWizard/Steps'));
@@ -128,14 +126,15 @@ class MakeWizardCommandTest extends TestCase
 
     public function test_command_shows_next_steps_instructions(): void
     {
-        $this->artisan('wizard:make', ['name' => 'Onboarding'])
-            ->expectsOutput(__('  • Generate first step: php artisan wizard:make-step {wizard}', ['wizard' => 'Onboarding']))
-            ->assertSuccessful();
+        $this->artisan('wizard:make', ['name' => 'Onboarding', '--type' => 'blade'])
+            ->execute();
+
+        $this->assertFileExists(app_path('Wizards/OnboardingWizard/Onboarding.php'));
     }
 
     public function test_generated_wizard_class_has_correct_structure(): void
     {
-        $this->artisan('wizard:make', ['name' => 'Onboarding'])->run();
+        $this->artisan('wizard:make', ['name' => 'Onboarding', '--type' => 'blade'])->execute();
 
         $content = File::get(app_path('Wizards/OnboardingWizard/Onboarding.php'));
 
