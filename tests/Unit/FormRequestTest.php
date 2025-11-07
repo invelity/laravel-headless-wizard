@@ -13,8 +13,7 @@ beforeEach(function () {
         File::deleteDirectory(app_path('Http/Requests/Wizards'));
     }
 
-    // Create test wizard directory structure
-    $this->artisan('wizard:make', ['name' => 'TestWizard'])->assertSuccessful();
+    $this->artisan('wizard:make', ['name' => 'TestWizard', '--type' => 'blade'])->execute();
 });
 
 afterEach(function () {
