@@ -8,6 +8,7 @@ All notable changes to `wizard-package` will be documented in this file.
 
 - Upgraded Pest from v3.8.4 to v4.1.3
 - Upgraded PHPUnit from 11.x to 12.x (transitive dependency)
+- Upgraded Orchestra Testbench to v10.7 for PHPUnit 12 compatibility
 - Upgraded all Pest plugins to v4.0
   - pestphp/pest-plugin-arch: v3.1.1 → v4.0.0
   - pestphp/pest-plugin-laravel: v3.2.0 → v4.0.0
@@ -15,7 +16,7 @@ All notable changes to `wizard-package` will be documented in this file.
 
 ### Developer Experience
 
-- All 399 tests passing with Pest 4
+- All 399 tests passing with Pest 4 and PHPUnit 12
 - PHPStan Level 5 - 0 errors
 - Laravel Pint compliance maintained
 - No breaking changes in test syntax
