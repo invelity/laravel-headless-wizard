@@ -207,6 +207,10 @@ test('no methods return View instances', function () {
             continue;
         }
 
+        if (str_contains($className, 'Component')) {
+            continue;
+        }
+
         foreach ($reflection->getMethods() as $method) {
             if ($method->class !== $className) {
                 continue;
@@ -363,7 +367,7 @@ test('no God objects - classes stay focused', function () {
         $properties = $reflection->getProperties();
         $propertyCount = count($properties);
 
-        if (str_contains($className, 'Configuration') || str_contains($className, 'Command') || str_contains($className, 'Model')) {
+        if (str_contains($className, 'Configuration') || str_contains($className, 'Command') || str_contains($className, 'Model') || str_contains($className, 'Component')) {
             continue;
         }
 

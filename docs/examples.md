@@ -33,9 +33,7 @@ class PersonalInfoStep extends AbstractStep
         parent::__construct(
             id: 'personal-info',
             title: 'Personal Information',
-            order: 1,
-            isOptional: false,
-            canSkip: false
+            order: 1
         );
     }
 
@@ -134,8 +132,6 @@ class EmailVerificationStep extends AbstractStep
             id: 'email-verification',
             title: 'Verify Your Email',
             order: 3,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -205,8 +201,6 @@ class CartReviewStep extends AbstractStep
             id: 'cart-review',
             title: 'Review Cart',
             order: 1,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -263,8 +257,6 @@ class ShippingAddressStep extends AbstractStep
             id: 'shipping-address',
             title: 'Shipping Address',
             order: 2,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -315,8 +307,6 @@ class PaymentStep extends AbstractStep
             id: 'payment',
             title: 'Payment',
             order: 3,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -384,8 +374,6 @@ class BasicInfoStep extends AbstractStep
             id: 'basic-info',
             title: 'Basic Information',
             order: 1,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -425,8 +413,6 @@ class EmploymentDetailsStep extends AbstractStep
             id: 'employment-details',
             title: 'Employment Details',
             order: 2,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -498,8 +484,6 @@ class PersonalInfoStep extends AbstractStep
             id: 'personal-info',
             title: 'Personal Info',
             order: 1,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -537,8 +521,6 @@ class PreferencesStep extends AbstractStep
             id: 'preferences',
             title: 'Preferences',
             order: 2,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -576,8 +558,6 @@ class SummaryStep extends AbstractStep
             id: 'summary',
             title: 'Summary',
             order: 3,
-            isOptional: false,
-            canSkip: false
         );
     }
 
@@ -976,6 +956,333 @@ class OnboardingWizard extends Component
         return view('livewire.onboarding-wizard');
     }
 }
+```
+
+---
+
+## Blade Wizard with Components
+
+Complete Blade implementation using pre-built components:
+
+### personal-info.blade.php
+
+```blade
+<x-wizard::layout title="User Registration">
+    <x-wizard::progress-bar :steps="$steps" :currentStep="'personal-info'" />
+    
+    <x-wizard::form-wrapper :action="route('wizard.registration.store', 'personal-info')">
+        <h2>Personal Information</h2>
+        <p class="text-gray-600 mb-4">Please provide your basic information</p>
+        
+        <div class="space-y-4">
+            <div>
+                <label for="name" class="block text-sm font-medium">Full Name</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    value="{{ old('name') }}"
+                    class="mt-1 block w-full rounded-md border-gray-300"
+                    required
+                />
+                @error('name')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            
+            <div>
+                <label for="email" class="block text-sm font-medium">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    value="{{ old('email') }}"
+                    class="mt-1 block w-full rounded-md border-gray-300"
+                    required
+                />
+                @error('email')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            
+            <div>
+                <label for="age" class="block text-sm font-medium">Age</label>
+                <input 
+                    type="number" 
+                    id="age" 
+                    name="age" 
+                    value="{{ old('age') }}"
+                    class="mt-1 block w-full rounded-md border-gray-300"
+                    required
+                />
+                @error('age')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+        
+        <x-wizard::step-navigation 
+            :canGoBack="false"
+            :canGoForward="true"
+            :isLastStep="false"
+            :nextStep="'preferences'"
+            nextText="Continue to Preferences"
+        />
+    </x-wizard::form-wrapper>
+</x-wizard::layout>
+```
+
+---
+
+## Vue SPA Wizard with useWizard()
+
+Complete Vue 3 implementation using the composable:
+
+### RegistrationWizard.vue
+
+```vue
+<template>
+    <div v-if="!state.loading" class="max-w-2xl mx-auto p-6">
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between mb-2">
+                <span class="text-sm font-medium">
+                    Step {{ state.currentStepIndex + 1 }} of {{ state.steps.length }}
+                </span>
+                <span class="text-sm font-medium">
+                    {{ Math.round((state.currentStepIndex + 1) / state.steps.length * 100) }}% Complete
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                    class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    :style="{ width: Math.round((state.currentStepIndex + 1) / state.steps.length * 100) + '%' }"
+                ></div>
+            </div>
+        </div>
+        
+        <!-- Step Content -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">{{ currentStep?.title }}</h2>
+            
+            <!-- Personal Info Step -->
+            <form v-if="currentStep?.id === 'personal-info'" @submit.prevent="handleSubmit">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Full Name</label>
+                        <input 
+                            v-model="formData.name"
+                            type="text" 
+                            class="w-full px-3 py-2 border rounded-md"
+                            :class="{ 'border-red-500': getFieldError('name') }"
+                        />
+                        <p v-if="getFieldError('name')" class="text-red-500 text-sm mt-1">
+                            {{ getFieldError('name') }}
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Email</label>
+                        <input 
+                            v-model="formData.email"
+                            type="email" 
+                            class="w-full px-3 py-2 border rounded-md"
+                            :class="{ 'border-red-500': getFieldError('email') }"
+                        />
+                        <p v-if="getFieldError('email')" class="text-red-500 text-sm mt-1">
+                            {{ getFieldError('email') }}
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Age</label>
+                        <input 
+                            v-model="formData.age"
+                            type="number" 
+                            class="w-full px-3 py-2 border rounded-md"
+                            :class="{ 'border-red-500': getFieldError('age') }"
+                        />
+                        <p v-if="getFieldError('age')" class="text-red-500 text-sm mt-1">
+                            {{ getFieldError('age') }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button 
+                        v-if="canGoBack"
+                        type="button"
+                        @click="handleBack"
+                        class="px-4 py-2 border rounded-md hover:bg-gray-50"
+                    >
+                        Previous
+                    </button>
+                    <button 
+                        type="submit"
+                        :disabled="state.loading"
+                        class="ml-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {{ isLastStep ? 'Complete' : 'Next' }}
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Preferences Step -->
+            <form v-else-if="currentStep?.id === 'preferences'" @submit.prevent="handleSubmit">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Theme</label>
+                        <select 
+                            v-model="formData.theme"
+                            class="w-full px-3 py-2 border rounded-md"
+                        >
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Notifications</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input 
+                                    v-model="formData.notifications.email"
+                                    type="checkbox" 
+                                    class="mr-2"
+                                />
+                                Email notifications
+                            </label>
+                            <label class="flex items-center">
+                                <input 
+                                    v-model="formData.notifications.sms"
+                                    type="checkbox" 
+                                    class="mr-2"
+                                />
+                                SMS notifications
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button 
+                        type="button"
+                        @click="handleBack"
+                        class="px-4 py-2 border rounded-md hover:bg-gray-50"
+                    >
+                        Previous
+                    </button>
+                    <button 
+                        type="submit"
+                        :disabled="state.loading"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {{ isLastStep ? 'Complete' : 'Next' }}
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Summary Step -->
+            <div v-else-if="currentStep?.id === 'summary'">
+                <div class="bg-gray-50 rounded-md p-4 mb-4">
+                    <h3 class="font-medium mb-2">Registration Summary</h3>
+                    <dl class="space-y-1">
+                        <div>
+                            <dt class="text-sm text-gray-600">Name:</dt>
+                            <dd class="font-medium">{{ state.wizardData['personal-info']?.name }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm text-gray-600">Email:</dt>
+                            <dd class="font-medium">{{ state.wizardData['personal-info']?.email }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm text-gray-600">Theme:</dt>
+                            <dd class="font-medium">{{ state.wizardData['preferences']?.theme }}</dd>
+                        </div>
+                    </dl>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button 
+                        type="button"
+                        @click="handleBack"
+                        class="px-4 py-2 border rounded-md hover:bg-gray-50"
+                    >
+                        Previous
+                    </button>
+                    <button 
+                        @click="handleComplete"
+                        :disabled="state.loading"
+                        class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                    >
+                        Complete Registration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div v-else class="max-w-2xl mx-auto p-6">
+        <div class="text-center">Loading...</div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useWizard } from '@/composables/useWizard';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const { 
+    state, 
+    currentStep, 
+    canGoBack,
+    canGoForward, 
+    isLastStep,
+    initialize, 
+    submitStep, 
+    goToStep,
+    getFieldError,
+    clearErrors
+} = useWizard('registration');
+
+const formData = ref<Record<string, any>>({
+    notifications: { email: false, sms: false }
+});
+
+onMounted(async () => {
+    await initialize();
+});
+
+const handleSubmit = async () => {
+    clearErrors();
+    const result = await submitStep(formData.value);
+    
+    if (result.success) {
+        formData.value = { notifications: { email: false, sms: false } };
+        
+        if (result.completed) {
+            router.push('/dashboard');
+        }
+    }
+};
+
+const handleBack = async () => {
+    const previousStep = state.steps[state.currentStepIndex - 1];
+    if (previousStep) {
+        await goToStep(previousStep.id);
+    }
+};
+
+const handleComplete = async () => {
+    const result = await submitStep({});
+    if (result.success) {
+        router.push('/dashboard');
+    }
+};
+</script>
 ```
 
 ---
