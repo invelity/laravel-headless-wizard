@@ -22,22 +22,30 @@ readonly class WizardDiscoveryService
 
     public function discoverWizards(): Collection
     {
-        return $this->cache->remember(
-            'wizard.discovered_wizards',
-            now()->addDay(),
-            fn () => $this->scanWizardDirectories()
-        );
+        try {
+            return $this->cache->remember(
+                'wizard.discovered_wizards',
+                now()->addDay(),
+                fn () => $this->scanWizardDirectories()
+            );
+        } catch (Throwable) {
+            return $this->scanWizardDirectories();
+        }
     }
 
     public function discoverSteps(string $wizardClass): Collection
     {
         $cacheKey = "wizard.steps.{$wizardClass}";
 
-        return $this->cache->remember(
-            $cacheKey,
-            now()->addDay(),
-            fn () => $this->scanStepDirectories($wizardClass)
-        );
+        try {
+            return $this->cache->remember(
+                $cacheKey,
+                now()->addDay(),
+                fn () => $this->scanStepDirectories($wizardClass)
+            );
+        } catch (Throwable) {
+            return $this->scanStepDirectories($wizardClass);
+        }
     }
 
     public function clearCache(): void
