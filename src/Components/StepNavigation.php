@@ -21,6 +21,9 @@ class StepNavigation extends Component
 
     public function render(): \Illuminate\Contracts\View\View
     {
-        return view('wizard-package::components.step-navigation');
+        /** @var view-string $viewPath */
+        $viewPath = 'wizard-package::components.step-navigation';
+
+        return view($viewPath);
     }
 }
