@@ -13,13 +13,16 @@ A powerful **headless** multi-step wizard package for Laravel. Build complex, mu
 ## ✨ Features
 
 - 🚀 **Zero Frontend Lock-in** - Pure JSON API for any framework
-- ⚡ **Interactive Generators** - Beautiful CLI with Laravel Prompts
-- ✅ **Laravel-Native Validation** - Uses FormRequest classes
-- 💾 **Flexible Storage** - Session, database, or cache
-- 📊 **Smart Progress Tracking** - Real-time completion percentages
-- 🔀 **Conditional Logic** - Optional steps and dynamic flows
+- ⚡ **Interactive Generators** - Beautiful CLI with Laravel Prompts for wizard creation
+- 🎨 **Pre-built Components** - Blade components for rapid prototyping (Layout, ProgressBar, Navigation)
+- 🔄 **Vue 3 Composable** - useWizard() composable with TypeScript definitions for SPA integration
+- 🔀 **Multi-Type Wizards** - Generate Blade, API, Livewire, or Inertia wizards
+- ✅ **Laravel-Native Validation** - Uses FormRequest classes with automatic integration
+- 💾 **Flexible Storage** - Session, database, or cache adapters
+- 📊 **Smart Progress Tracking** - Real-time completion percentages with automatic calculation
+- 🔀 **Conditional Logic** - Optional steps, dynamic flows, and step reordering
 - 🔔 **Event-Driven** - Hook into every wizard lifecycle event
-- ✨ **Modern PHP 8.4** - Property hooks and strict types
+- ✨ **Modern PHP 8.4** - Property hooks, constructor promotion, and strict types
 
 ## 📚 Documentation
 
@@ -46,16 +49,24 @@ Publish the configuration:
 php artisan vendor:publish --tag="wizard-config"
 ```
 
-Create your first wizard:
+Create your first wizard (interactive):
 
 ```bash
 php artisan wizard:make Onboarding
+# Choose wizard type: blade, api, livewire, or inertia
 ```
 
-Generate wizard steps:
+Or with options:
 
 ```bash
-php artisan wizard:make-step --wizard=onboarding
+php artisan wizard:make Onboarding --type=blade
+```
+
+Add steps to your wizard:
+
+```bash
+php artisan wizard:make-step Onboarding PersonalInfo --order=1
+# Interactive prompts guide you through step creation
 ```
 
 ## 📋 Requirements
@@ -65,10 +76,11 @@ php artisan wizard:make-step --wizard=onboarding
 
 ## 📊 Code Quality
 
-- **98.6% Test Coverage** - 375 comprehensive Pest tests
+- **89.7% Test Coverage** - 397 comprehensive Pest tests
 - **Cyclomatic Complexity: 4.37** - Clean, maintainable code
 - **PHPStan Level 5** - Zero static analysis errors
 - **100% Type Coverage** - Full type declarations
+- **Architecture Tests** - SOLID principles enforced via Pest Arch
 
 ## 🤝 Contributing
 

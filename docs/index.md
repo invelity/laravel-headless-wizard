@@ -11,7 +11,7 @@ nav_order: 1
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6" markdown="0">
   <a href="https://packagist.org/packages/invelity/laravel-headless-wizard" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
     <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Version</span>
-    <span class="text-lg font-bold text-primary-600 group-hover:text-primary-700">v1.0.0</span>
+    <span class="text-lg font-bold text-primary-600 group-hover:text-primary-700">v1.2.0</span>
   </a>
   <a href="https://github.com/invelity/laravel-headless-wizard/actions" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
     <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Tests</span>
@@ -19,7 +19,7 @@ nav_order: 1
   </a>
   <a href="https://github.com/invelity/laravel-headless-wizard" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
     <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Coverage</span>
-    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">98.6%</span>
+    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">89.7%</span>
   </a>
   <a href="https://github.com/invelity/laravel-headless-wizard" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
     <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">PHPStan</span>
@@ -49,6 +49,14 @@ Create your first wizard:
 
 ```bash
 php artisan wizard:make Onboarding
+# Interactive: Choose wizard type (Blade/API/Livewire/Inertia)
+```
+
+Add steps to your wizard:
+
+```bash
+php artisan wizard:make-step Onboarding PersonalInfo --order=1
+# Interactive prompts guide you through step creation
 ```
 
 ---
@@ -82,22 +90,26 @@ Test your wizard implementations
 ## ✨ Key Features
 
 - 🚀 **Zero Frontend Lock-in** - Pure JSON API for any framework
-- ⚡ **Interactive Generators** - Beautiful CLI with Laravel Prompts
-- ✅ **Laravel-Native Validation** - Uses FormRequest classes
-- 💾 **Flexible Storage** - Session, database, or cache
-- 📊 **Smart Progress Tracking** - Real-time completion percentages
-- 🔀 **Conditional Logic** - Optional steps and dynamic flows
+- ⚡ **Interactive Generators** - Beautiful CLI with Laravel Prompts for wizard creation
+- 🎨 **Pre-built Components** - Blade components for rapid prototyping (Layout, ProgressBar, Navigation)
+- 🔄 **Vue 3 Composable** - useWizard() composable with TypeScript definitions for SPA integration
+- 🔀 **Multi-Type Wizards** - Generate Blade, API, Livewire, or Inertia wizards
+- ✅ **Laravel-Native Validation** - Uses FormRequest classes with automatic integration
+- 💾 **Flexible Storage** - Session, database, or cache adapters
+- 📊 **Smart Progress Tracking** - Real-time completion percentages with automatic calculation
+- 🔀 **Conditional Logic** - Optional steps, dynamic flows, and step reordering
 - 🔔 **Event-Driven** - Hook into every wizard lifecycle event
-- ✨ **Modern PHP 8.4** - Property hooks and strict types
+- ✨ **Modern PHP 8.4** - Property hooks, constructor promotion, and strict types
 
 ---
 
 ## 📊 Code Quality
 
-- **98.6% Test Coverage** - 375 comprehensive Pest tests
+- **89.7% Test Coverage** - 399 comprehensive Pest tests
 - **Cyclomatic Complexity: 4.37** - Clean, maintainable code
 - **PHPStan Level 5** - Zero static analysis errors
 - **100% Type Coverage** - Full type declarations
+- **Architecture Tests** - SOLID principles enforced via Pest Arch
 
 ---
 

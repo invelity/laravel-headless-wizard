@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\note;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
 
@@ -29,8 +32,8 @@ class MakeStepCommand extends Command
         $wizards = $this->getAvailableWizards();
 
         if (empty($wizards)) {
-            $this->error(__('No wizards found. Create a wizard first:'));
-            $this->comment('php artisan wizard:make');
+            error(__('No wizards found. Create a wizard first:'));
+            note('php artisan wizard:make');
 
             return self::FAILURE;
         }
@@ -54,7 +57,7 @@ class MakeStepCommand extends Command
 
         $validationError = $this->validateStepName($name);
         if ($validationError !== null) {
-            $this->error($validationError);
+            error($validationError);
 
             return self::FAILURE;
         }
@@ -64,7 +67,7 @@ class MakeStepCommand extends Command
         $force = $this->option('force');
 
         if ($this->stepExists($stepClass, $wizardName) && ! $force) {
-            $this->error(__('Step \':class\' already exists. Use --force to overwrite.', ['class' => $stepClass]));
+            error(__('Step \':class\' already exists. Use --force to overwrite.', ['class' => $stepClass]));
 
             return self::FAILURE;
         }
@@ -93,27 +96,29 @@ class MakeStepCommand extends Command
         );
 
         try {
+            $this->reorderExistingSteps($wizardName, (int) $order);
             $this->createStepClass($wizardName, $stepClass, $stepId, $title, (int) $order, $optional);
             $this->createFormRequestClass($stepClass);
 
             $requestClass = str_replace('Step', '', $stepClass).'Request';
 
-            $this->info(__('✓ Step class created: app/Wizards/{wizard}Wizard/Steps/{class}.php', ['wizard' => $wizardName, 'class' => $stepClass]));
-            $this->info(__('✓ FormRequest created: app/Http/Requests/Wizards/{class}.php', ['class' => $requestClass]));
-            $this->info(__('✓ Step will be auto-discovered'));
+            info('Step created successfully!');
+            note("Step class: app/Wizards/{$wizardName}Wizard/Steps/{$stepClass}.php");
+            note("FormRequest: app/Http/Requests/Wizards/{$requestClass}.php");
+            note('Step will be auto-discovered');
             $this->newLine();
-            $this->comment(__('Next steps:'));
-            $this->comment(__('  • Add validation rules: app/Http/Requests/Wizards/{class}.php', ['class' => $requestClass]));
-            $this->comment(__('  • Implement business logic: app/Wizards/{wizard}Wizard/Steps/{class}.php', ['wizard' => $wizardName, 'class' => $stepClass]));
-            $this->comment(__('  • Generate another step: php artisan wizard:make-step {wizard}', ['wizard' => $wizardName]));
+            note('Next steps:');
+            note("  • Add validation rules: app/Http/Requests/Wizards/{$requestClass}.php");
+            note("  • Implement business logic: app/Wizards/{$wizardName}Wizard/Steps/{$stepClass}.php");
+            note("  • Generate another step: php artisan wizard:make-step {$wizardName}");
 
             return self::SUCCESS;
         } catch (Exception $e) {
-            $this->error('Failed to create step: '.$e->getMessage());
+            error('Failed to create step: '.$e->getMessage());
             $this->newLine();
-            $this->comment(__('Troubleshooting:'));
-            $this->comment(__('  • Check directory permissions for app/Wizards/'));
-            $this->comment(__('  • Check directory permissions for app/Http/Requests/Wizards/'));
+            note(__('Troubleshooting:'));
+            note(__('  • Check directory permissions for app/Wizards/'));
+            note(__('  • Check directory permissions for app/Http/Requests/Wizards/'));
 
             return self::FAILURE;
         }
@@ -172,6 +177,35 @@ class MakeStepCommand extends Command
         return count($files);
     }
 
+    protected function reorderExistingSteps(string $wizardName, int $newStepOrder): void
+    {
+        $stepsPath = app_path("{$wizardName}Wizard/Steps");
+
+        if (! File::isDirectory($stepsPath)) {
+            return;
+        }
+
+        $files = File::files($stepsPath);
+
+        foreach ($files as $file) {
+            $content = File::get($file->getPathname());
+
+            if (preg_match('/order:\s*(\d+)/', $content, $matches)) {
+                $currentOrder = (int) $matches[1];
+
+                if ($currentOrder >= $newStepOrder) {
+                    $updatedContent = preg_replace(
+                        '/order:\s*\d+/',
+                        'order: '.($currentOrder + 1),
+                        $content
+                    );
+
+                    File::put($file->getPathname(), $updatedContent);
+                }
+            }
+        }
+    }
+
     protected function createStepClass(string $wizardName, string $stepClass, string $stepId, string $title, int $order, bool $optional): void
     {
         $directory = app_path("Wizards/{$wizardName}Wizard/Steps");
@@ -184,6 +218,8 @@ class MakeStepCommand extends Command
 
         $requestClass = str_replace('Step', '', $stepClass).'Request';
 
+        $optionalParams = $optional ? ',\n            isOptional: true,\n            canSkip: true' : '';
+
         $content = str_replace(
             [
                 '{{ namespace }}',
@@ -191,7 +227,7 @@ class MakeStepCommand extends Command
                 '{{ stepId }}',
                 '{{ title }}',
                 '{{ order }}',
-                '{{ optional }}',
+                '{{ optionalParams }}',
                 '{{ formRequestNamespace }}',
                 '{{ formRequestClass }}',
             ],
@@ -201,7 +237,7 @@ class MakeStepCommand extends Command
                 $stepId,
                 $title,
                 (string) $order,
-                $optional ? 'true' : 'false',
+                $optionalParams,
                 'App\\Http\\Requests\\Wizards',
                 $requestClass,
             ],
