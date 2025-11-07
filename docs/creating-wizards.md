@@ -18,31 +18,127 @@ Learn how to create multi-step wizards from scratch.
 php artisan wizard:make Onboarding
 ```
 
-**Interactive prompt:**
+**Interactive prompts:**
 ```
-✔ What is the wizard name? › Onboarding
-✓ Wizard class created: app/Wizards/OnboardingWizard/Onboarding.php
-✓ Wizard directory created: app/Wizards/OnboardingWizard/
-✓ Wizard will be auto-discovered on next request
+ What type of wizard do you want to create?
+  [blade] Blade (Traditional server-side rendering)
+  [api] API (Headless JSON responses)
+  [livewire] Livewire (Reactive components)
+  [inertia] Inertia.js (SPA with Vue/React)
+ > blade
+
+ℹ Wizard created successfully!
+✎ Wizard class: app/Wizards/OnboardingWizard/Onboarding.php
+✎ Controller: app/Http/Controllers/OnboardingController.php
+✎ Views: resources/views/wizards/onboarding/
+```
+
+Or use command options to skip interactive prompts:
+
+```bash
+php artisan wizard:make Onboarding --type=api
 ```
 
 ### 2. Generate Steps
 
 ```bash
-php artisan wizard:make-step Onboarding
+php artisan wizard:make-step Onboarding PersonalInfo --order=1
 ```
 
 **Interactive prompts:**
 ```
-✔ What is the step name? › PersonalInfo
-✔ What is the step title? › Personal Information  
-✔ What is the step order? › 1
-✔ Is this step optional? › No
+ What is the step title? › Personal Information
+ Is this step optional? › No
 
-✓ Step class created: app/Wizards/OnboardingWizard/Steps/PersonalInfoStep.php
-✓ FormRequest created: app/Http/Requests/Wizards/PersonalInfoRequest.php
-✓ Step will be auto-discovered
+ℹ Step created successfully!
+✎ Step class: app/Wizards/OnboardingWizard/Steps/PersonalInfoStep.php
+✎ FormRequest: app/Http/Requests/Wizards/PersonalInfoRequest.php
+✎ Step will be auto-discovered
+
+✎ Next steps:
+  • Add validation rules: app/Http/Requests/Wizards/PersonalInfoRequest.php
+  • Implement business logic: app/Wizards/OnboardingWizard/Steps/PersonalInfoStep.php
 ```
+
+---
+
+## Wizard Types
+
+Laravel Headless Wizard supports 4 wizard types to fit your stack:
+
+### Blade Wizards
+
+Traditional server-side rendered wizards with Blade templates and pre-built components.
+
+```bash
+php artisan wizard:make Onboarding --type=blade
+```
+
+**Best for:**
+- Traditional Laravel applications
+- Server-side rendering
+- Rapid prototyping with pre-built components
+
+**Features:**
+- Auto-generated Blade views with layout
+- Pre-built components (ProgressBar, Navigation, FormWrapper)
+- CSRF protection included
+- Traditional form submissions
+
+### API Wizards
+
+Headless JSON API for modern SPA frameworks (React, Vue, Angular, Svelte).
+
+```bash
+php artisan wizard:make Onboarding --type=api
+```
+
+**Best for:**
+- Decoupled frontend/backend
+- Mobile apps
+- Multiple frontend consumers
+
+**Features:**
+- Pure JSON responses
+- RESTful API endpoints
+- useWizard() Vue composable included
+- Requires CSRF exception setup
+
+**CSRF Setup Required:**
+```php
+// bootstrap/app.php
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->validateCsrfTokens(except: [
+        'wizard/onboarding/*',
+    ]);
+})
+```
+
+### Livewire Wizards
+
+Reactive components with Laravel Livewire.
+
+```bash
+php artisan wizard:make Onboarding --type=livewire
+```
+
+**Best for:**
+- Reactive UIs without JavaScript frameworks
+- Real-time validation
+- Dynamic forms
+
+### Inertia Wizards
+
+SPA experience with Vue/React using Inertia.js.
+
+```bash
+php artisan wizard:make Onboarding --type=inertia
+```
+
+**Best for:**
+- Modern SPA with server-side routing
+- Vue/React with Laravel backend
+- Best of both worlds (SPA + Laravel)
 
 ---
 
@@ -77,9 +173,7 @@ class PersonalInfoStep extends AbstractStep
         parent::__construct(
             id: 'personal-info',
             title: 'Personal Information',
-            order: 1,
-            isOptional: false,
-            canSkip: false
+            order: 1
         );
     }
 
@@ -154,7 +248,7 @@ class PersonalInfoRequest extends FormRequest
 
 ## Optional Steps
 
-Make a step optional by passing `optional: true`:
+Make a step optional by passing `isOptional: true`:
 
 ```php
 public function __construct()
@@ -173,6 +267,9 @@ public function getFormRequest(): ?string
     return null; // No validation for optional step
 }
 ```
+
+{: .note }
+> **Smart Defaults**: Generated step constructors automatically omit `isOptional: false` and `canSkip: false` for cleaner code. Only include these parameters when set to `true`.
 
 ---
 
@@ -303,6 +400,295 @@ Available events:
 
 ---
 
+## Blade Components
+
+For Blade wizards, use pre-built components for rapid development:
+
+### Layout Component
+
+Provides base wizard layout with title and content slot:
+
+```blade
+<x-wizard::layout title="User Onboarding">
+    <!-- Your wizard content here -->
+</x-wizard::layout>
+```
+
+### Progress Bar Component
+
+Shows wizard completion progress:
+
+```blade
+<x-wizard::progress-bar 
+    :steps="$steps" 
+    :currentStep="$currentStep" 
+/>
+```
+
+The component automatically calculates completion percentage based on current step position.
+
+### Form Wrapper Component
+
+Wraps your form with CSRF protection and error handling:
+
+```blade
+<x-wizard::form-wrapper :action="route('wizard.onboarding.store', $step->id)">
+    <!-- Your form fields -->
+    <input type="text" name="name" value="{{ old('name') }}" />
+    <input type="email" name="email" value="{{ old('email') }}" />
+    
+    <!-- Navigation buttons -->
+</x-wizard::form-wrapper>
+```
+
+Automatically displays validation errors at the top of the form.
+
+### Step Navigation Component
+
+Provides back/next/complete buttons:
+
+```blade
+<x-wizard::step-navigation 
+    :canGoBack="$canGoBack"
+    :canGoForward="$canGoForward"
+    :isLastStep="$isLastStep"
+    :previousStep="$previousStep ?? null"
+    :nextStep="$nextStep ?? null"
+    backText="Previous"
+    nextText="Next"
+    completeText="Complete"
+/>
+```
+
+### Complete Example
+
+```blade
+<x-wizard::layout title="User Onboarding">
+    <x-wizard::progress-bar :steps="$steps" :currentStep="$currentStep" />
+    
+    <x-wizard::form-wrapper :action="route('wizard.onboarding.store', 'personal-info')">
+        <h2>Personal Information</h2>
+        
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" value="{{ old('name') }}" />
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ old('email') }}" />
+        </div>
+        
+        <x-wizard::step-navigation 
+            :canGoBack="false"
+            :canGoForward="true"
+            :isLastStep="false"
+            :nextStep="$nextStep"
+        />
+    </x-wizard::form-wrapper>
+</x-wizard::layout>
+```
+
+**Customization:**
+
+Publish components to customize styling:
+
+```bash
+php artisan vendor:publish --tag="wizard-components"
+```
+
+Components will be available in `resources/views/vendor/wizard-package/components/`.
+
+---
+
+## Vue 3 Composable
+
+For API/SPA wizards, use the `useWizard()` composable:
+
+### Installation
+
+Publish assets:
+
+```bash
+php artisan vendor:publish --tag="wizard-assets"
+```
+
+Import in your Vue component:
+
+```typescript
+import { useWizard } from '@/composables/useWizard';
+
+export default {
+    setup() {
+        const { 
+            state, 
+            currentStep, 
+            canGoBack, 
+            canGoForward, 
+            isLastStep,
+            initialize, 
+            submitStep, 
+            goToStep 
+        } = useWizard('onboarding');
+        
+        return { 
+            state, 
+            currentStep, 
+            canGoBack, 
+            canGoForward, 
+            isLastStep,
+            initialize, 
+            submitStep, 
+            goToStep 
+        };
+    }
+};
+```
+
+### Reactive State
+
+```typescript
+interface WizardState {
+    currentStepIndex: number;
+    steps: WizardStep[];
+    formData: Record<string, any>;
+    errors: Record<string, string[]>;
+    loading: boolean;
+    completed: boolean;
+    wizardData: any;
+}
+```
+
+### Methods
+
+#### Initialize Wizard
+
+```typescript
+await initialize();
+```
+
+#### Submit Step
+
+```typescript
+const result = await submitStep({
+    name: 'John Doe',
+    email: 'john@example.com'
+});
+
+if (result.success) {
+    console.log('Step completed!', result.nextStep);
+} else {
+    console.error('Validation errors:', result.errors);
+}
+```
+
+#### Navigate to Step
+
+```typescript
+await goToStep('personal-info');
+```
+
+#### Form Helpers
+
+```typescript
+// Set field value
+setFieldValue('email', 'john@example.com');
+
+// Get field error
+const emailError = getFieldError('email');
+
+// Clear all errors
+clearErrors();
+```
+
+### Complete Vue Example
+
+```vue
+<template>
+    <div v-if="!state.loading" class="wizard">
+        <div class="progress">
+            Step {{ state.currentStepIndex + 1 }} of {{ state.steps.length }}
+            <progress :value="state.currentStepIndex + 1" :max="state.steps.length"></progress>
+        </div>
+        
+        <h2>{{ currentStep?.title }}</h2>
+        
+        <form @submit.prevent="handleSubmit">
+            <div v-if="currentStep?.id === 'personal-info'">
+                <input v-model="formData.name" type="text" placeholder="Name" />
+                <span v-if="getFieldError('name')" class="error">
+                    {{ getFieldError('name') }}
+                </span>
+                
+                <input v-model="formData.email" type="email" placeholder="Email" />
+                <span v-if="getFieldError('email')" class="error">
+                    {{ getFieldError('email') }}
+                </span>
+            </div>
+            
+            <div class="navigation">
+                <button v-if="canGoBack" type="button" @click="goToStep(previousStep.id)">
+                    Previous
+                </button>
+                <button type="submit" :disabled="state.loading">
+                    {{ isLastStep ? 'Complete' : 'Next' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useWizard } from '@/composables/useWizard';
+
+const { 
+    state, 
+    currentStep, 
+    canGoBack, 
+    isLastStep,
+    initialize, 
+    submitStep, 
+    goToStep,
+    setFieldValue,
+    getFieldError
+} = useWizard('onboarding');
+
+const formData = ref<Record<string, any>>({});
+
+onMounted(async () => {
+    await initialize();
+});
+
+const handleSubmit = async () => {
+    const result = await submitStep(formData.value);
+    if (result.success) {
+        formData.value = {};
+    }
+};
+</script>
+```
+
+---
+
+## Automatic Step Reordering
+
+When you add a new step with a specific order, existing steps are automatically reordered:
+
+```bash
+# Existing steps: Step1 (order: 1), Step3 (order: 2)
+php artisan wizard:make-step Onboarding NewStep --order=2
+
+# Result:
+# - Step1 (order: 1)
+# - NewStep (order: 2) ← newly inserted
+# - Step3 (order: 3) ← automatically incremented
+```
+
+The package scans the `Steps/` directory and updates step order properties automatically. No manual file editing required!
+
+---
+
 ## Using the Facade
 
 ### Initialize a Wizard
@@ -338,7 +724,30 @@ Wizard::complete();
 
 ## Frontend Integration
 
-### React/Vue/Inertia Example
+### Vue 3 with useWizard()
+
+**Recommended approach for SPA:**
+
+```vue
+<script setup>
+import { useWizard } from '@/composables/useWizard';
+
+const { state, currentStep, submitStep, initialize } = useWizard('onboarding');
+
+onMounted(() => initialize());
+
+const handleSubmit = async (formData) => {
+    const result = await submitStep(formData);
+    if (result.success) {
+        // Navigate to next step automatically
+    }
+};
+</script>
+```
+
+### Manual Fetch API (Alternative)
+
+If you prefer manual control or use React/Angular:
 
 ```javascript
 // Fetch wizard state
@@ -348,7 +757,10 @@ const { step, navigation, progress } = await response.json();
 // Submit step data
 const result = await fetch('/wizard/onboarding/personal-info', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+    },
     body: JSON.stringify({
         name: 'John Doe',
         email: 'john@example.com'

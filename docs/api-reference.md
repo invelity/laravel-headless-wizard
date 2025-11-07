@@ -10,6 +10,312 @@ Complete API documentation for Laravel Headless Wizard.
 
 ---
 
+## Artisan Commands
+
+### wizard:make
+
+Generate a new wizard with interactive prompts.
+
+**Signature:**
+```bash
+php artisan wizard:make {name?} {--type=} {--force}
+```
+
+**Arguments:**
+- `name` - The wizard name (PascalCase)
+
+**Options:**
+- `--type=blade|api|livewire|inertia` - Wizard type (interactive if not provided)
+- `--force` - Overwrite existing wizard
+
+**Examples:**
+```bash
+# Interactive
+php artisan wizard:make Onboarding
+
+# With options
+php artisan wizard:make Onboarding --type=api
+
+# Force overwrite
+php artisan wizard:make Onboarding --type=blade --force
+```
+
+**Output:**
+- Wizard class: `app/Wizards/{Name}Wizard/{Name}.php`
+- Controller: `app/Http/Controllers/{Name}Controller.php`
+- Views (Blade only): `resources/views/wizards/{name}/`
+
+---
+
+### wizard:make-step
+
+Generate a new wizard step with FormRequest validation.
+
+**Signature:**
+```bash
+php artisan wizard:make-step {wizard?} {name?} {--order=} {--optional=} {--force}
+```
+
+**Arguments:**
+- `wizard` - The wizard name
+- `name` - The step name (PascalCase)
+
+**Options:**
+- `--order=N` - Step order number (interactive if not provided)
+- `--optional=true|false` - Mark step as optional
+- `--force` - Overwrite existing step
+
+**Examples:**
+```bash
+# Interactive
+php artisan wizard:make-step Onboarding
+
+# With all options
+php artisan wizard:make-step Onboarding PersonalInfo --order=1 --optional=false
+
+# Optional step
+php artisan wizard:make-step Onboarding Newsletter --order=3 --optional=true
+```
+
+**Output:**
+- Step class: `app/Wizards/{Wizard}Wizard/Steps/{Name}Step.php`
+- FormRequest: `app/Http/Requests/Wizards/{Name}Request.php`
+
+**Features:**
+- Automatic step reordering (inserts at specified order, increments existing)
+- Smart default omission (only includes `isOptional`/`canSkip` when `true`)
+- Auto-discovery (no config registration needed)
+
+---
+
+## Blade Components
+
+### x-wizard::layout
+
+Base wizard layout with title and content slot.
+
+**Props:**
+- `title` (string, default: 'Wizard') - Page title
+
+**Slots:**
+- Default slot - Main content
+
+**Example:**
+```blade
+<x-wizard::layout title="User Onboarding">
+    <h1>Welcome!</h1>
+    <!-- Your wizard content -->
+</x-wizard::layout>
+```
+
+---
+
+### x-wizard::progress-bar
+
+Progress indicator with percentage calculation.
+
+**Props:**
+- `steps` (array, required) - Array of step objects with `id` property
+- `currentStep` (string, required) - Current step ID
+
+**Example:**
+```blade
+<x-wizard::progress-bar 
+    :steps="$steps" 
+    :currentStep="$currentStep" 
+/>
+```
+
+**Output:**
+- Progress bar with `X% Complete` text
+- Automatically calculates percentage based on step position
+
+---
+
+### x-wizard::form-wrapper
+
+Form wrapper with CSRF protection and error display.
+
+**Props:**
+- `action` (string, required) - Form action URL
+- `method` (string, default: 'POST') - HTTP method
+
+**Slots:**
+- Default slot - Form fields
+
+**Example:**
+```blade
+<x-wizard::form-wrapper :action="route('wizard.store', 'step-1')">
+    <input type="text" name="name" />
+    <button type="submit">Next</button>
+</x-wizard::form-wrapper>
+```
+
+**Features:**
+- Automatic CSRF token
+- Validation error display at top of form
+- Preserves all HTML attributes via `$attributes`
+
+---
+
+### x-wizard::step-navigation
+
+Navigation buttons (back/next/complete).
+
+**Props:**
+- `canGoBack` (bool, default: false) - Show back button
+- `canGoForward` (bool, default: true) - Show next button
+- `isLastStep` (bool, default: false) - Show "Complete" instead of "Next"
+- `previousStep` (?string, default: null) - Previous step ID (for back link)
+- `nextStep` (?string, default: null) - Next step ID (for forward link)
+- `backText` (string, default: 'Previous') - Back button text
+- `nextText` (string, default: 'Next') - Next button text
+- `completeText` (string, default: 'Complete') - Complete button text
+
+**Example:**
+```blade
+<x-wizard::step-navigation 
+    :canGoBack="true"
+    :canGoForward="true"
+    :isLastStep="false"
+    :previousStep="'personal-info'"
+    :nextStep="'preferences'"
+    backText="Go Back"
+    nextText="Continue"
+/>
+```
+
+---
+
+## Vue Composable
+
+### useWizard(wizardId, options?)
+
+Vue 3 Composition API composable for SPA wizard integration.
+
+**Parameters:**
+- `wizardId` (string, required) - Wizard identifier
+- `options` (object, optional) - Configuration options
+  - `apiBaseUrl` (string, default: '/wizard') - API base URL
+  - `onStepComplete` (function) - Callback after step completion
+  - `onWizardComplete` (function) - Callback after wizard completion
+  - `onError` (function) - Error handler callback
+
+**Returns:**
+```typescript
+interface UseWizardReturn {
+    state: WizardState;
+    currentStep: ComputedRef<WizardStep | null>;
+    canGoBack: ComputedRef<boolean>;
+    canGoForward: ComputedRef<boolean>;
+    isLastStep: ComputedRef<boolean>;
+    initialize: () => Promise<void>;
+    submitStep: (data: Record<string, any>) => Promise<SubmitStepResult>;
+    goToStep: (stepId: string) => Promise<void>;
+    setFieldValue: (field: string, value: any) => void;
+    getFieldError: (field: string) => string | null;
+    clearErrors: () => void;
+}
+```
+
+**State Interface:**
+```typescript
+interface WizardState {
+    currentStepIndex: number;
+    steps: WizardStep[];
+    formData: Record<string, any>;
+    errors: Record<string, string[]>;
+    loading: boolean;
+    completed: boolean;
+    wizardData: any;
+}
+```
+
+**Example:**
+```typescript
+import { useWizard } from '@/composables/useWizard';
+
+const { 
+    state, 
+    currentStep, 
+    canGoBack,
+    isLastStep,
+    initialize, 
+    submitStep 
+} = useWizard('onboarding');
+
+// Initialize wizard
+await initialize();
+
+// Submit step data
+const result = await submitStep({
+    name: 'John Doe',
+    email: 'john@example.com'
+});
+
+if (result.success) {
+    console.log('Next step:', result.nextStep);
+}
+```
+
+**Methods:**
+
+#### initialize()
+
+Fetches wizard configuration and initializes state.
+
+```typescript
+await initialize();
+```
+
+#### submitStep(data)
+
+Submits current step data and navigates to next step on success.
+
+```typescript
+const result = await submitStep({ name: 'John', email: 'john@example.com' });
+
+// result.success (boolean)
+// result.nextStep (WizardStep | null)
+// result.completed (boolean)
+// result.errors (Record<string, string[]> | null)
+```
+
+#### goToStep(stepId)
+
+Navigates to a specific step.
+
+```typescript
+await goToStep('personal-info');
+```
+
+#### setFieldValue(field, value)
+
+Sets form field value in reactive state.
+
+```typescript
+setFieldValue('email', 'john@example.com');
+```
+
+#### getFieldError(field)
+
+Gets validation error for a specific field.
+
+```typescript
+const error = getFieldError('email');
+// Returns: "The email field is required." or null
+```
+
+#### clearErrors()
+
+Clears all validation errors.
+
+```typescript
+clearErrors();
+```
+
+---
+
 ## WizardManagerInterface
 
 The main interface for managing wizard state and navigation.
