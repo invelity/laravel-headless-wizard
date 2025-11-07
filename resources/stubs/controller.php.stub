@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+
+class {{ class }}Controller extends Controller
+{
+    public function __construct(
+        private readonly WizardManagerInterface $wizardManager
+    ) {}
+
+    public function show(string $step): View|JsonResponse
+    {
+        $this->wizardManager->initialize('{{ wizardId }}');
+        $stepData = $this->wizardManager->getStepData($step);
+
+        return request()->wantsJson()
+            ? response()->json($stepData)
+            : view('wizards.{{ wizardKebab }}.steps.{$step}', $stepData);
+    }
+
+    public function store(Request $request, string $step): RedirectResponse|JsonResponse
+    {
+        $this->wizardManager->initialize('{{ wizardId }}');
+        $result = $this->wizardManager->processStep($step, $request->all());
+
+        if ($result->hasErrors()) {
+            return request()->wantsJson()
+                ? response()->json(['errors' => $result->errors()], 422)
+                : back()->withErrors($result->errors())->withInput();
+        }
+
+        $nextStep = $result->nextStep();
+
+        if ($result->isCompleted()) {
+            return request()->wantsJson()
+                ? response()->json(['completed' => true, 'data' => $result->data()])
+                : redirect()->route('{{ wizardKebab }}.complete');
+        }
+
+        return request()->wantsJson()
+            ? response()->json(['next_step' => $nextStep])
+            : redirect()->route('wizard.{{ wizardKebab }}.show', $nextStep);
+    }
+}

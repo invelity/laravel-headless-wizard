@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
@@ -12,6 +13,7 @@ use Invelity\WizardPackage\Core\WizardManager;
 use Invelity\WizardPackage\Http\Middleware\StepAccess;
 use Invelity\WizardPackage\Http\Middleware\WizardSession;
 use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
+use Invelity\WizardPackage\Services\WizardDiscoveryService;
 use Invelity\WizardPackage\Storage\CacheStorage;
 use Invelity\WizardPackage\Storage\DatabaseStorage;
 use Invelity\WizardPackage\Storage\SessionStorage;
@@ -28,6 +30,15 @@ class WizardServiceProvider extends PackageServiceProvider
             ->hasRoute('web')
             ->hasMigration('create_wizard_progress_table')
             ->hasTranslations()
+            ->hasViews('wizard-package')
+            ->hasViewComponents(
+                'wizard',
+                Components\Layout::class,
+                Components\ProgressBar::class,
+                Components\StepNavigation::class,
+                Components\FormWrapper::class
+            )
+            ->hasAssets()
             ->hasCommands([
                 Commands\MakeStepCommand::class,
                 Commands\MakeWizardCommand::class,
@@ -59,13 +70,19 @@ class WizardServiceProvider extends PackageServiceProvider
         $this->app->singleton(Wizard::class, function ($app) {
             return new Wizard($app->make(WizardManagerInterface::class));
         });
+
+        // Register wizard discovery service
+        $this->app->singleton(WizardDiscoveryService::class);
     }
 
+    /**
+     * @throws BindingResolutionException
+     */
     public function packageBooted(): void
     {
         $this->registerMiddleware();
         $this->registerPublishableStubs();
-        $this->discoverWizards();
+        $this->registerDiscoveredWizards();
     }
 
     protected function registerPublishableStubs(): void
@@ -83,67 +100,30 @@ class WizardServiceProvider extends PackageServiceProvider
         $this->app['router']->aliasMiddleware('wizard.step-access', StepAccess::class);
     }
 
-    protected function discoverWizards(): void
+    /**
+     * @throws BindingResolutionException
+     */
+    protected function registerDiscoveredWizards(): void
     {
-        $wizardsPath = app_path('Wizards');
+        $discoveryService = $this->app->make(WizardDiscoveryService::class);
+        $wizards = $discoveryService->discoverWizards();
 
-        if (! is_dir($wizardsPath)) {
-            return;
-        }
+        $wizardsConfig = [];
 
-        $wizards = [];
-        $directories = glob($wizardsPath.'/*Wizard', GLOB_ONLYDIR);
+        $wizards->each(function ($wizard) use ($discoveryService, &$wizardsConfig) {
+            $wizardClass = get_class($wizard);
+            $steps = $discoveryService->discoverSteps($wizardClass);
 
-        foreach ($directories as $wizardDir) {
-            $wizardFolderName = basename($wizardDir);
-            $wizardClassName = str_replace('Wizard', '', $wizardFolderName);
-            $wizardFile = $wizardDir.'/'.$wizardClassName.'.php';
+            $wizardId = method_exists($wizard, 'getId')
+                ? $wizard->getId()
+                : str(class_basename($wizardClass))->kebab()->toString();
 
-            if (! file_exists($wizardFile)) {
-                continue;
-            }
-
-            $wizardClass = "App\\Wizards\\{$wizardFolderName}\\{$wizardClassName}";
-
-            if (! class_exists($wizardClass)) {
-                continue;
-            }
-
-            $steps = $this->discoverStepsForWizard($wizardDir);
-
-            $wizardInstance = new $wizardClass;
-            $wizardId = method_exists($wizardInstance, 'getId') ? $wizardInstance->getId() : str($wizardClassName)->kebab()->toString();
-
-            $wizards[$wizardId] = [
+            $wizardsConfig[$wizardId] = [
                 'class' => $wizardClass,
-                'steps' => $steps,
+                'steps' => $steps->map(fn ($step) => get_class($step))->toArray(),
             ];
-        }
+        });
 
-        config(['wizard.wizards' => $wizards]);
-    }
-
-    protected function discoverStepsForWizard(string $wizardDir): array
-    {
-        $stepsDir = $wizardDir.'/Steps';
-
-        if (! is_dir($stepsDir)) {
-            return [];
-        }
-
-        $stepFiles = glob($stepsDir.'/*Step.php');
-        $steps = [];
-
-        foreach ($stepFiles as $stepFile) {
-            $stepClassName = basename($stepFile, '.php');
-            $wizardFolderName = basename($wizardDir);
-            $stepClass = "App\\Wizards\\{$wizardFolderName}\\Steps\\{$stepClassName}";
-
-            if (class_exists($stepClass)) {
-                $steps[] = $stepClass;
-            }
-        }
-
-        return $steps;
+        config(['wizard.wizards' => $wizardsConfig]);
     }
 }
