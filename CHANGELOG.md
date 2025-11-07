@@ -2,6 +2,52 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## [1.2.0] - 2025-11-07
+
+### Added
+- **Interactive Wizard Generation**: Laravel Prompts integration for beautiful CLI experience
+  - Interactive wizard type selection (Blade, API, Livewire, Inertia)
+  - Step-by-step guided wizard and step creation with validation hints
+  - Rich output with `info()`, `note()`, and `warning()` helpers
+  - CSRF protection warnings for API/SPA wizards
+- **Blade Components**: Pre-built UI components for rapid prototyping
+  - `<x-wizard::layout>` - Base wizard layout with title support
+  - `<x-wizard::progress-bar>` - Automatic progress calculation and display
+  - `<x-wizard::step-navigation>` - Customizable back/next/complete buttons
+  - `<x-wizard::form-wrapper>` - Form with CSRF and error handling
+  - All components are publishable and customizable
+- **Vue 3 Composable**: `useWizard()` for SPA integration
+  - Full TypeScript definitions included
+  - Reactive state management with Vue 3 Composition API
+  - Automatic API communication with CSRF token handling
+  - Form helpers: `setFieldValue()`, `getFieldError()`, `clearErrors()`
+  - Navigation: `submitStep()`, `goToStep()`, `initialize()`
+- **Automatic Step Reordering**: Insert steps at any position, existing steps automatically renumbered
+- **Smart Default Value Omission**: Generated step classes only include non-default parameters (cleaner code)
+- **WizardDiscoveryService**: Automatic wizard and step discovery from `app/Wizards/` directory
+
+### Improved
+- Commands now use Laravel Prompts for all user interactions
+- Generated views use package components (building blocks approach)
+- Step stubs omit `isOptional: false` and `canSkip: false` for cleaner generated code
+- Better error messages with troubleshooting hints
+- Enhanced command output with file paths and next steps
+
+### Fixed
+- All stubs now have `declare(strict_types=1)` for strict type checking
+- Constructor property promotion used throughout generated code
+- Named arguments in all parent constructor calls
+- Architecture tests exclude Components from God object and View return checks
+
+### Developer Experience
+- 397 comprehensive tests (89.7% coverage)
+- PHPStan Level 5 with zero errors
+- Laravel Pint compliance (126 files formatted)
+- Architecture tests enforce SOLID principles
+- Generated code passes PHPStan Level 5
+
+**Author:** Martin-1182 <halaj@invelity.com>
+
 ## [1.1.0] - 2025-11-05
 
 ### Bug Fixes

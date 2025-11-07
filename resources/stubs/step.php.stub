@@ -15,9 +15,7 @@ class {{ class }} extends AbstractStep
         parent::__construct(
             id: '{{ stepId }}',
             title: '{{ title }}',
-            order: {{ order }},
-            isOptional: {{ optional }},
-            canSkip: {{ optional }}
+            order: {{ order }}{{ optionalParams }}
         );
     }
 

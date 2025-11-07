@@ -20,9 +20,4 @@ class {{ class }}
     {
         return '{{ name }}';
     }
-
-    public function getSteps(): array
-    {
-        return config('wizard.wizards.{{ id }}.steps', []);
-    }
 }

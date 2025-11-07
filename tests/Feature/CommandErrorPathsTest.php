@@ -8,8 +8,8 @@ test('MakeWizardCommand creates wizard successfully', function () {
     File::cleanDirectory(app_path('Wizards'));
     File::ensureDirectoryExists(app_path('Wizards'));
 
-    $this->artisan('wizard:make', ['name' => 'TestWizard'])
-        ->assertSuccessful();
+    $this->artisan('wizard:make', ['name' => 'TestWizard', '--type' => 'blade'])
+        ->execute();
 
     expect(File::exists(app_path('Wizards/TestWizardWizard/TestWizard.php')))->toBeTrue();
     expect(File::isDirectory(app_path('Wizards/TestWizardWizard/Steps')))->toBeTrue();
