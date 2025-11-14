@@ -6,14 +6,22 @@ namespace Invelity\WizardPackage;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
+use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardManager;
 use Invelity\WizardPackage\Http\Middleware\StepAccess;
 use Invelity\WizardPackage\Http\Middleware\WizardSession;
+use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
+use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
 use Invelity\WizardPackage\Services\WizardDiscoveryService;
+use Invelity\WizardPackage\Services\WizardEventManager;
+use Invelity\WizardPackage\Services\WizardLifecycleManager;
+use Invelity\WizardPackage\Services\WizardProgressTracker;
+use Invelity\WizardPackage\Services\WizardStepProcessor;
 use Invelity\WizardPackage\Storage\CacheStorage;
 use Invelity\WizardPackage\Storage\DatabaseStorage;
 use Invelity\WizardPackage\Storage\SessionStorage;
@@ -64,6 +72,18 @@ class WizardServiceProvider extends PackageServiceProvider
 
         // Register validation service
         $this->app->singleton(FormRequestValidatorInterface::class, FormRequestValidator::class);
+
+        // Register event manager
+        $this->app->singleton(WizardEventManagerInterface::class, WizardEventManager::class);
+
+        // Register step processor
+        $this->app->singleton(WizardStepProcessorInterface::class, WizardStepProcessor::class);
+
+        // Register progress tracker
+        $this->app->singleton(WizardProgressTrackerInterface::class, WizardProgressTracker::class);
+
+        // Register lifecycle manager
+        $this->app->singleton(WizardLifecycleManagerInterface::class, WizardLifecycleManager::class);
 
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
 

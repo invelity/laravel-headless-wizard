@@ -8,15 +8,5 @@ use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 interface WizardProgressTrackerInterface
 {
-    public function getProgress(): WizardProgressValue;
-
-    public function getAllData(): array;
-
-    public function getCurrentStep(): ?WizardStepInterface;
-
-    public function getNextStep(): ?WizardStepInterface;
-
-    public function getPreviousStep(): ?WizardStepInterface;
-
-    public function getNavigation(): WizardNavigationInterface;
+    public function getProgress(string $wizardId, array $steps): WizardProgressValue;
 }
