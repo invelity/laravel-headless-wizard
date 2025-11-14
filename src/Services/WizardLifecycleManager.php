@@ -6,7 +6,6 @@ namespace Invelity\WizardPackage\Services;
 
 use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
-use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Models\WizardProgress;
@@ -18,7 +17,6 @@ class WizardLifecycleManager implements WizardLifecycleManagerInterface
     public function __construct(
         private readonly WizardStorageInterface $storage,
         private readonly WizardEventManagerInterface $eventManager,
-        private readonly WizardProgressTrackerInterface $progressTracker,
         private readonly WizardConfiguration $configuration,
     ) {}
 
