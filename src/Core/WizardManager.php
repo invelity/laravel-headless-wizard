@@ -24,12 +24,7 @@ use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 use RuntimeException;
 
-class WizardManager implements 
-    WizardManagerInterface,
-    WizardInitializationInterface,
-    WizardStepAccessInterface,
-    WizardNavigationManagerInterface,
-    WizardDataInterface
+class WizardManager implements WizardDataInterface, WizardInitializationInterface, WizardManagerInterface, WizardNavigationManagerInterface, WizardStepAccessInterface
 {
     private ?string $currentWizardId = null;
 

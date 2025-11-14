@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Contracts;
 
-use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
-
 interface WizardEventManagerInterface
 {
     public function fireWizardStarted(string $wizardId, ?int $userId, string $sessionId, array $initialData): void;

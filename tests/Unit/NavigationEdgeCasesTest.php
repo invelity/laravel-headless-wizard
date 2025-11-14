@@ -22,7 +22,7 @@ test('canNavigateTo returns false when step not found', function () {
         new \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep,
     ];
 
-    $stepFinder = new StepFinderService();
+    $stepFinder = new StepFinderService;
     $navigation = new WizardNavigation($steps, $storage, $config, 'test', $stepFinder);
 
     $storage->put('test', [

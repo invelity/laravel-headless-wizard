@@ -67,15 +67,15 @@ class FormRequestValidationTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Contact Information');
-        
+
         $exitCode = $result->run();
-        
+
         // Debug: Check if wizard directory exists
         $this->assertTrue(
             \Illuminate\Support\Facades\File::isDirectory(app_path('Wizards/TestWizardWizard')),
             'TestWizardWizard directory should exist'
         );
-        
+
         // Debug: Check step file
         $stepPath = app_path('Wizards/TestWizardWizard/Steps/ContactInfoStep.php');
         $this->assertFileExists($stepPath, 'Step file should be created');

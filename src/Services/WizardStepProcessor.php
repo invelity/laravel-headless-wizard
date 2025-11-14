@@ -6,13 +6,11 @@ namespace Invelity\WizardPackage\Services;
 
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
 use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
-use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\ValueObjects\StepData;
 use Invelity\WizardPackage\ValueObjects\StepResult;
-use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 class WizardStepProcessor implements WizardStepProcessorInterface
 {

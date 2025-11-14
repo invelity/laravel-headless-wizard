@@ -124,4 +124,3 @@ test('deleteWizard with database throws exception when instance not found', func
     expect(fn () => $manager->deleteWizard('test', 99999))
         ->toThrow(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
 });
-

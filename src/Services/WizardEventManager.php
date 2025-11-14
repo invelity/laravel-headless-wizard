@@ -20,7 +20,7 @@ class WizardEventManager implements WizardEventManagerInterface
 
     public function fireWizardStarted(string $wizardId, ?int $userId, string $sessionId, array $initialData): void
     {
-        if (!$this->configuration->fireEvents) {
+        if (! $this->configuration->fireEvents) {
             return;
         }
 
@@ -34,7 +34,7 @@ class WizardEventManager implements WizardEventManagerInterface
 
     public function fireStepCompleted(string $wizardId, string $stepId, array $stepData, int $percentComplete): void
     {
-        if (!$this->configuration->fireEvents) {
+        if (! $this->configuration->fireEvents) {
             return;
         }
 
@@ -43,7 +43,7 @@ class WizardEventManager implements WizardEventManagerInterface
 
     public function fireStepSkipped(string $wizardId, string $stepId, string $sessionId): void
     {
-        if (!$this->configuration->fireEvents) {
+        if (! $this->configuration->fireEvents) {
             return;
         }
 
@@ -52,7 +52,7 @@ class WizardEventManager implements WizardEventManagerInterface
 
     public function fireWizardCompleted(string $wizardId, array $allData): void
     {
-        if (!$this->configuration->fireEvents) {
+        if (! $this->configuration->fireEvents) {
             return;
         }
 

@@ -10,7 +10,7 @@ use Invelity\WizardPackage\Contracts\WizardStepInterface;
 class StepFinderService implements StepFinderInterface
 {
     /**
-     * @param array<WizardStepInterface> $steps
+     * @param  array<WizardStepInterface>  $steps
      */
     public function findStep(array $steps, string $stepId): ?WizardStepInterface
     {
@@ -21,7 +21,7 @@ class StepFinderService implements StepFinderInterface
     }
 
     /**
-     * @param array<WizardStepInterface> $steps
+     * @param  array<WizardStepInterface>  $steps
      */
     public function findStepIndex(array $steps, string $stepId): ?int
     {

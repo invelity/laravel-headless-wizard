@@ -26,6 +26,7 @@ class MakeStepCommand extends Command
     ) {
         parent::__construct();
     }
+
     protected $signature = 'wizard:make-step
                             {wizard? : The wizard name}
                             {name? : The name of the step}
@@ -166,5 +167,4 @@ class MakeStepCommand extends Command
 
         return null;
     }
-
 }

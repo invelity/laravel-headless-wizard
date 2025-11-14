@@ -47,7 +47,7 @@ test('getStepsBefore defensive null check never reached in normal flow', functio
     $step1 = new \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
     $step2 = new \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 
-    $stepFinder = new StepFinderService();
+    $stepFinder = new StepFinderService;
     $navigation = new WizardNavigation([$step1, $step2], $storage, $config, 'test', $stepFinder);
 
     $storage->put('test', [

@@ -74,7 +74,7 @@ class WizardLifecycleManager implements WizardLifecycleManagerInterface
     {
         $wizardData = $this->storage->get($wizardId);
         $steps = $wizardData['steps'] ?? [];
-        
+
         $this->storage->update($wizardId, 'completed_at', now()->toIso8601String());
         $this->storage->update($wizardId, 'status', 'completed');
 
