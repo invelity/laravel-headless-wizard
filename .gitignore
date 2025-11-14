@@ -45,3 +45,5 @@ add_strict_types.sh
 /.playwright-mcp/
 IMPROVEMENTS.md
 BUGFIX-PROGRESS.md
+coverage-report/
+COVERAGE-REPORT.md
