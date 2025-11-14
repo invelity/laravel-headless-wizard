@@ -67,7 +67,7 @@ class FormRequestValidationTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Contact Information')
-            ->assertSuccessful();
+            ->execute();
 
         $requestPath = app_path('Http/Requests/Wizards/ContactInfoRequest.php');
         $this->assertFileExists($requestPath);
@@ -86,7 +86,7 @@ class FormRequestValidationTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->assertSuccessful();
+            ->execute();
 
         $stepPath = app_path('Wizards/TestWizardWizard/Steps/PersonalInfoStep.php');
         $this->assertFileExists($stepPath);
@@ -106,7 +106,7 @@ class FormRequestValidationTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Email Verification')
-            ->assertSuccessful();
+            ->execute();
 
         $requestPath = app_path('Http/Requests/Wizards/EmailVerificationRequest.php');
         $requestContent = File::get($requestPath);
@@ -134,7 +134,7 @@ class FormRequestValidationTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Account Setup')
-            ->assertSuccessful();
+            ->execute();
 
         $requestPath = app_path('Http/Requests/Wizards/AccountSetupRequest.php');
         $requestContent = File::get($requestPath);

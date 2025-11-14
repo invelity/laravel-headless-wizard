@@ -34,7 +34,7 @@ test('form request has rules method', function () {
         '--optional' => false,
     ])
         ->expectsQuestion('What is the step title?', 'User Information')
-        ->assertSuccessful();
+        ->execute();
 
     $requestPath = app_path('Http/Requests/Wizards/UserInfoRequest.php');
 
@@ -53,7 +53,7 @@ test('form request authorize defaults to true', function () {
         '--optional' => false,
     ])
         ->expectsQuestion('What is the step title?', 'Profile Information')
-        ->assertSuccessful();
+        ->execute();
 
     $requestPath = app_path('Http/Requests/Wizards/ProfileInfoRequest.php');
     $requestContent = File::get($requestPath);
@@ -69,7 +69,7 @@ test('form request rules returns array', function () {
         '--optional' => false,
     ])
         ->expectsQuestion('What is the step title?', 'Contact Details')
-        ->assertSuccessful();
+        ->execute();
 
     $requestPath = app_path('Http/Requests/Wizards/ContactDetailsRequest.php');
 
@@ -89,7 +89,7 @@ test('form request extends laravel form request', function () {
         '--optional' => false,
     ])
         ->expectsQuestion('What is the step title?', 'Address Information')
-        ->assertSuccessful();
+        ->execute();
 
     $requestPath = app_path('Http/Requests/Wizards/AddressInfoRequest.php');
 

@@ -55,11 +55,7 @@ class WizardServiceProvider extends PackageServiceProvider
                 Components\StepNavigation::class,
                 Components\FormWrapper::class
             )
-            ->hasAssets()
-            ->hasCommands([
-                Commands\MakeStepCommand::class,
-                Commands\MakeWizardCommand::class,
-            ]);
+            ->hasAssets();
     }
 
     public function packageRegistered(): void
@@ -139,6 +135,17 @@ class WizardServiceProvider extends PackageServiceProvider
         $this->registerMiddleware();
         $this->registerPublishableStubs();
         $this->registerDiscoveredWizards();
+        $this->registerCommands();
+    }
+
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Invelity\WizardPackage\Commands\MakeStepCommand::class,
+                \Invelity\WizardPackage\Commands\MakeWizardCommand::class,
+            ]);
+        }
     }
 
     protected function registerPublishableStubs(): void
