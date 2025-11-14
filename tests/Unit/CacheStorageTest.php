@@ -6,8 +6,9 @@ use Illuminate\Support\Facades\Cache;
 use Invelity\WizardPackage\Storage\CacheStorage;
 
 beforeEach(function () {
+    config()->set('cache.default', 'array');
     Cache::flush();
-    $this->storage = new CacheStorage(Cache::store(), 3600, 'test:');
+    $this->storage = new CacheStorage(Cache::store('array'), 3600, 'test:');
 });
 
 test('cache storage can put data', function () {
