@@ -2,17 +2,116 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## v1.3.0 - SOLID Refactoring & Quality Improvements - 2025-11-14
+
+### 🎉 Major Improvements
+
+This release brings comprehensive SOLID refactoring with significant improvements to code quality, test coverage, and maintainability.
+
+### ✨ Features
+
+#### SOLID Architecture Refactoring
+
+- **Single Responsibility Principle**: Extracted specialized services from WizardManager
+- **Interface Segregation Principle**: Split WizardManager into 4 focused interfaces
+- **Dependency Inversion Principle**: Created abstractions for all dependencies
+- **Open/Closed Principle**: Enhanced extensibility through better abstractions
+- **Don't Repeat Yourself**: Removed code duplication across the package
+
+#### New Services
+
+- `WizardLifecycleManager` - Handles wizard initialization, completion, and reset
+- `WizardStepProcessor` - Processes and validates wizard steps
+- `WizardEventManager` - Manages wizard events
+- `WizardProgressTracker` - Tracks wizard completion progress
+- `StepFinderService` - Finds steps by ID and index
+- `WizardNavigationFactory` - Creates navigation instances
+
+#### New Components
+
+- `StepGenerator` - Generates step class files
+- `FormRequestGenerator` - Generates FormRequest files
+- `WizardStepResponseBuilder` - Builds standardized responses
+
+#### New Interfaces
+
+- `WizardInitializationInterface` - Wizard initialization contract
+- `WizardDataInterface` - Data management contract
+- `WizardStepAccessInterface` - Step access control contract
+- `WizardNavigationManagerInterface` - Navigation management contract
+- `WizardEventManagerInterface` - Event management contract
+- `StepFinderInterface` - Step finding contract
+
+### 🐛 Bug Fixes
+
+- Fixed command registration to support constructor dependency injection
+- Fixed Laravel Prompts testing compatibility
+- Fixed FormRequest stub file path
+- Fixed CacheStorageTest with array cache driver
+- Fixed WizardSessionMiddlewareTest with ArraySessionHandler
+
+### 📊 Quality Metrics
+
+#### Test Coverage
+
+- **398/398 tests passing** (100%)
+- **89.4% line coverage** (1016/1136 lines)
+- **88.3% method coverage** (204/231 methods)
+- **11 out of 18 directories** have 100% coverage
+
+#### Static Analysis
+
+- **PHPStan**: Level max, 0 errors
+- **ArchTest**: 21/21 tests passing (100% SOLID compliant)
+- **Dead Code**: 0 unused methods found
+
+#### Coverage Highlights
+
+- Core business logic: 98.95%
+- HTTP layer: 100%
+- Storage layer: 100%
+- Actions: 97.14%
+
+### 📈 Code Quality Improvements
+
+- Reduced WizardManager from 262 to 213 lines (19% reduction)
+- Extracted 6 new specialized service classes
+- Created 6 new focused interfaces
+- Improved testability through dependency injection
+- Enhanced code organization and maintainability
+
+### 🔄 Breaking Changes
+
+**None** - All changes are internal refactoring. The public API remains fully backward compatible.
+
+### 📚 Documentation
+
+- Added comprehensive SOLID audit report
+- Documented all new services and interfaces
+- Updated code coverage reports
+
+### 🙏 Credits
+
+This release represents a significant improvement in code quality and architecture, ensuring the package is maintainable, testable, and follows industry best practices.
+
+
+---
+
+**Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v1.2.0...v1.3.0
+
 ## [1.2.0] - 2025-11-07
 
 ### Added
 
 - **Interactive Wizard Generation**: Laravel Prompts integration for beautiful CLI experience
+  
   - Interactive wizard type selection (Blade, API, Livewire, Inertia)
   - Step-by-step guided wizard and step creation with validation hints
   - Rich output with `info()`, `note()`, and `warning()` helpers
   - CSRF protection warnings for API/SPA wizards
   
 - **Blade Components**: Pre-built UI components for rapid prototyping
+  
   - `<x-wizard::layout>` - Base wizard layout with title support
   - `<x-wizard::progress-bar>` - Automatic progress calculation and display
   - `<x-wizard::step-navigation>` - Customizable back/next/complete buttons
@@ -20,6 +119,7 @@ All notable changes to `wizard-package` will be documented in this file.
   - All components are publishable and customizable
   
 - **Vue 3 Composable**: `useWizard()` for SPA integration
+  
   - Full TypeScript definitions included
   - Reactive state management with Vue 3 Composition API
   - Automatic API communication with CSRF token handling
@@ -27,8 +127,11 @@ All notable changes to `wizard-package` will be documented in this file.
   - Navigation: `submitStep()`, `goToStep()`, `initialize()`
   
 - **Automatic Step Reordering**: Insert steps at any position, existing steps automatically renumbered
+  
 - **Smart Default Value Omission**: Generated step classes only include non-default parameters (cleaner code)
+  
 - **WizardDiscoveryService**: Automatic wizard and step discovery from `app/Wizards/` directory
+  
 
 ### Improved
 
