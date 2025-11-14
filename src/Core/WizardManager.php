@@ -52,21 +52,8 @@ class WizardManager implements
 
     public function initialize(string $wizardId, array $config = []): void
     {
-        $this->currentWizardId = $wizardId;
-
         $stepClasses = $config['steps'] ?? config("wizard.wizards.{$wizardId}.steps", []);
-        $this->steps = $this->stepFactory->makeMany($stepClasses);
-
-        usort($this->steps, fn ($a, $b) => $a->getOrder() <=> $b->getOrder());
-
-        $this->navigation = new WizardNavigation(
-            steps: $this->steps,
-            storage: $this->storage,
-            configuration: $this->configuration,
-            wizardId: $wizardId,
-            stepFinder: $this->stepFinder,
-        );
-
+        $this->setupWizardContext($wizardId, $stepClasses);
         $this->lifecycleManager->initializeWizard($wizardId, $this->steps, $config);
     }
 
@@ -234,21 +221,8 @@ class WizardManager implements
 
     public function loadFromStorage(string $wizardId, int $instanceId): void
     {
-        $this->currentWizardId = $wizardId;
-
         $stepClasses = config("wizard.wizards.{$wizardId}.steps", []);
-        $this->steps = $this->stepFactory->makeMany($stepClasses);
-
-        usort($this->steps, fn ($a, $b) => $a->getOrder() <=> $b->getOrder());
-
-        $this->navigation = new WizardNavigation(
-            steps: $this->steps,
-            storage: $this->storage,
-            configuration: $this->configuration,
-            wizardId: $wizardId,
-            stepFinder: $this->stepFinder,
-        );
-
+        $this->setupWizardContext($wizardId, $stepClasses);
         $this->lifecycleManager->loadFromStorage($wizardId, $instanceId, $this->steps);
     }
 
@@ -266,6 +240,22 @@ class WizardManager implements
         }
 
         return $this->navigation;
+    }
+
+    private function setupWizardContext(string $wizardId, array $stepClasses): void
+    {
+        $this->currentWizardId = $wizardId;
+        $this->steps = $this->stepFactory->makeMany($stepClasses);
+
+        usort($this->steps, fn ($a, $b) => $a->getOrder() <=> $b->getOrder());
+
+        $this->navigation = new WizardNavigation(
+            steps: $this->steps,
+            storage: $this->storage,
+            configuration: $this->configuration,
+            wizardId: $wizardId,
+            stepFinder: $this->stepFinder,
+        );
     }
 
     private function ensureInitialized(): void
