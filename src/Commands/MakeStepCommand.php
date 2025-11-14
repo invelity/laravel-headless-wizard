@@ -8,6 +8,8 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Invelity\WizardPackage\Generators\FormRequestGenerator;
+use Invelity\WizardPackage\Generators\StepGenerator;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
@@ -18,6 +20,13 @@ use function Laravel\Prompts\text;
 
 class MakeStepCommand extends Command
 {
+    public function __construct(
+        private readonly StepGenerator $stepGenerator,
+        private readonly FormRequestGenerator $formRequestGenerator,
+    ) {
+        parent::__construct();
+    }
+
     protected $signature = 'wizard:make-step
                             {wizard? : The wizard name}
                             {name? : The name of the step}
@@ -66,7 +75,7 @@ class MakeStepCommand extends Command
         $stepId = Str::kebab($name);
         $force = $this->option('force');
 
-        if ($this->stepExists($stepClass, $wizardName) && ! $force) {
+        if ($this->stepGenerator->exists($stepClass, $wizardName) && ! $force) {
             error(__('Step \':class\' already exists. Use --force to overwrite.', ['class' => $stepClass]));
 
             return self::FAILURE;
@@ -82,7 +91,7 @@ class MakeStepCommand extends Command
         $order = $this->option('order') ?? text(
             label: 'What is the step order?',
             placeholder: '1',
-            default: (string) ($this->getLastStepOrder($wizardName) + 1),
+            default: (string) ($this->stepGenerator->getLastStepOrder($wizardName) + 1),
             required: true,
             validate: fn (string $value) => ! is_numeric($value) ? 'Order must be a number' : null,
             hint: 'Numeric order for step sequence. Lower numbers appear first.'
@@ -96,9 +105,9 @@ class MakeStepCommand extends Command
         );
 
         try {
-            $this->reorderExistingSteps($wizardName, (int) $order);
-            $this->createStepClass($wizardName, $stepClass, $stepId, $title, (int) $order, $optional);
-            $this->createFormRequestClass($stepClass);
+            $this->stepGenerator->reorderExistingSteps($wizardName, (int) $order);
+            $this->stepGenerator->generate($wizardName, $stepClass, $stepId, $title, (int) $order, $optional);
+            $this->formRequestGenerator->generate($stepClass);
 
             $requestClass = str_replace('Step', '', $stepClass).'Request';
 
@@ -157,114 +166,5 @@ class MakeStepCommand extends Command
         }
 
         return null;
-    }
-
-    protected function stepExists(string $stepClass, string $wizardName): bool
-    {
-        return File::exists(app_path("Wizards/{$wizardName}Wizard/Steps/{$stepClass}.php"));
-    }
-
-    protected function getLastStepOrder(string $wizardName): int
-    {
-        $stepsPath = app_path("Wizards/{$wizardName}Wizard/Steps");
-
-        if (! File::isDirectory($stepsPath)) {
-            return 0;
-        }
-
-        $files = File::files($stepsPath);
-
-        return count($files);
-    }
-
-    protected function reorderExistingSteps(string $wizardName, int $newStepOrder): void
-    {
-        $stepsPath = app_path("{$wizardName}Wizard/Steps");
-
-        if (! File::isDirectory($stepsPath)) {
-            return;
-        }
-
-        $files = File::files($stepsPath);
-
-        foreach ($files as $file) {
-            $content = File::get($file->getPathname());
-
-            if (preg_match('/order:\s*(\d+)/', $content, $matches)) {
-                $currentOrder = (int) $matches[1];
-
-                if ($currentOrder >= $newStepOrder) {
-                    $updatedContent = preg_replace(
-                        '/order:\s*\d+/',
-                        'order: '.($currentOrder + 1),
-                        $content
-                    );
-
-                    File::put($file->getPathname(), $updatedContent);
-                }
-            }
-        }
-    }
-
-    protected function createStepClass(string $wizardName, string $stepClass, string $stepId, string $title, int $order, bool $optional): void
-    {
-        $directory = app_path("Wizards/{$wizardName}Wizard/Steps");
-
-        if (! File::isDirectory($directory)) {
-            File::makeDirectory($directory, 0755, true);
-        }
-
-        $stub = File::get(__DIR__.'/../../resources/stubs/step.php.stub');
-
-        $requestClass = str_replace('Step', '', $stepClass).'Request';
-
-        $optionalParams = $optional ? ',\n            isOptional: true,\n            canSkip: true' : '';
-
-        $content = str_replace(
-            [
-                '{{ namespace }}',
-                '{{ class }}',
-                '{{ stepId }}',
-                '{{ title }}',
-                '{{ order }}',
-                '{{ optionalParams }}',
-                '{{ formRequestNamespace }}',
-                '{{ formRequestClass }}',
-            ],
-            [
-                "App\\Wizards\\{$wizardName}Wizard\\Steps",
-                $stepClass,
-                $stepId,
-                $title,
-                (string) $order,
-                $optionalParams,
-                'App\\Http\\Requests\\Wizards',
-                $requestClass,
-            ],
-            $stub
-        );
-
-        File::put(app_path("Wizards/{$wizardName}Wizard/Steps/{$stepClass}.php"), $content);
-    }
-
-    protected function createFormRequestClass(string $stepClass): void
-    {
-        $directory = app_path('Http/Requests/Wizards');
-
-        if (! File::isDirectory($directory)) {
-            File::makeDirectory($directory, 0755, true);
-        }
-
-        $stub = File::get(__DIR__.'/../../resources/stubs/request.php.stub');
-
-        $requestClass = str_replace('Step', '', $stepClass).'Request';
-
-        $content = str_replace(
-            ['{{ namespace }}', '{{ class }}'],
-            ['App\Http\Requests\Wizards', $requestClass],
-            $stub
-        );
-
-        File::put(app_path("Http/Requests/Wizards/{$requestClass}.php"), $content);
     }
 }
