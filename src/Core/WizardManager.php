@@ -17,6 +17,7 @@ use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Services\StepFinderService;
 use Invelity\WizardPackage\Steps\StepFactory;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
@@ -46,6 +47,7 @@ class WizardManager implements
         private readonly WizardStepProcessorInterface $stepProcessor,
         private readonly WizardProgressTrackerInterface $progressTracker,
         private readonly WizardLifecycleManagerInterface $lifecycleManager,
+        private readonly StepFinderService $stepFinder,
     ) {}
 
     public function initialize(string $wizardId, array $config = []): void
@@ -62,6 +64,7 @@ class WizardManager implements
             storage: $this->storage,
             configuration: $this->configuration,
             wizardId: $wizardId,
+            stepFinder: $this->stepFinder,
         );
 
         $this->lifecycleManager->initializeWizard($wizardId, $this->steps, $config);
@@ -226,10 +229,7 @@ class WizardManager implements
 
     private function findStep(string $stepId): ?WizardStepInterface
     {
-        return array_find(
-            $this->steps,
-            fn (WizardStepInterface $step) => $step->getId() === $stepId
-        );
+        return $this->stepFinder->findStep($this->steps, $stepId);
     }
 
     public function loadFromStorage(string $wizardId, int $instanceId): void
@@ -246,6 +246,7 @@ class WizardManager implements
             storage: $this->storage,
             configuration: $this->configuration,
             wizardId: $wizardId,
+            stepFinder: $this->stepFinder,
         );
 
         $this->lifecycleManager->loadFromStorage($wizardId, $instanceId, $this->steps);
