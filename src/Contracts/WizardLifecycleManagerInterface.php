@@ -8,9 +8,13 @@ use Invelity\WizardPackage\ValueObjects\StepResult;
 
 interface WizardLifecycleManagerInterface
 {
-    public function initialize(string $wizardId, array $config = []): void;
+    public function initializeWizard(string $wizardId, array $steps, array $config = []): void;
 
-    public function complete(): StepResult;
+    public function loadFromStorage(string $wizardId, int $instanceId, array $steps): void;
 
-    public function reset(): void;
+    public function completeWizard(string $wizardId): StepResult;
+
+    public function resetWizard(string $wizardId): void;
+
+    public function deleteWizard(string $wizardId, int $instanceId): void;
 }
