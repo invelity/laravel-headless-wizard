@@ -6,6 +6,7 @@ namespace Invelity\WizardPackage;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
+use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardDataInterface;
 use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
@@ -94,7 +95,7 @@ class WizardServiceProvider extends PackageServiceProvider
         $this->app->singleton(WizardStepResponseBuilder::class);
 
         // Register step finder service
-        $this->app->singleton(StepFinderService::class);
+        $this->app->singleton(StepFinderInterface::class, StepFinderService::class);
 
         // Register generators
         $this->app->singleton(StepGenerator::class);

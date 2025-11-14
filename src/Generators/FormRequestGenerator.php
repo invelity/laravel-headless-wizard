@@ -16,7 +16,7 @@ class FormRequestGenerator
             File::makeDirectory($directory, 0755, true);
         }
 
-        $stub = File::get(__DIR__.'/../../resources/stubs/form-request.php.stub');
+        $stub = File::get(__DIR__.'/../../resources/stubs/request.php.stub');
 
         $requestClass = str_replace('Step', '', $stepClass).'Request';
 

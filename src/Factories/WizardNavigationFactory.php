@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Factories;
 
+use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardNavigation;
-use Invelity\WizardPackage\Services\StepFinderService;
 
 class WizardNavigationFactory
 {
     public function __construct(
         private readonly WizardStorageInterface $storage,
         private readonly WizardConfiguration $configuration,
-        private readonly StepFinderService $stepFinder,
+        private readonly StepFinderInterface $stepFinder,
     ) {}
 
     public function create(array $steps, string $wizardId): WizardNavigationInterface

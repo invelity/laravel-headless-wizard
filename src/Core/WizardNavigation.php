@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Core;
 
+use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
-use Invelity\WizardPackage\Services\StepFinderService;
 use Invelity\WizardPackage\ValueObjects\NavigationItem;
 
 class WizardNavigation implements WizardNavigationInterface
@@ -20,7 +20,7 @@ class WizardNavigation implements WizardNavigationInterface
         private readonly WizardStorageInterface $storage,
         private readonly WizardConfiguration $configuration,
         private readonly string $wizardId,
-        private readonly StepFinderService $stepFinder,
+        private readonly StepFinderInterface $stepFinder,
     ) {}
 
     /**

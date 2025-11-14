@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Services;
 
+use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 
-class StepFinderService
+class StepFinderService implements StepFinderInterface
 {
     /**
      * @param array<WizardStepInterface> $steps

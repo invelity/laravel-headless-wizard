@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Core;
 
+use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardDataInterface;
 use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
@@ -18,7 +19,6 @@ use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Exceptions\InvalidStepException;
 use Invelity\WizardPackage\Factories\WizardNavigationFactory;
-use Invelity\WizardPackage\Services\StepFinderService;
 use Invelity\WizardPackage\Steps\StepFactory;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
@@ -47,7 +47,7 @@ class WizardManager implements
         private readonly WizardStepProcessorInterface $stepProcessor,
         private readonly WizardProgressTrackerInterface $progressTracker,
         private readonly WizardLifecycleManagerInterface $lifecycleManager,
-        private readonly StepFinderService $stepFinder,
+        private readonly StepFinderInterface $stepFinder,
         private readonly WizardNavigationFactory $navigationFactory,
     ) {}
 

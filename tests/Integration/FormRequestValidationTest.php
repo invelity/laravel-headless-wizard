@@ -60,17 +60,28 @@ class FormRequestValidationTest extends TestCase
 
     public function test_validation_occurs_through_form_request(): void
     {
-        $this->artisan('wizard:make-step', [
+        $result = $this->artisan('wizard:make-step', [
             'wizard' => 'TestWizard',
             'name' => 'ContactInfo',
             '--order' => 1,
             '--optional' => false,
         ])
-            ->expectsQuestion('What is the step title?', 'Contact Information')
-            ->execute();
+            ->expectsQuestion('What is the step title?', 'Contact Information');
+        
+        $exitCode = $result->run();
+        
+        // Debug: Check if wizard directory exists
+        $this->assertTrue(
+            \Illuminate\Support\Facades\File::isDirectory(app_path('Wizards/TestWizardWizard')),
+            'TestWizardWizard directory should exist'
+        );
+        
+        // Debug: Check step file
+        $stepPath = app_path('Wizards/TestWizardWizard/Steps/ContactInfoStep.php');
+        $this->assertFileExists($stepPath, 'Step file should be created');
 
         $requestPath = app_path('Http/Requests/Wizards/ContactInfoRequest.php');
-        $this->assertFileExists($requestPath);
+        $this->assertFileExists($requestPath, 'FormRequest file should be created');
 
         $requestContent = File::get($requestPath);
         $this->assertStringContainsString('public function rules()', $requestContent);
