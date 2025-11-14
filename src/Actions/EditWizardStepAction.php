@@ -9,6 +9,7 @@ use Invelity\WizardPackage\Contracts\WizardDataInterface;
 use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepAccessInterface;
 use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
+use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
 
 final readonly class EditWizardStepAction
 {
@@ -16,6 +17,7 @@ final readonly class EditWizardStepAction
         private readonly WizardInitializationInterface $initialization,
         private readonly WizardStepAccessInterface $stepAccess,
         private readonly WizardDataInterface $data,
+        private readonly WizardStepResponseBuilder $responseBuilder,
     ) {}
 
     public function execute(string $wizard, int $wizardId, string $step): JsonResponse
@@ -33,22 +35,14 @@ final readonly class EditWizardStepAction
         $wizardData = $this->data->getAllData();
         $progress = $this->data->getProgress();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'wizard_id' => $wizard,
-                'instance_id' => $wizardId,
-                'step' => [
-                    'id' => $stepInstance->getId(),
-                    'title' => $stepInstance->getTitle(),
-                    'order' => $stepInstance->getOrder(),
-                ],
-                'step_data' => $wizardData[$step] ?? [],
-                'progress' => [
-                    'completion_percentage' => $progress->completionPercentage,
-                ],
-                'is_edit_mode' => true,
-            ],
-        ]);
+        return response()->json(
+            $this->responseBuilder->buildStepEditResponse(
+                wizardId: $wizard,
+                instanceId: $wizardId,
+                step: $stepInstance,
+                stepData: $wizardData[$step] ?? [],
+                progress: $progress
+            )
+        );
     }
 }
