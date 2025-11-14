@@ -10,6 +10,7 @@ use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStepAccessInterface;
 use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
+use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
 
 final readonly class ShowWizardStepAction
 {
@@ -18,6 +19,7 @@ final readonly class ShowWizardStepAction
         private readonly WizardStepAccessInterface $stepAccess,
         private readonly WizardDataInterface $data,
         private readonly WizardNavigationManagerInterface $navigation,
+        private readonly WizardStepResponseBuilder $responseBuilder,
     ) {}
 
     public function execute(string $wizard, string $step): JsonResponse
@@ -36,33 +38,16 @@ final readonly class ShowWizardStepAction
         $progress = $this->data->getProgress();
         $navigationInstance = $this->navigation->getNavigation();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'wizard_id' => $wizard,
-                'step' => [
-                    'id' => $stepInstance->getId(),
-                    'title' => $stepInstance->getTitle(),
-                    'order' => $stepInstance->getOrder(),
-                    'is_optional' => $stepInstance->isOptional(),
-                    'can_skip' => $stepInstance->canSkip(),
-                ],
-                'step_data' => $wizardData[$step] ?? [],
-                'progress' => [
-                    'total_steps' => $progress->totalSteps,
-                    'completed_steps' => $progress->completedSteps,
-                    'current_step_position' => $progress->currentStepPosition,
-                    'completion_percentage' => $progress->completionPercentage,
-                    'is_complete' => $progress->isComplete,
-                ],
-                'navigation' => [
-                    'can_go_back' => $navigationInstance->canGoBack(),
-                    'can_go_forward' => $navigationInstance->canGoForward(),
-                    'previous_step' => $this->navigation->getPreviousStep()?->getId(),
-                    'next_step' => $this->navigation->getNextStep()?->getId(),
-                    'items' => $navigationInstance->getItems(),
-                ],
-            ],
-        ]);
+        return response()->json(
+            $this->responseBuilder->buildStepShowResponse(
+                wizardId: $wizard,
+                step: $stepInstance,
+                stepData: $wizardData[$step] ?? [],
+                progress: $progress,
+                navigation: $navigationInstance,
+                previousStepId: $this->navigation->getPreviousStep()?->getId(),
+                nextStepId: $this->navigation->getNextStep()?->getId()
+            )
+        );
     }
 }
