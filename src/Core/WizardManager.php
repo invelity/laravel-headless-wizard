@@ -17,6 +17,7 @@ use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Factories\WizardNavigationFactory;
 use Invelity\WizardPackage\Services\StepFinderService;
 use Invelity\WizardPackage\Steps\StepFactory;
 use Invelity\WizardPackage\ValueObjects\StepResult;
@@ -48,6 +49,7 @@ class WizardManager implements
         private readonly WizardProgressTrackerInterface $progressTracker,
         private readonly WizardLifecycleManagerInterface $lifecycleManager,
         private readonly StepFinderService $stepFinder,
+        private readonly WizardNavigationFactory $navigationFactory,
     ) {}
 
     public function initialize(string $wizardId, array $config = []): void
@@ -249,13 +251,7 @@ class WizardManager implements
 
         usort($this->steps, fn ($a, $b) => $a->getOrder() <=> $b->getOrder());
 
-        $this->navigation = new WizardNavigation(
-            steps: $this->steps,
-            storage: $this->storage,
-            configuration: $this->configuration,
-            wizardId: $wizardId,
-            stepFinder: $this->stepFinder,
-        );
+        $this->navigation = $this->navigationFactory->create($this->steps, $wizardId);
     }
 
     private function ensureInitialized(): void

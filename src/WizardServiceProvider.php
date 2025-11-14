@@ -99,6 +99,9 @@ class WizardServiceProvider extends PackageServiceProvider
         $this->app->singleton(StepGenerator::class);
         $this->app->singleton(FormRequestGenerator::class);
 
+        // Register factories
+        $this->app->singleton(\Invelity\WizardPackage\Factories\WizardNavigationFactory::class);
+
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
 
         $this->app->singleton(Wizard::class, function ($app) {
