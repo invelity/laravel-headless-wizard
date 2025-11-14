@@ -18,6 +18,7 @@ use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
 use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
 use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
+use Invelity\WizardPackage\Services\StepFinderService;
 use Invelity\WizardPackage\Services\WizardDiscoveryService;
 use Invelity\WizardPackage\Services\WizardEventManager;
 use Invelity\WizardPackage\Services\WizardLifecycleManager;
@@ -88,6 +89,9 @@ class WizardServiceProvider extends PackageServiceProvider
 
         // Register response builders
         $this->app->singleton(WizardStepResponseBuilder::class);
+
+        // Register step finder service
+        $this->app->singleton(StepFinderService::class);
 
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
 
