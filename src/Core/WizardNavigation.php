@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Core;
 
+use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
@@ -19,6 +20,7 @@ class WizardNavigation implements WizardNavigationInterface
         private readonly WizardStorageInterface $storage,
         private readonly WizardConfiguration $configuration,
         private readonly string $wizardId,
+        private readonly StepFinderInterface $stepFinder,
     ) {}
 
     /**
@@ -197,20 +199,11 @@ class WizardNavigation implements WizardNavigationInterface
 
     private function findStep(string $stepId): ?WizardStepInterface
     {
-        return array_find(
-            $this->steps,
-            fn (WizardStepInterface $step) => $step->getId() === $stepId
-        );
+        return $this->stepFinder->findStep($this->steps, $stepId);
     }
 
     private function findStepIndex(string $stepId): ?int
     {
-        foreach ($this->steps as $index => $step) {
-            if ($step->getId() === $stepId) {
-                return $index;
-            }
-        }
-
-        return null;
+        return $this->stepFinder->findStepIndex($this->steps, $stepId);
     }
 }

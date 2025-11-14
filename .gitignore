@@ -44,3 +44,4 @@ add_strict_types.sh
 .backups/
 /.playwright-mcp/
 IMPROVEMENTS.md
+BUGFIX-PROGRESS.md

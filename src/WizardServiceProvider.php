@@ -6,14 +6,32 @@ namespace Invelity\WizardPackage;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
+use Invelity\WizardPackage\Contracts\StepFinderInterface;
+use Invelity\WizardPackage\Contracts\WizardDataInterface;
+use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
+use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
+use Invelity\WizardPackage\Contracts\WizardStepAccessInterface;
+use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardManager;
+use Invelity\WizardPackage\Factories\WizardNavigationFactory;
+use Invelity\WizardPackage\Generators\FormRequestGenerator;
+use Invelity\WizardPackage\Generators\StepGenerator;
 use Invelity\WizardPackage\Http\Middleware\StepAccess;
 use Invelity\WizardPackage\Http\Middleware\WizardSession;
+use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
+use Invelity\WizardPackage\Services\StepFinderService;
 use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
 use Invelity\WizardPackage\Services\WizardDiscoveryService;
+use Invelity\WizardPackage\Services\WizardEventManager;
+use Invelity\WizardPackage\Services\WizardLifecycleManager;
+use Invelity\WizardPackage\Services\WizardProgressTracker;
+use Invelity\WizardPackage\Services\WizardStepProcessor;
 use Invelity\WizardPackage\Storage\CacheStorage;
 use Invelity\WizardPackage\Storage\DatabaseStorage;
 use Invelity\WizardPackage\Storage\SessionStorage;
@@ -38,11 +56,7 @@ class WizardServiceProvider extends PackageServiceProvider
                 Components\StepNavigation::class,
                 Components\FormWrapper::class
             )
-            ->hasAssets()
-            ->hasCommands([
-                Commands\MakeStepCommand::class,
-                Commands\MakeWizardCommand::class,
-            ]);
+            ->hasAssets();
     }
 
     public function packageRegistered(): void
@@ -65,7 +79,46 @@ class WizardServiceProvider extends PackageServiceProvider
         // Register validation service
         $this->app->singleton(FormRequestValidatorInterface::class, FormRequestValidator::class);
 
+        // Register event manager
+        $this->app->singleton(WizardEventManagerInterface::class, WizardEventManager::class);
+
+        // Register step processor
+        $this->app->singleton(WizardStepProcessorInterface::class, WizardStepProcessor::class);
+
+        // Register progress tracker
+        $this->app->singleton(WizardProgressTrackerInterface::class, WizardProgressTracker::class);
+
+        // Register lifecycle manager
+        $this->app->singleton(WizardLifecycleManagerInterface::class, WizardLifecycleManager::class);
+
+        // Register response builders
+        $this->app->singleton(WizardStepResponseBuilder::class);
+
+        // Register step finder service
+        $this->app->singleton(StepFinderInterface::class, StepFinderService::class);
+
+        // Register generators
+        $this->app->singleton(StepGenerator::class);
+        $this->app->singleton(FormRequestGenerator::class);
+
+        // Register factories
+        $this->app->singleton(WizardNavigationFactory::class);
+
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
+
+        // Register segregated interfaces (bind to same WizardManager singleton instance)
+        $this->app->bind(WizardInitializationInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
+        $this->app->bind(WizardStepAccessInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
+        $this->app->bind(WizardNavigationManagerInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
+        $this->app->bind(WizardDataInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
 
         $this->app->singleton(Wizard::class, function ($app) {
             return new Wizard($app->make(WizardManagerInterface::class));
@@ -83,6 +136,17 @@ class WizardServiceProvider extends PackageServiceProvider
         $this->registerMiddleware();
         $this->registerPublishableStubs();
         $this->registerDiscoveredWizards();
+        $this->registerCommands();
+    }
+
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Invelity\WizardPackage\Commands\MakeStepCommand::class,
+                \Invelity\WizardPackage\Commands\MakeWizardCommand::class,
+            ]);
+        }
     }
 
     protected function registerPublishableStubs(): void

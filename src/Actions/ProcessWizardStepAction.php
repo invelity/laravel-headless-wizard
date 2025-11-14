@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Actions;
 
 use Illuminate\Http\JsonResponse;
-use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardDataInterface;
+use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
 use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
 
 final readonly class ProcessWizardStepAction
 {
     public function __construct(
-        private readonly WizardManagerInterface $manager,
+        private readonly WizardInitializationInterface $initialization,
+        private readonly WizardDataInterface $data,
+        private readonly WizardNavigationManagerInterface $navigation,
     ) {}
 
     public function execute(string $wizard, string $step, array $data): JsonResponse
     {
-        $this->manager->initialize($wizard);
+        $this->initialization->initialize($wizard);
 
-        $result = $this->manager->processStep($step, $data);
+        $result = $this->data->processStep($step, $data);
 
         if (! $result->success) {
             return WizardJsonResponse::validationError($result->errors);
@@ -26,8 +30,8 @@ final readonly class ProcessWizardStepAction
 
         return WizardJsonResponse::stepProcessed(
             $result,
-            $this->manager->getNextStep(),
-            $this->manager->getProgress()
+            $this->navigation->getNextStep(),
+            $this->data->getProgress()
         );
     }
 }

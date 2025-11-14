@@ -5,58 +5,49 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Actions;
 
 use Illuminate\Http\JsonResponse;
-use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardDataInterface;
+use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardStepAccessInterface;
 use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
+use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
 
 final readonly class ShowWizardStepAction
 {
     public function __construct(
-        private readonly WizardManagerInterface $manager,
+        private readonly WizardInitializationInterface $initialization,
+        private readonly WizardStepAccessInterface $stepAccess,
+        private readonly WizardDataInterface $data,
+        private readonly WizardNavigationManagerInterface $navigation,
+        private readonly WizardStepResponseBuilder $responseBuilder,
     ) {}
 
     public function execute(string $wizard, string $step): JsonResponse
     {
-        $this->manager->initialize($wizard);
+        $this->initialization->initialize($wizard);
 
-        if (! $this->manager->canAccessStep($step)) {
+        if (! $this->stepAccess->canAccessStep($step)) {
             return WizardJsonResponse::stepAccessDenied(
-                $this->manager->getCurrentStep(),
+                $this->stepAccess->getCurrentStep(),
                 $step
             );
         }
 
-        $stepInstance = $this->manager->getStep($step);
-        $wizardData = $this->manager->getAllData();
-        $progress = $this->manager->getProgress();
-        $navigation = $this->manager->getNavigation();
+        $stepInstance = $this->stepAccess->getStep($step);
+        $wizardData = $this->data->getAllData();
+        $progress = $this->data->getProgress();
+        $navigationInstance = $this->navigation->getNavigation();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'wizard_id' => $wizard,
-                'step' => [
-                    'id' => $stepInstance->getId(),
-                    'title' => $stepInstance->getTitle(),
-                    'order' => $stepInstance->getOrder(),
-                    'is_optional' => $stepInstance->isOptional(),
-                    'can_skip' => $stepInstance->canSkip(),
-                ],
-                'step_data' => $wizardData[$step] ?? [],
-                'progress' => [
-                    'total_steps' => $progress->totalSteps,
-                    'completed_steps' => $progress->completedSteps,
-                    'current_step_position' => $progress->currentStepPosition,
-                    'completion_percentage' => $progress->completionPercentage,
-                    'is_complete' => $progress->isComplete,
-                ],
-                'navigation' => [
-                    'can_go_back' => $navigation->canGoBack(),
-                    'can_go_forward' => $navigation->canGoForward(),
-                    'previous_step' => $this->manager->getPreviousStep()?->getId(),
-                    'next_step' => $this->manager->getNextStep()?->getId(),
-                    'items' => $navigation->getItems(),
-                ],
-            ],
-        ]);
+        return response()->json(
+            $this->responseBuilder->buildStepShowResponse(
+                wizardId: $wizard,
+                step: $stepInstance,
+                stepData: $wizardData[$step] ?? [],
+                progress: $progress,
+                navigation: $navigationInstance,
+                previousStepId: $this->navigation->getPreviousStep()?->getId(),
+                nextStepId: $this->navigation->getNextStep()?->getId()
+            )
+        );
     }
 }

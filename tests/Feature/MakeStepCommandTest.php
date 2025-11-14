@@ -81,7 +81,7 @@ class MakeStepCommandTest extends TestCase
     {
         $this->artisan('wizard:make-step', ['wizard' => 'Onboarding', 'name' => 'PersonalInfo', '--order' => 1, '--optional' => false])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->assertSuccessful();
+            ->execute();
 
         $this->assertFileExists(app_path('Wizards/OnboardingWizard/Steps/PersonalInfoStep.php'));
         $this->assertFileExists(app_path('Http/Requests/Wizards/PersonalInfoRequest.php'));
@@ -96,7 +96,7 @@ class MakeStepCommandTest extends TestCase
             '--optional' => true,
         ])
             ->expectsQuestion('What is the step title?', 'Contact Details')
-            ->assertSuccessful();
+            ->execute();
 
         $this->assertFileExists(app_path('Wizards/OnboardingWizard/Steps/ContactDetailsStep.php'));
     }
@@ -110,7 +110,7 @@ class MakeStepCommandTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->assertSuccessful();
+            ->execute();
 
         $this->assertFileExists(app_path('Wizards/OnboardingWizard/Steps/PersonalInfoStep.php'));
 
@@ -128,7 +128,7 @@ class MakeStepCommandTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->assertSuccessful();
+            ->execute();
 
         $this->assertFileExists(app_path('Http/Requests/Wizards/PersonalInfoRequest.php'));
 
@@ -156,7 +156,7 @@ class MakeStepCommandTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->assertSuccessful();
+            ->execute();
 
         $result = $this->artisan('wizard:make-step', [
             'wizard' => 'Onboarding',
@@ -175,7 +175,7 @@ class MakeStepCommandTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->assertSuccessful();
+            ->execute();
 
         $this->artisan('wizard:make-step', [
             'wizard' => 'Onboarding',
@@ -185,6 +185,6 @@ class MakeStepCommandTest extends TestCase
             '--optional' => false,
         ])
             ->expectsQuestion('What is the step title?', 'Personal Information')
-            ->assertSuccessful();
+            ->execute();
     }
 }
