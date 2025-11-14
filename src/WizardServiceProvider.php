@@ -17,6 +17,8 @@ use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
 use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
+use Invelity\WizardPackage\Generators\FormRequestGenerator;
+use Invelity\WizardPackage\Generators\StepGenerator;
 use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
 use Invelity\WizardPackage\Services\StepFinderService;
 use Invelity\WizardPackage\Services\WizardDiscoveryService;
@@ -92,6 +94,10 @@ class WizardServiceProvider extends PackageServiceProvider
 
         // Register step finder service
         $this->app->singleton(StepFinderService::class);
+
+        // Register generators
+        $this->app->singleton(StepGenerator::class);
+        $this->app->singleton(FormRequestGenerator::class);
 
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
 
