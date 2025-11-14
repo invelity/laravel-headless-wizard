@@ -20,4 +20,8 @@ interface WizardNavigationInterface
     public function canGoForward(): bool;
 
     public function getStepUrl(string $stepId, ?string $wizardId = null): ?string;
+
+    public function getNextStep(?string $currentStepId = null): ?WizardStepInterface;
+
+    public function getPreviousStep(?string $currentStepId = null): ?WizardStepInterface;
 }

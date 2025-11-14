@@ -38,10 +38,9 @@ class WizardManager implements
      */
     private array $steps = [];
 
-    private ?WizardNavigation $navigation = null;
+    private ?WizardNavigationInterface $navigation = null;
 
     public function __construct(
-        private readonly WizardConfiguration $configuration,
         private readonly WizardStorageInterface $storage,
         private readonly StepFactory $stepFactory,
         private readonly WizardEventManagerInterface $eventManager,
