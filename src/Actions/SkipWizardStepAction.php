@@ -5,24 +5,28 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Actions;
 
 use Illuminate\Http\JsonResponse;
-use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardDataInterface;
+use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
 use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
 
 final readonly class SkipWizardStepAction
 {
     public function __construct(
-        private readonly WizardManagerInterface $manager,
+        private readonly WizardInitializationInterface $initialization,
+        private readonly WizardDataInterface $data,
+        private readonly WizardNavigationManagerInterface $navigation,
     ) {}
 
     public function execute(string $wizard, string $step): JsonResponse
     {
-        $this->manager->initialize($wizard);
+        $this->initialization->initialize($wizard);
 
-        $this->manager->skipStep($step);
+        $this->data->skipStep($step);
 
         return WizardJsonResponse::stepSkipped(
-            $this->manager->getNextStep(),
-            $this->manager->getProgress()
+            $this->navigation->getNextStep(),
+            $this->data->getProgress()
         );
     }
 }

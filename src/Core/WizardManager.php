@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Core;
 
+use Invelity\WizardPackage\Contracts\WizardDataInterface;
 use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
 use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
+use Invelity\WizardPackage\Contracts\WizardStepAccessInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
@@ -18,7 +22,12 @@ use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 use RuntimeException;
 
-class WizardManager implements WizardManagerInterface
+class WizardManager implements 
+    WizardManagerInterface,
+    WizardInitializationInterface,
+    WizardStepAccessInterface,
+    WizardNavigationManagerInterface,
+    WizardDataInterface
 {
     private ?string $currentWizardId = null;
 

@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Actions;
 
 use Illuminate\Http\JsonResponse;
-use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardDataInterface;
+use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
 use Invelity\WizardPackage\Http\Responses\WizardJsonResponse;
 
 final readonly class CompleteWizardAction
 {
     public function __construct(
-        private readonly WizardManagerInterface $manager,
+        private readonly WizardInitializationInterface $initialization,
+        private readonly WizardDataInterface $data,
     ) {}
 
     public function execute(string $wizard): JsonResponse
     {
-        $this->manager->initialize($wizard);
+        $this->initialization->initialize($wizard);
 
-        $result = $this->manager->complete();
+        $result = $this->data->complete();
 
         if (! $result->success) {
             return WizardJsonResponse::validationError($result->errors);
