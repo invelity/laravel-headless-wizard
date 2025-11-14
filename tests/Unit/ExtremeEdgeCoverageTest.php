@@ -7,6 +7,7 @@ use Invelity\WizardPackage\Commands\MakeWizardCommand;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardNavigation;
+use Invelity\WizardPackage\Services\StepFinderService;
 
 test('writeWithLock error path when fopen fails due to permissions', function () {
     $testPath = sys_get_temp_dir().'/readonly-test-'.uniqid().'.php';
@@ -46,7 +47,8 @@ test('getStepsBefore defensive null check never reached in normal flow', functio
     $step1 = new \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
     $step2 = new \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 
-    $navigation = new WizardNavigation([$step1, $step2], $storage, $config, 'test');
+    $stepFinder = new StepFinderService();
+    $navigation = new WizardNavigation([$step1, $step2], $storage, $config, 'test', $stepFinder);
 
     $storage->put('test', [
         'current_step' => 'step1',

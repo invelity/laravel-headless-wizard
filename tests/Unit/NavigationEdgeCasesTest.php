@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardNavigation;
+use Invelity\WizardPackage\Services\StepFinderService;
 
 test('canNavigateTo returns false when step not found', function () {
     $storage = app(WizardStorageInterface::class);
@@ -21,7 +22,8 @@ test('canNavigateTo returns false when step not found', function () {
         new \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep,
     ];
 
-    $navigation = new WizardNavigation($steps, $storage, $config, 'test');
+    $stepFinder = new StepFinderService();
+    $navigation = new WizardNavigation($steps, $storage, $config, 'test', $stepFinder);
 
     $storage->put('test', [
         'current_step' => 'personal-info',

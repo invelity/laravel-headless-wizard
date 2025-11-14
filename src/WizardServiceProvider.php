@@ -6,21 +6,26 @@ namespace Invelity\WizardPackage;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
+use Invelity\WizardPackage\Contracts\WizardDataInterface;
 use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
+use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
+use Invelity\WizardPackage\Contracts\WizardStepAccessInterface;
+use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardManager;
-use Invelity\WizardPackage\Http\Middleware\StepAccess;
-use Invelity\WizardPackage\Http\Middleware\WizardSession;
-use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
-use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
-use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
-use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
+use Invelity\WizardPackage\Factories\WizardNavigationFactory;
 use Invelity\WizardPackage\Generators\FormRequestGenerator;
 use Invelity\WizardPackage\Generators\StepGenerator;
+use Invelity\WizardPackage\Http\Middleware\StepAccess;
+use Invelity\WizardPackage\Http\Middleware\WizardSession;
 use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
 use Invelity\WizardPackage\Services\StepFinderService;
+use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
 use Invelity\WizardPackage\Services\WizardDiscoveryService;
 use Invelity\WizardPackage\Services\WizardEventManager;
 use Invelity\WizardPackage\Services\WizardLifecycleManager;
@@ -100,9 +105,23 @@ class WizardServiceProvider extends PackageServiceProvider
         $this->app->singleton(FormRequestGenerator::class);
 
         // Register factories
-        $this->app->singleton(\Invelity\WizardPackage\Factories\WizardNavigationFactory::class);
+        $this->app->singleton(WizardNavigationFactory::class);
 
         $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
+
+        // Register segregated interfaces (bind to same WizardManager singleton instance)
+        $this->app->bind(WizardInitializationInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
+        $this->app->bind(WizardStepAccessInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
+        $this->app->bind(WizardNavigationManagerInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
+        $this->app->bind(WizardDataInterface::class, function ($app) {
+            return $app->make(WizardManagerInterface::class);
+        });
 
         $this->app->singleton(Wizard::class, function ($app) {
             return new Wizard($app->make(WizardManagerInterface::class));

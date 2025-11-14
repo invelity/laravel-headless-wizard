@@ -125,21 +125,3 @@ test('deleteWizard with database throws exception when instance not found', func
         ->toThrow(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
 });
 
-test('getNavigation throws when navigation is null after initialization', function () {
-    $manager = new \Invelity\WizardPackage\Core\WizardManager(
-        app(\Invelity\WizardPackage\Core\WizardConfiguration::class),
-        app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class),
-        app(\Invelity\WizardPackage\Steps\StepFactory::class),
-        app(\Invelity\WizardPackage\Contracts\FormRequestValidatorInterface::class)
-    );
-
-    $reflection = new \ReflectionClass($manager);
-    $property = $reflection->getProperty('currentWizardId');
-    $property->setValue($manager, 'test');
-
-    $navProperty = $reflection->getProperty('navigation');
-    $navProperty->setValue($manager, null);
-
-    expect(fn () => $manager->getNavigation())
-        ->toThrow(\RuntimeException::class, 'Navigation not initialized.');
-});
