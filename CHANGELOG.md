@@ -2,6 +2,20 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## v1.3.1 - Complete SOLID Refactoring with Documentation - 2025-11-17
+
+### 🐛 Bug Fixes
+
+- Fixed missing CHANGELOG.md documentation in v1.3.0 release
+- Removed temporary SOLID_AUDIT_REPORT.md file
+
+### 📚 Documentation
+
+- Added complete SOLID refactoring documentation to CHANGELOG.md
+- All v1.3.0 changes now properly documented
+
+**Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v1.3.0...v1.3.1
+
 ## v1.3.0 - SOLID Refactoring & Quality Improvements - 2025-11-14
 
 ### 🎉 Major Improvements
