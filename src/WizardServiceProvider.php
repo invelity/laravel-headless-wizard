@@ -48,16 +48,7 @@ class WizardServiceProvider extends PackageServiceProvider
             ->name('wizard')
             ->hasConfigFile('wizard')
             ->hasMigration('create_wizard_progress_table')
-            ->hasTranslations()
-            ->hasViews('wizard-package')
-            ->hasViewComponents(
-                'wizard',
-                Components\Layout::class,
-                Components\ProgressBar::class,
-                Components\StepNavigation::class,
-                Components\FormWrapper::class
-            )
-            ->hasAssets();
+            ->hasTranslations();
     }
 
     public function packageRegistered(): void

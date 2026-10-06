@@ -2,6 +2,12 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## Unreleased
+
+### Removed
+
+- **Breaking:** the Blade components (`x-wizard::layout`, `progress-bar`, `step-navigation`, `form-wrapper`), the published views and the `useWizard()` Vue composable. None of them matched the package's HTTP API (for example `route('wizard.show', $step)` without the wizard parameter, `/api/wizard/{id}` that does not exist). The package stays headless; build the UI from the navigation and progress data (#25).
+
 ## v1.4.0 - Laravel 13 Support - 2026-10-06
 
 ### Added
