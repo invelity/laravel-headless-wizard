@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Core;
 
+use Illuminate\Support\Facades\Route;
 use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
@@ -119,6 +120,10 @@ class WizardNavigation implements WizardNavigationInterface
 
     public function getStepUrl(string $stepId, ?string $wizardId = null): ?string
     {
+        if (! Route::has('wizard.show')) {
+            return null;
+        }
+
         $wizard = $wizardId ?? $this->wizardId;
 
         return route('wizard.show', [
