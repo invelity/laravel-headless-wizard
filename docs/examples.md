@@ -70,6 +70,7 @@ class OrderWizard extends Wizard
 }
 ```
 
+{% raw %}
 ```blade
 {{-- resources/views/order/partials/navigation.blade.php --}}
 <nav aria-label="Order progress">
@@ -89,7 +90,9 @@ class OrderWizard extends Wizard
     </ol>
 </nav>
 ```
+{% endraw %}
 
+{% raw %}
 ```blade
 {{-- resources/views/order/calculator.blade.php --}}
 <form method="POST" action="{{ url("/order/{$step->id()}") }}">
@@ -103,6 +106,7 @@ class OrderWizard extends Wizard
     <button>Continue</button>
 </form>
 ```
+{% endraw %}
 
 ## Livewire
 

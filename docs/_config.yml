@@ -15,6 +15,10 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - node_modules
+  - package.json
+  - package-lock.json
+  - tailwind.config.js
+  - assets/css/input.css
   - vendor
   - .sass-cache
   - .jekyll-cache
