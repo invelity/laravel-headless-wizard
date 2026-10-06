@@ -2,15 +2,23 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
-## Unreleased
+## v1.4.0 - Laravel 13 Support - 2026-10-06
 
 ### Added
 
 - Laravel 13 support (Testbench 11, Pest 4). Thanks to @l3aro for #17.
 
+### Fixed
+
+- `wizard.routes.enabled = false` now really disables the package routes. Until now they were always registered, so apps that drive the wizard from their own controllers still exposed `/wizard/...` endpoints (#19).
+- The routes read the documented `wizard.routes.prefix` and `wizard.routes.middleware` keys. The legacy `wizard.route.*` keys keep working and take precedence (#19).
+- Navigation items return a `null` URL instead of throwing when the `wizard.show` route is not registered (#19).
+
 ### Changed
 
 - CI runs on pull requests and covers PHP 8.5 and Laravel 13. Code style is checked with `pint --test` instead of being auto-committed.
+
+**Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v1.3.1...v1.4.0
 
 ## v1.3.1 - Complete SOLID Refactoring with Documentation - 2025-11-17
 
