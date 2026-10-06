@@ -2,6 +2,16 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## Unreleased
+
+### Added
+
+- Laravel 13 support (Testbench 11, Pest 4). Thanks to @l3aro for #17.
+
+### Changed
+
+- CI runs on pull requests and covers PHP 8.5 and Laravel 13. Code style is checked with `pint --test` instead of being auto-committed.
+
 ## v1.3.1 - Complete SOLID Refactoring with Documentation - 2025-11-17
 
 ### 🐛 Bug Fixes

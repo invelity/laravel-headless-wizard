@@ -8,6 +8,7 @@ use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Enums\StepStatus;
 use Invelity\WizardPackage\ValueObjects\NavigationItem;
 
 class WizardNavigation implements WizardNavigationInterface
@@ -38,10 +39,10 @@ class WizardNavigation implements WizardNavigationInterface
                 title: $step->getTitle(),
                 position: $index + 1,
                 status: in_array($step->getId(), $completedSteps)
-                    ? \Invelity\WizardPackage\Enums\StepStatus::Completed
+                    ? StepStatus::Completed
                     : ($step->getId() === $currentStepId
-                        ? \Invelity\WizardPackage\Enums\StepStatus::InProgress
-                        : \Invelity\WizardPackage\Enums\StepStatus::Pending),
+                        ? StepStatus::InProgress
+                        : StepStatus::Pending),
                 isAccessible: $this->canNavigateTo($step->getId()),
                 isOptional: $step->isOptional(),
                 url: $this->getStepUrl($step->getId()),

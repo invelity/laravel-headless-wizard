@@ -1,9 +1,15 @@
 <?php
 
 declare(strict_types=1);
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Tests\Fixtures\ConditionalStep;
+use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+use Invelity\WizardPackage\Tests\Fixtures\DependentStep;
+use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 
 test('canNavigateTo returns false when step not found', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
     $navigation = $manager->getNavigation();
@@ -13,11 +19,11 @@ test('canNavigateTo returns false when step not found', function () {
 
 test('canNavigateTo returns false when dependencies not met', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
     $navigation = $manager->getNavigation();
@@ -26,10 +32,10 @@ test('canNavigateTo returns false when dependencies not met', function () {
 });
 
 test('canGoBack returns false when current step is null', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'current_step', null);
 
     $navigation = $manager->getNavigation();
@@ -38,10 +44,10 @@ test('canGoBack returns false when current step is null', function () {
 });
 
 test('canGoForward returns false when current step is null', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'current_step', null);
 
     $navigation = $manager->getNavigation();
@@ -50,10 +56,10 @@ test('canGoForward returns false when current step is null', function () {
 });
 
 test('getNextStep returns null when current step index not found', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'current_step', 'invalid-step');
 
     $navigation = $manager->getNavigation();
@@ -62,7 +68,7 @@ test('getNextStep returns null when current step index not found', function () {
 });
 
 test('getPreviousStep returns null when current step index not found or is zero', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
     $navigation = $manager->getNavigation();
@@ -72,10 +78,10 @@ test('getPreviousStep returns null when current step index not found or is zero'
 });
 
 test('getPreviousStep returns null when current step is null', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'current_step', null);
 
     $navigation = $manager->getNavigation();
@@ -87,12 +93,12 @@ test('canNavigateTo returns true when jump navigation is enabled', function () {
     config([
         'wizard.navigation.allow_jump' => true,
         'wizard.wizards.test.steps' => [
-            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-            \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+            PersonalInfoStep::class,
+            ContactDetailsStep::class,
         ],
     ]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
     $navigation = $manager->getNavigation();
@@ -102,11 +108,11 @@ test('canNavigateTo returns true when jump navigation is enabled', function () {
 
 test('canNavigateTo returns false when has missing dependency', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
     $navigation = $manager->getNavigation();
@@ -116,13 +122,13 @@ test('canNavigateTo returns false when has missing dependency', function () {
 
 test('getNextStep returns first step when current step is null', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+        PersonalInfoStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $wizardData = $storage->get('test');
     $wizardData['current_step'] = null;
     $storage->put('test', $wizardData);
@@ -136,11 +142,11 @@ test('getNextStep returns first step when current step is null', function () {
 
 test('getNextStep continues when step should not be skipped', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
 
@@ -152,11 +158,11 @@ test('getNextStep continues when step should not be skipped', function () {
 
 test('getPreviousStep returns previous non-skipped step', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
     $manager->processStep('contact-details', ['email' => 'test@example.com']);
@@ -168,7 +174,7 @@ test('getPreviousStep returns previous non-skipped step', function () {
 });
 
 test('getStepUrl generates correct route', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
     $navigation = $manager->getNavigation();
@@ -180,12 +186,12 @@ test('getStepUrl generates correct route', function () {
 
 test('canNavigateTo returns false when step has unmet dependencies', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\DependentStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
+        DependentStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
 
@@ -196,16 +202,16 @@ test('canNavigateTo returns false when step has unmet dependencies', function ()
 
 test('getNextStep skips steps when shouldSkip returns true', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ConditionalStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ConditionalStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'steps.skip_conditional', true);
 
     $navigation = $manager->getNavigation();
@@ -216,17 +222,17 @@ test('getNextStep skips steps when shouldSkip returns true', function () {
 
 test('getPreviousStep skips steps when shouldSkip returns true', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ConditionalStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ConditionalStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
     $manager->processStep('contact-details', ['email' => 'test@example.com']);
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'steps.skip_conditional', true);
 
     $navigation = $manager->getNavigation();
@@ -237,14 +243,14 @@ test('getPreviousStep skips steps when shouldSkip returns true', function () {
 
 test('getPreviousStep returns null when all previous steps should be skipped', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\ConditionalStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        ConditionalStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'current_step', 'contact-details');
     $storage->update('test', 'steps.skip_conditional', true);
 
@@ -256,11 +262,11 @@ test('getPreviousStep returns null when all previous steps should be skipped', f
 
 test('getStepsBefore returns empty array when step index not found', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
 

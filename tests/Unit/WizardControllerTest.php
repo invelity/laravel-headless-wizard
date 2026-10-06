@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Http\Controllers\WizardController;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
@@ -21,7 +23,7 @@ test('controller show method calls ShowWizardStepAction', function () {
 
     $response = $controller->show('test', 'personal-info');
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($response)->toBeInstanceOf(JsonResponse::class);
     expect($response->status())->toBe(200);
 });
 
@@ -31,12 +33,12 @@ test('controller store method calls ProcessWizardStepAction', function () {
 
     $response = $controller->store($request, 'test', 'personal-info');
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($response)->toBeInstanceOf(JsonResponse::class);
     expect($response->status())->toBeIn([200, 422]);
 });
 
 test('controller edit method calls EditWizardStepAction', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
     $wizardId = session('test.wizard_id') ?? 1;
@@ -45,12 +47,12 @@ test('controller edit method calls EditWizardStepAction', function () {
 
     $response = $controller->edit('test', $wizardId, 'personal-info');
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($response)->toBeInstanceOf(JsonResponse::class);
     expect($response->status())->toBeIn([200, 404]);
 });
 
 test('controller update method calls UpdateWizardStepAction', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
     $wizardId = session('test.wizard_id') ?? 1;
@@ -60,12 +62,12 @@ test('controller update method calls UpdateWizardStepAction', function () {
 
     $response = $controller->update($request, 'test', $wizardId, 'personal-info');
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($response)->toBeInstanceOf(JsonResponse::class);
     expect($response->status())->toBeIn([200, 422]);
 });
 
 test('controller destroy method deletes wizard and returns success', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $wizardId = session('test.wizard_id') ?? 1;
 
@@ -73,7 +75,7 @@ test('controller destroy method deletes wizard and returns success', function ()
 
     $response = $controller->destroy('test', $wizardId);
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($response)->toBeInstanceOf(JsonResponse::class);
     expect($response->status())->toBe(200);
     $data = $response->getData(true);
     expect($data['success'])->toBeTrue();

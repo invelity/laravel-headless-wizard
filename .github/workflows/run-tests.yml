@@ -1,13 +1,9 @@
-name: run-tests
+name: tests
 
 on:
   push:
-    paths:
-      - '**.php'
-      - '.github/workflows/run-tests.yml'
-      - 'phpunit.xml.dist'
-      - 'composer.json'
-      - 'composer.lock'
+    branches: [main, 1.x]
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,32 +11,45 @@ concurrency:
 
 jobs:
   test:
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        php: [8.4]
-        laravel: [12.*, 11.*]
+        os: [ubuntu-latest]
+        php: [8.4, 8.5]
+        laravel: [13.*, 12.*, 11.*]
         stability: [prefer-lowest, prefer-stable]
+        exclude:
+          - laravel: 11.*
+            php: 8.5
         include:
+          - laravel: 13.*
+            constraint: ^13.0
+            testbench: 11.*
           - laravel: 12.*
+            constraint: ^12.23.2
             testbench: 10.*
           - laravel: 11.*
+            constraint: ^11.31
             testbench: 9.*
-
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
+          - os: windows-latest
+            php: 8.4
+            laravel: 13.*
+            constraint: ^13.0
+            testbench: 11.*
+            stability: prefer-stable
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, intl, fileinfo
           coverage: none
 
       - name: Setup problem matchers
@@ -49,19 +58,21 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Install dependencies
-        shell: bash
         run: |
-          if [ "${{ matrix.laravel }}" == "12.*" ]; then
-            composer require "laravel/framework:^12.23.2" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          elif [ "${{ matrix.laravel }}" == "11.*" ]; then
-            composer require "laravel/framework:^11.31" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          else
-            composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          fi
+          composer require "laravel/framework:${{ matrix.constraint }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
-      - name: List Installed Dependencies
+      - name: List installed dependencies
         run: composer show -D
 
       - name: Execute tests
         run: vendor/bin/pest --ci
+
+  tests:
+    name: tests
+    if: always()
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every matrix job to pass
+        run: test "${{ needs.test.result }}" = "success"

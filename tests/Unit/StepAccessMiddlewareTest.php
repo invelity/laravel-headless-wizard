@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Http\Middleware\StepAccess;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
@@ -17,12 +19,12 @@ beforeEach(function () {
 });
 
 test('middleware allows access to first step', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $middleware = new StepAccess($manager);
 
     $request = Request::create('/wizard/checkout/personal-info', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/wizard/{wizard}/{step}', []);
+        $route = new Route('GET', '/wizard/{wizard}/{step}', []);
         $route->bind($request);
         $route->setParameter('wizard', 'checkout');
         $route->setParameter('step', 'personal-info');
@@ -38,12 +40,12 @@ test('middleware allows access to first step', function () {
 });
 
 test('middleware blocks access to inaccessible step', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $middleware = new StepAccess($manager);
 
     $request = Request::create('/wizard/checkout/contact-details', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/wizard/{wizard}/{step}', []);
+        $route = new Route('GET', '/wizard/{wizard}/{step}', []);
         $route->bind($request);
         $route->setParameter('wizard', 'checkout');
         $route->setParameter('step', 'contact-details');
@@ -60,7 +62,7 @@ test('middleware blocks access to inaccessible step', function () {
 });
 
 test('middleware allows access after completing previous step', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John Doe']);
 
@@ -68,7 +70,7 @@ test('middleware allows access after completing previous step', function () {
 
     $request = Request::create('/wizard/checkout/contact-details', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/wizard/{wizard}/{step}', []);
+        $route = new Route('GET', '/wizard/{wizard}/{step}', []);
         $route->bind($request);
         $route->setParameter('wizard', 'checkout');
         $route->setParameter('step', 'contact-details');
@@ -84,12 +86,12 @@ test('middleware allows access after completing previous step', function () {
 });
 
 test('middleware passes through requests without wizard parameter', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $middleware = new StepAccess($manager);
 
     $request = Request::create('/some-other-route', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/some-other-route', []);
+        $route = new Route('GET', '/some-other-route', []);
         $route->bind($request);
 
         return $route;
@@ -103,12 +105,12 @@ test('middleware passes through requests without wizard parameter', function () 
 });
 
 test('middleware passes through requests without step parameter', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $middleware = new StepAccess($manager);
 
     $request = Request::create('/wizard/checkout', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/wizard/{wizard}', []);
+        $route = new Route('GET', '/wizard/{wizard}', []);
         $route->bind($request);
         $route->setParameter('wizard', 'checkout');
 
@@ -123,12 +125,12 @@ test('middleware passes through requests without step parameter', function () {
 });
 
 test('middleware initializes wizard automatically', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $middleware = new StepAccess($manager);
 
     $request = Request::create('/wizard/checkout/personal-info', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/wizard/{wizard}/{step}', []);
+        $route = new Route('GET', '/wizard/{wizard}/{step}', []);
         $route->bind($request);
         $route->setParameter('wizard', 'checkout');
         $route->setParameter('step', 'personal-info');
@@ -145,12 +147,12 @@ test('middleware initializes wizard automatically', function () {
 });
 
 test('middleware redirects with error message when blocked', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $middleware = new StepAccess($manager);
 
     $request = Request::create('/wizard/checkout/contact-details', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/wizard/{wizard}/{step}', []);
+        $route = new Route('GET', '/wizard/{wizard}/{step}', []);
         $route->bind($request);
         $route->setParameter('wizard', 'checkout');
         $route->setParameter('step', 'contact-details');
@@ -167,14 +169,14 @@ test('middleware redirects with error message when blocked', function () {
 });
 
 test('middleware uses current step for redirect when available', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
 
     $middleware = new StepAccess($manager);
 
     $request = Request::create('/wizard/checkout/contact-details', 'GET');
     $request->setRouteResolver(function () use ($request) {
-        $route = new \Illuminate\Routing\Route('GET', '/wizard/{wizard}/{step}', []);
+        $route = new Route('GET', '/wizard/{wizard}/{step}', []);
         $route->bind($request);
         $route->setParameter('wizard', 'checkout');
         $route->setParameter('step', 'contact-details');

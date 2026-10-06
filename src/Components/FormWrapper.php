@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Components;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
 class FormWrapper extends Component
@@ -13,7 +14,7 @@ class FormWrapper extends Component
         public string $method = 'POST'
     ) {}
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function render(): View
     {
         /** @var view-string $viewPath */
         $viewPath = 'wizard-package::components.form-wrapper';

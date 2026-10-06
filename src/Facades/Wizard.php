@@ -21,7 +21,7 @@ use Invelity\WizardPackage\Contracts\WizardManagerInterface;
  * @method static \Invelity\WizardPackage\ValueObjects\StepResult complete()
  * @method static void reset()
  *
- * @see \Invelity\WizardPackage\Contracts\WizardManagerInterface
+ * @see WizardManagerInterface
  */
 class Wizard extends Facade
 {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Components;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
 class ProgressBar extends Component
@@ -32,7 +33,7 @@ class ProgressBar extends Component
         return (int) (($currentIndex + 1) / $totalSteps * 100);
     }
 
-    public function render(): \Illuminate\Contracts\View\View
+    public function render(): View
     {
         /** @var view-string $viewPath */
         $viewPath = 'wizard-package::components.progress-bar';

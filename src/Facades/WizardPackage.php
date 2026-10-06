@@ -9,6 +9,7 @@ use Invelity\WizardPackage\Contracts\WizardNavigationInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
+use Invelity\WizardPackage\Wizard;
 
 /**
  * @method static void initialize(string $wizardId, array $config = [])
@@ -28,12 +29,12 @@ use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
  * @method static WizardNavigationInterface getNavigation()
  * @method static void skipStep(string $stepId)
  *
- * @see \Invelity\WizardPackage\Wizard
+ * @see Wizard
  */
 class WizardPackage extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Invelity\WizardPackage\Wizard::class;
+        return Wizard::class;
     }
 }

@@ -13,7 +13,7 @@ Get started with Laravel Headless Wizard in just a few minutes.
 ## Requirements
 
 - PHP 8.4 or higher
-- Laravel 11.0 or 12.0
+- Laravel 11, 12 or 13
 
 ---
 

@@ -29,7 +29,7 @@ test('middleware throws exception when session is not available', function () {
     $middleware->handle($request, function ($req) {
         return response('OK', 200);
     });
-})->throws(\RuntimeException::class);
+})->throws(RuntimeException::class);
 
 test('middleware starts session', function () {
     $middleware = new WizardSession;

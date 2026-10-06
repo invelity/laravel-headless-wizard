@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Tests;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Bootstrap\HandleExceptions;
+use Illuminate\Foundation\Exceptions\Handler;
+use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 use Invelity\WizardPackage\WizardServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -12,9 +17,9 @@ class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
-        if (method_exists(\Illuminate\Foundation\Bootstrap\HandleExceptions::class, 'flushState')) {
+        if (method_exists(HandleExceptions::class, 'flushState')) {
             try {
-                \Illuminate\Foundation\Bootstrap\HandleExceptions::flushState();
+                HandleExceptions::flushState();
             } catch (\TypeError $e) {
             }
         }
@@ -29,8 +34,8 @@ class TestCase extends Orchestra
     protected function resolveApplicationExceptionHandler($app)
     {
         $app->singleton(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \Illuminate\Foundation\Exceptions\Handler::class
+            ExceptionHandler::class,
+            Handler::class
         );
     }
 
@@ -63,8 +68,8 @@ class TestCase extends Orchestra
 
         config()->set('wizard.wizards.test-wizard', [
             'steps' => [
-                \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-                \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+                PersonalInfoStep::class,
+                ContactDetailsStep::class,
             ],
         ]);
     }
