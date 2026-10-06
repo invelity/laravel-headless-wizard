@@ -1,4 +1,4 @@
-name: static-analysis
+name: code-style
 
 on:
   push:
@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  phpstan:
-    name: phpstan
+  pint:
+    name: pint
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -27,5 +27,5 @@ jobs:
       - name: Install composer dependencies
         uses: ramsey/composer-install@v4
 
-      - name: Run PHPStan
-        run: vendor/bin/phpstan --error-format=github
+      - name: Check code style
+        run: vendor/bin/pint --test

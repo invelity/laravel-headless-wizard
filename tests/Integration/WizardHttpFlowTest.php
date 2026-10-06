@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Exceptions\StepValidationException;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\OptionalStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
@@ -59,11 +61,11 @@ test('user receives validation errors for invalid data', function () {
         'step' => 'personal-info',
     ]), [
         'name' => '',
-    ]))->toThrow(\Invelity\WizardPackage\Exceptions\StepValidationException::class);
+    ]))->toThrow(StepValidationException::class);
 });
 
 test('user can skip optional step via manager', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('registration');
     $manager->processStep('personal-info', ['name' => 'John']);
 
@@ -90,7 +92,7 @@ test('user cannot skip required step', function () {
 });
 
 test('user can complete wizard after all steps', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('registration');
     $manager->processStep('personal-info', ['name' => 'John']);
     $manager->processStep('optional-step', ['optional_field' => 'test']);
@@ -128,7 +130,7 @@ test('user is redirected when accessing inaccessible step', function () {
 });
 
 test('user data persists across steps', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('registration');
 
     $manager->processStep('personal-info', ['name' => 'Jane Doe']);

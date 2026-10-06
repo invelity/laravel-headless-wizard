@@ -72,7 +72,7 @@ class FormRequestValidationTest extends TestCase
 
         // Debug: Check if wizard directory exists
         $this->assertTrue(
-            \Illuminate\Support\Facades\File::isDirectory(app_path('Wizards/TestWizardWizard')),
+            File::isDirectory(app_path('Wizards/TestWizardWizard')),
             'TestWizardWizard directory should exist'
         );
 

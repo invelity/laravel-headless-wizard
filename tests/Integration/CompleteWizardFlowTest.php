@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Exceptions\StepValidationException;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\OptionalStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
@@ -86,7 +88,7 @@ test('wizard validates step data before processing', function () {
     $manager->initialize('onboarding');
 
     expect(fn () => $manager->processStep('personal-info', ['name' => '']))
-        ->toThrow(\Invelity\WizardPackage\Exceptions\StepValidationException::class);
+        ->toThrow(StepValidationException::class);
 });
 
 test('wizard tracks progress accurately', function () {
@@ -162,7 +164,7 @@ test('wizard prevents skipping required steps', function () {
     $manager->processStep('personal-info', ['name' => 'John']);
 
     expect(fn () => $manager->skipStep('contact-details'))
-        ->toThrow(\Invelity\WizardPackage\Exceptions\InvalidStepException::class);
+        ->toThrow(InvalidStepException::class);
 });
 
 test('wizard returns next and previous steps correctly', function () {

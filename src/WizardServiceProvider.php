@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Invelity\WizardPackage\Commands\MakeStepCommand;
+use Invelity\WizardPackage\Commands\MakeWizardCommand;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
 use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardDataInterface;
@@ -143,8 +145,8 @@ class WizardServiceProvider extends PackageServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Invelity\WizardPackage\Commands\MakeStepCommand::class,
-                \Invelity\WizardPackage\Commands\MakeWizardCommand::class,
+                MakeStepCommand::class,
+                MakeWizardCommand::class,
             ]);
         }
     }

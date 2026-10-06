@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Invelity\WizardPackage\Models\WizardProgress;
 
@@ -167,5 +168,5 @@ test('wizard progress has user relationship', function () {
     ]);
 
     $relation = $progress->user();
-    expect($relation)->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
+    expect($relation)->toBeInstanceOf(BelongsTo::class);
 });

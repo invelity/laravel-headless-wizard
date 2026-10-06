@@ -8,6 +8,8 @@ use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardNavigation;
 use Invelity\WizardPackage\Services\StepFinderService;
+use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 
 test('writeWithLock error path when fopen fails due to permissions', function () {
     $testPath = sys_get_temp_dir().'/readonly-test-'.uniqid().'.php';
@@ -27,10 +29,10 @@ test('writeWithLock error path when fopen fails due to permissions', function ()
         chmod($testPath, 0644);
         File::delete($testPath);
         expect(false)->toBeTrue('Should throw exception');
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         chmod($testPath, 0644);
         File::delete($testPath);
-        expect($e)->toBeInstanceOf(\Throwable::class);
+        expect($e)->toBeInstanceOf(Throwable::class);
     }
 });
 
@@ -44,8 +46,8 @@ test('getStepsBefore defensive null check never reached in normal flow', functio
         fireEvents: true
     );
 
-    $step1 = new \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
-    $step2 = new \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+    $step1 = new PersonalInfoStep;
+    $step2 = new ContactDetailsStep;
 
     $stepFinder = new StepFinderService;
     $navigation = new WizardNavigation([$step1, $step2], $storage, $config, 'test', $stepFinder);

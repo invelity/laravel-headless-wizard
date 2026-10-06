@@ -1,12 +1,20 @@
 <?php
 
 declare(strict_types=1);
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\WizardStorageInterface;
+use Invelity\WizardPackage\Core\WizardManager;
+use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Models\WizardProgress;
+use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 test('getCurrentStep returns null when current step is null', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $storage->update('test', 'current_step', null);
 
     expect($manager->getCurrentStep())->toBeNull();
@@ -14,18 +22,18 @@ test('getCurrentStep returns null when current step is null', function () {
 
 test('loadFromStorage loads existing session data', function () {
     config(['wizard.storage' => 'session', 'wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+        PersonalInfoStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
     $manager->processStep('personal-info', ['name' => 'John']);
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     $data = $storage->get('test');
     expect($data)->toHaveKey('wizard_id');
 
-    $newManager = app(\Invelity\WizardPackage\Core\WizardManager::class);
+    $newManager = app(WizardManager::class);
     $newManager->loadFromStorage('test', 1);
 
     expect($newManager->getAllData())->toHaveKey('personal-info');
@@ -34,10 +42,10 @@ test('loadFromStorage loads existing session data', function () {
 test('deleteWizard removes wizard from storage when not using database', function () {
     config(['wizard.storage' => 'session']);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
     expect($storage->exists('test'))->toBeTrue();
 
     $manager->deleteWizard('test', 1);
@@ -46,34 +54,34 @@ test('deleteWizard removes wizard from storage when not using database', functio
 });
 
 test('getNavigation throws exception when not initialized', function () {
-    $manager = app(\Invelity\WizardPackage\Core\WizardManager::class);
+    $manager = app(WizardManager::class);
 
     expect(fn () => $manager->getNavigation())
-        ->toThrow(\RuntimeException::class);
+        ->toThrow(RuntimeException::class);
 });
 
 test('navigateToStep throws exception when step not accessible', function () {
     config(['wizard.wizards.test.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('test');
 
     expect(fn () => $manager->navigateToStep('contact-details'))
-        ->toThrow(\Invelity\WizardPackage\Exceptions\InvalidStepException::class);
+        ->toThrow(InvalidStepException::class);
 });
 
 test('loadFromStorage with database loads from WizardProgress model', function () {
     config([
         'wizard.storage' => 'database',
         'wizard.wizards.test.steps' => [
-            \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
+            PersonalInfoStep::class,
         ],
     ]);
 
-    $progress = \Invelity\WizardPackage\Models\WizardProgress::create([
+    $progress = WizardProgress::create([
         'wizard_id' => 'test',
         'current_step' => 'personal-info',
         'completed_steps' => [],
@@ -82,7 +90,7 @@ test('loadFromStorage with database loads from WizardProgress model', function (
         'started_at' => now(),
     ]);
 
-    $manager = app(\Invelity\WizardPackage\Core\WizardManager::class);
+    $manager = app(WizardManager::class);
     $manager->loadFromStorage('test', $progress->id);
 
     expect($manager->getCurrentStep()->getId())->toBe('personal-info');
@@ -92,16 +100,16 @@ test('loadFromStorage with database loads from WizardProgress model', function (
 test('loadFromStorage with database throws exception when instance not found', function () {
     config(['wizard.storage' => 'database']);
 
-    $manager = app(\Invelity\WizardPackage\Core\WizardManager::class);
+    $manager = app(WizardManager::class);
 
     expect(fn () => $manager->loadFromStorage('test', 99999))
-        ->toThrow(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        ->toThrow(NotFoundHttpException::class);
 });
 
 test('deleteWizard with database removes WizardProgress record', function () {
     config(['wizard.storage' => 'database']);
 
-    $progress = \Invelity\WizardPackage\Models\WizardProgress::create([
+    $progress = WizardProgress::create([
         'wizard_id' => 'test',
         'current_step' => 'personal-info',
         'completed_steps' => [],
@@ -110,17 +118,17 @@ test('deleteWizard with database removes WizardProgress record', function () {
         'started_at' => now(),
     ]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->deleteWizard('test', $progress->id);
 
-    expect(\Invelity\WizardPackage\Models\WizardProgress::find($progress->id))->toBeNull();
+    expect(WizardProgress::find($progress->id))->toBeNull();
 });
 
 test('deleteWizard with database throws exception when instance not found', function () {
     config(['wizard.storage' => 'database']);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
 
     expect(fn () => $manager->deleteWizard('test', 99999))
-        ->toThrow(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        ->toThrow(NotFoundHttpException::class);
 });

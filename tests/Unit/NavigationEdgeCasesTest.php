@@ -6,6 +6,8 @@ use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Core\WizardNavigation;
 use Invelity\WizardPackage\Services\StepFinderService;
+use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 
 test('canNavigateTo returns false when step not found', function () {
     $storage = app(WizardStorageInterface::class);
@@ -18,8 +20,8 @@ test('canNavigateTo returns false when step not found', function () {
     );
 
     $steps = [
-        new \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep,
-        new \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep,
+        new PersonalInfoStep,
+        new ContactDetailsStep,
     ];
 
     $stepFinder = new StepFinderService;

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 
@@ -27,7 +28,7 @@ test('middleware allows access to first step', function () {
 });
 
 test('middleware allows access to accessible step after completing previous', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John Doe']);
 
@@ -49,7 +50,7 @@ test('middleware blocks access to inaccessible step', function () {
 });
 
 test('middleware redirects to current accessible step when blocked', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
 
     $response = $this->get(route('wizard.show', [
@@ -75,7 +76,7 @@ test('middleware initializes wizard if not already initialized', function () {
 
     $response->assertOk();
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     expect($manager->getCurrentStep())->not->toBeNull();
 });
 
@@ -103,7 +104,7 @@ test('middleware validates wizard flow across multiple steps', function () {
     ]));
     $response2->assertOk();
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $progress = $manager->getProgress();
 
@@ -111,7 +112,7 @@ test('middleware validates wizard flow across multiple steps', function () {
 });
 
 test('middleware handles completed wizard navigation', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
     $manager->processStep('contact-details', ['email' => 'john@example.com']);

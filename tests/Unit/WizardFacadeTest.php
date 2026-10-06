@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Facades\Wizard;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
+use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 beforeEach(function () {
     config(['wizard.wizards.test' => [
@@ -44,7 +46,7 @@ test('facade can get progress', function () {
 
     $progress = Wizard::getProgress();
 
-    expect($progress)->toBeInstanceOf(\Invelity\WizardPackage\ValueObjects\WizardProgressValue::class);
+    expect($progress)->toBeInstanceOf(WizardProgressValue::class);
     expect($progress->totalSteps)->toBe(2);
 });
 
@@ -72,5 +74,5 @@ test('facade can reset wizard', function () {
 test('facade resolves to correct service', function () {
     $instance = Wizard::getFacadeRoot();
 
-    expect($instance)->toBeInstanceOf(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    expect($instance)->toBeInstanceOf(WizardManagerInterface::class);
 });

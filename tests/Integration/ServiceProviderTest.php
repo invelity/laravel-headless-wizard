@@ -5,7 +5,10 @@ declare(strict_types=1);
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
+use Invelity\WizardPackage\Storage\CacheStorage;
+use Invelity\WizardPackage\Storage\DatabaseStorage;
 use Invelity\WizardPackage\Storage\SessionStorage;
+use Invelity\WizardPackage\Wizard;
 
 test('it registers wizard configuration as singleton', function () {
     $config1 = app(WizardConfiguration::class);
@@ -50,25 +53,25 @@ test('config file is published', function () {
 
 test('it registers database storage when configured', function () {
     config(['wizard.storage' => 'database']);
-    $this->app->forgetInstance(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $this->app->forgetInstance(WizardStorageInterface::class);
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
 
-    expect($storage)->toBeInstanceOf(\Invelity\WizardPackage\Storage\DatabaseStorage::class);
+    expect($storage)->toBeInstanceOf(DatabaseStorage::class);
 });
 
 test('it registers cache storage when configured', function () {
     config(['wizard.storage' => 'cache']);
-    $this->app->forgetInstance(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $this->app->forgetInstance(WizardStorageInterface::class);
 
-    $storage = app(\Invelity\WizardPackage\Contracts\WizardStorageInterface::class);
+    $storage = app(WizardStorageInterface::class);
 
-    expect($storage)->toBeInstanceOf(\Invelity\WizardPackage\Storage\CacheStorage::class);
+    expect($storage)->toBeInstanceOf(CacheStorage::class);
 });
 
 test('it registers Wizard facade singleton', function () {
-    $wizard1 = app(\Invelity\WizardPackage\Wizard::class);
-    $wizard2 = app(\Invelity\WizardPackage\Wizard::class);
+    $wizard1 = app(Wizard::class);
+    $wizard2 = app(Wizard::class);
 
     expect($wizard1)->toBe($wizard2);
 });

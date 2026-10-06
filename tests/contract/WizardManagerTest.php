@@ -5,13 +5,16 @@ declare(strict_types=1);
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStepInterface;
 use Invelity\WizardPackage\Exceptions\InvalidStepException;
+use Invelity\WizardPackage\Exceptions\StepValidationException;
+use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 use Invelity\WizardPackage\ValueObjects\WizardProgressValue;
 
 beforeEach(function () {
     config(['wizard.wizards.test-wizard.steps' => [
-        \Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep::class,
+        PersonalInfoStep::class,
+        ContactDetailsStep::class,
     ]]);
     $this->manager = app(WizardManagerInterface::class);
 });
@@ -67,7 +70,7 @@ test('it returns failure result for invalid data', function () {
 
     expect(fn () => $this->manager->processStep('personal-info', [
         'name' => '',
-    ]))->toThrow(\Invelity\WizardPackage\Exceptions\StepValidationException::class);
+    ]))->toThrow(StepValidationException::class);
 });
 
 test('it can navigate to next step', function () {

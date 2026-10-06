@@ -3,7 +3,11 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Invelity\WizardPackage\Actions\SkipWizardStepAction;
+use Invelity\WizardPackage\Actions\UpdateWizardStepAction;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
+use Invelity\WizardPackage\Tests\Fixtures\OptionalStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 
 uses(RefreshDatabase::class);
@@ -18,11 +22,11 @@ beforeEach(function () {
 });
 
 test('UpdateWizardStepAction processes step successfully', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $wizardId = session('checkout.wizard_id') ?? 1;
 
-    $action = app(\Invelity\WizardPackage\Actions\UpdateWizardStepAction::class);
+    $action = app(UpdateWizardStepAction::class);
     $response = $action->execute('checkout', $wizardId, 'personal-info', ['name' => 'John Doe']);
 
     expect($response->status())->toBe(200);
@@ -32,12 +36,12 @@ test('UpdateWizardStepAction processes step successfully', function () {
 });
 
 test('UpdateWizardStepAction handles step processing', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
     $wizardId = session('checkout.wizard_id') ?? 1;
 
-    $action = app(\Invelity\WizardPackage\Actions\UpdateWizardStepAction::class);
+    $action = app(UpdateWizardStepAction::class);
     $response = $action->execute('checkout', $wizardId, 'personal-info', ['name' => 'Jane']);
 
     expect($response->status())->toBe(200);
@@ -48,15 +52,15 @@ test('UpdateWizardStepAction handles step processing', function () {
 test('SkipWizardStepAction skips step successfully', function () {
     config(['wizard.wizards.checkout.steps' => [
         PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\OptionalStep::class,
+        OptionalStep::class,
         ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
 
-    $action = app(\Invelity\WizardPackage\Actions\SkipWizardStepAction::class);
+    $action = app(SkipWizardStepAction::class);
     $response = $action->execute('checkout', 'optional-step');
 
     expect($response->status())->toBe(200);
@@ -68,13 +72,13 @@ test('SkipWizardStepAction skips step successfully', function () {
 test('SkipWizardStepAction returns progress information', function () {
     config(['wizard.wizards.checkout.steps' => [
         PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\OptionalStep::class,
+        OptionalStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
 
-    $action = app(\Invelity\WizardPackage\Actions\SkipWizardStepAction::class);
+    $action = app(SkipWizardStepAction::class);
     $response = $action->execute('checkout', 'optional-step');
 
     $data = $response->getData(true);
@@ -85,14 +89,14 @@ test('SkipWizardStepAction returns progress information', function () {
 test('SkipWizardStepAction completes wizard when no more steps', function () {
     config(['wizard.wizards.checkout.steps' => [
         PersonalInfoStep::class,
-        \Invelity\WizardPackage\Tests\Fixtures\OptionalStep::class,
+        OptionalStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
 
-    $action = app(\Invelity\WizardPackage\Actions\SkipWizardStepAction::class);
+    $action = app(SkipWizardStepAction::class);
     $response = $action->execute('checkout', 'optional-step');
 
     $data = $response->getData(true);
@@ -101,14 +105,14 @@ test('SkipWizardStepAction completes wizard when no more steps', function () {
 });
 
 test('UpdateWizardStepAction loads wizard from storage', function () {
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'Initial Name']);
 
     $wizardId = session('checkout.wizard_id') ?? 1;
     session()->forget('checkout');
 
-    $action = app(\Invelity\WizardPackage\Actions\UpdateWizardStepAction::class);
+    $action = app(UpdateWizardStepAction::class);
     $response = $action->execute('checkout', $wizardId, 'personal-info', ['name' => 'Updated Name']);
 
     expect($response->status())->toBe(200);

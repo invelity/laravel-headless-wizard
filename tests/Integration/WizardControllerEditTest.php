@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Invelity\WizardPackage\Actions\EditWizardStepAction;
+use Invelity\WizardPackage\Actions\UpdateWizardStepAction;
+use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Exceptions\StepValidationException;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 
@@ -38,18 +42,18 @@ test('it shows edit mode with prefilled data', function () {
 test('it validates data in edit mode', function () {
     config(['wizard.wizards.checkout.steps' => [PersonalInfoStep::class]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
     $wizardId = session('checkout.wizard_id') ?? 1;
 
-    $action = app(\Invelity\WizardPackage\Actions\UpdateWizardStepAction::class);
+    $action = app(UpdateWizardStepAction::class);
 
     try {
         $response = $action->execute('checkout', $wizardId, 'personal-info', []);
         expect($response->status())->toBe(422);
-    } catch (\Invelity\WizardPackage\Exceptions\StepValidationException $e) {
-        expect($e)->toBeInstanceOf(\Invelity\WizardPackage\Exceptions\StepValidationException::class);
+    } catch (StepValidationException $e) {
+        expect($e)->toBeInstanceOf(StepValidationException::class);
     }
 });
 
@@ -59,11 +63,11 @@ test('it returns access denied when step not accessible in edit mode', function 
         ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $wizardId = session('checkout.wizard_id') ?? 1;
 
-    $action = app(\Invelity\WizardPackage\Actions\EditWizardStepAction::class);
+    $action = app(EditWizardStepAction::class);
     $response = $action->execute('checkout', $wizardId, 'contact-details');
 
     expect($response->status())->toBe(403);
@@ -72,13 +76,13 @@ test('it returns access denied when step not accessible in edit mode', function 
 test('it loads wizard from database in edit mode', function () {
     config(['wizard.wizards.checkout.steps' => [PersonalInfoStep::class]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
 
     $wizardId = session('checkout.wizard_id') ?? 1;
 
-    $action = app(\Invelity\WizardPackage\Actions\EditWizardStepAction::class);
+    $action = app(EditWizardStepAction::class);
     $response = $action->execute('checkout', $wizardId, 'personal-info');
 
     expect($response->status())->toBe(200);
@@ -93,7 +97,7 @@ test('it preserves changes when navigating between steps', function () {
         ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
     $manager->processStep('contact-details', ['email' => 'john@example.com']);
@@ -111,14 +115,14 @@ test('it updates single step without affecting others', function () {
         ContactDetailsStep::class,
     ]]);
 
-    $manager = app(\Invelity\WizardPackage\Contracts\WizardManagerInterface::class);
+    $manager = app(WizardManagerInterface::class);
     $manager->initialize('checkout');
     $manager->processStep('personal-info', ['name' => 'John']);
     $manager->processStep('contact-details', ['email' => 'john@example.com']);
 
     $wizardId = session('checkout.wizard_id') ?? 1;
 
-    $action = app(\Invelity\WizardPackage\Actions\UpdateWizardStepAction::class);
+    $action = app(UpdateWizardStepAction::class);
     $action->execute('checkout', $wizardId, 'personal-info', ['name' => 'Jane']);
 
     $data = $manager->getAllData();
