@@ -13,6 +13,8 @@ use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Invelity\WizardPackage\Console\MakeStepCommand;
+use Invelity\WizardPackage\Console\MakeWizardCommand;
 use Invelity\WizardPackage\Console\PruneCommand;
 use Invelity\WizardPackage\Contracts\Factory;
 use Invelity\WizardPackage\Exceptions\StepNotAccessibleException;
@@ -139,6 +141,10 @@ final class WizardServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/lang' => $this->app->langPath('vendor/wizard'),
         ], 'wizard-translations');
+
+        $this->publishes([
+            __DIR__.'/../resources/stubs' => $this->app->basePath('stubs'),
+        ], 'wizard-stubs');
     }
 
     /**
@@ -147,6 +153,8 @@ final class WizardServiceProvider extends ServiceProvider
     private function registerCommands(): void
     {
         $this->commands([
+            MakeStepCommand::class,
+            MakeWizardCommand::class,
             PruneCommand::class,
         ]);
 

@@ -1,0 +1,30 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ requestClass }};
+use Illuminate\Foundation\Http\FormRequest;
+use Invelity\WizardPackage\Step;
+
+class {{ class }} extends Step
+{
+    /**
+     * The form request that validates the step's input.
+     *
+     * @var class-string<FormRequest>|null
+     */
+    protected ?string $formRequest = {{ request }}::class;
+{{ optional }}
+    /**
+     * Handle the validated input of the step.
+     *
+     * The returned array is stored as the step's data. Type-hint any service you need.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public function handle(array $data): array
+    {
+        return $data;
+    }
+}

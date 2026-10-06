@@ -1,0 +1,13 @@
+<?php
+
+namespace {{ namespace }};
+
+use Invelity\WizardPackage\Step;
+
+class {{ class }} extends Step
+{
+    /**
+     * Indicates if the step only displays information and never takes input.
+     */
+    protected bool $displayOnly = true;
+}
