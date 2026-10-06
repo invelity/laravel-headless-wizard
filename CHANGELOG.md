@@ -2,7 +2,15 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
-## Unreleased
+## v2.0.0 - Laravel-core Rewrite - 2026-10-06
+
+2.0 rebuilds the package the way Laravel itself is built. To upgrade, read [UPGRADING.md](UPGRADING.md). Sessions written by 1.x keep working.
+
+### Security
+
+- The cache and database stores kept one state for all visitors. Every store now keeps each visitor apart: the authenticated user, or a token kept in the session (#27).
+- The package registers no routes by itself, and the 1.x endpoints that edited or deleted wizard progress by numeric id, without an ownership check, are gone (#32).
+- Steps without a form request no longer store raw input; only validated data is stored (#30).
 
 ### Changed
 
@@ -12,6 +20,7 @@ All notable changes to `wizard-package` will be documented in this file.
 - **Breaking:** wizard state lives in named stores configured under `wizard.default` and `wizard.stores`. The cache and database stores keep every visitor apart. The session store keeps the 1.x key `wizard_{name}` and reads 1.x records, including keys the package does not own (#27).
 - **Breaking:** the events are `WizardStarted`, `StepCompleted`, `StepSkipped`, `StepReopened`, `WizardCompleted` and `WizardReset`, with scalar payloads that name the wizard class and the visitor's scope. They are always dispatched (#31).
 - **Breaking:** unknown steps answer 404 and inaccessible steps 403. Changes to a completed wizard answer 409. Skipping a required step or completing an unfinished wizard raises a validation error. Messages are translated (English, Slovak) (#31).
+- **Breaking:** requires PHP 8.4+ and Laravel 12 or 13. Laravel 11 reached the end of its security support in March 2026 and stays supported by 1.x. Tested with Pest 4 (Laravel 12) and Pest 5 (Laravel 13) on PHP 8.4 and 8.5, with lowest and stable dependencies; PHPStan runs at `level: max` (#24).
 
 ### Added
 
@@ -27,11 +36,6 @@ All notable changes to `wizard-package` will be documented in this file.
   - `wizard:make-step SummaryStep --wizard=OrderWizard [--optional] [--display]` creates a step and its form request, and adds the step to the wizard with a sorted import.
   - Both prompt for missing input and honour stubs published with the `wizard-stubs` tag (#33).
 
-### Changed (tooling)
-
-- Requires PHP 8.4+ and Laravel 12 or 13; Laravel 11 reached the end of its security support in March 2026 and stays supported by 1.x. Tested with Pest 4 (Laravel 12) and Pest 5 (Laravel 13) on PHP 8.4 and 8.5, lowest and stable dependencies (#24).
-- PHPStan runs at `level: max` without a baseline (#24).
-
 ### Fixed
 
 - Conditionally skipped steps no longer block completion or count towards progress (#26).
@@ -39,8 +43,10 @@ All notable changes to `wizard-package` will be documented in this file.
 
 ### Removed
 
-- **Breaking:** `WizardManagerInterface` and the twelve other single-implementation interfaces, the `Wizard` wrapper class, the `WizardPackage` facade, folder-based wizard discovery, `WizardProgress` and its migration, the 1.x routes, middleware and generators, and every 1.x config key. The HTTP API and the generators return as opt-in, rebuilt features (#32, #33).
+- **Breaking:** `WizardManagerInterface` and the other 1.x interfaces, the `Wizard` wrapper class, the `WizardPackage` facade, folder-based wizard discovery, `WizardProgress` and its migration, the 1.x routes, middleware and generators, and every 1.x config key. The HTTP API and the generators return as opt-in, rebuilt features (#32, #33).
 - **Breaking:** the Blade components (`x-wizard::layout`, `progress-bar`, `step-navigation`, `form-wrapper`), the published views and the `useWizard()` Vue composable. None of them matched the package's HTTP API (for example `route('wizard.show', $step)` without the wizard parameter, `/api/wizard/{id}` that does not exist). The package stays headless; build the UI from the navigation and progress data (#25).
+
+**Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v1.4.0...v2.0.0
 
 ## v1.4.0 - Laravel 13 Support - 2026-10-06
 

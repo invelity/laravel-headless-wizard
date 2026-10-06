@@ -4,1291 +4,212 @@ title: Examples
 nav_order: 6
 ---
 
-# Real-World Examples
+# Examples
 
-Practical examples of using Laravel Headless Wizard in production applications.
+The package is headless: it validates, stores and navigates; you render. These recipes all use the `OrderWizard` from
+[Wizards and steps]({{ site.baseurl }}/creating-wizards).
 
----
-
-## User Onboarding Wizard
-
-A complete 3-step user onboarding flow with profile creation, preferences, and email verification.
-
-### Step 1: Personal Information
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use App\Models\User;
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class PersonalInfoStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'personal-info',
-            title: 'Personal Information',
-            order: 1
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        $user = User::create([
-            'name' => $data->get('name'),
-            'email' => $data->get('email'),
-            'date_of_birth' => $data->get('date_of_birth'),
-        ]);
-
-        return StepResult::success(
-            data: ['user_id' => $user->id],
-            message: 'Profile created successfully!'
-        );
-    }
-}
-```
-
----
-
-### Step 2: Preferences (Optional)
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use App\Models\UserPreferences;
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class PreferencesStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'preferences',
-            title: 'Your Preferences',
-            order: 2,
-            isOptional: true,
-            canSkip: true
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\PreferencesRequest::class;
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        $userId = $this->getWizardData('personal-info.user_id');
-
-        UserPreferences::create([
-            'user_id' => $userId,
-            'newsletter' => $data->get('newsletter', false),
-            'notifications' => $data->get('notifications', true),
-            'theme' => $data->get('theme', 'light'),
-        ]);
-
-        return StepResult::success(
-            message: 'Preferences saved!'
-        );
-    }
-}
-```
-
----
-
-### Step 3: Email Verification
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use App\Mail\VerificationEmail;
-use App\Models\User;
-use Illuminate\Support\Facades\Mail;
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class EmailVerificationStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'email-verification',
-            title: 'Verify Your Email',
-            order: 3,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\EmailVerificationRequest::class;
-    }
-
-    public function getDependencies(): array
-    {
-        return ['personal-info'];
-    }
-
-
-    public function beforeProcess(StepData $data): void
-    {
-        $userId = $this->getWizardData('personal-info.user_id');
-        $user = User::find($userId);
-
-        Mail::to($user)->send(new VerificationEmail());
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        $userId = $this->getWizardData('personal-info.user_id');
-        $user = User::find($userId);
-
-        if ($user->verification_code !== $data->get('verification_code')) {
-            return StepResult::failure(
-                message: 'Invalid verification code',
-                errors: ['verification_code' => ['The code is incorrect']]
-            );
-        }
-
-        $user->update(['email_verified_at' => now()]);
-
-        return StepResult::success(
-            message: 'Email verified successfully!'
-        );
-    }
-}
-```
-
----
-
-## E-Commerce Checkout Wizard
-
-A complete checkout flow with cart, shipping, payment, and confirmation.
-
-### Step 1: Cart Review
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use App\Models\Cart;
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class CartReviewStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'cart-review',
-            title: 'Review Cart',
-            order: 1,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\CartReviewRequest::class;
-    }
-
-    public function shouldSkip(array $wizardData): bool
-    {
-        $cart = Cart::where('user_id', auth()->id())->first();
-        return $cart?->items()->count() === 0;
-    }
-
-
-    public function process(StepData $data): StepResult
-    {
-        $cart = Cart::firstOrCreate(['user_id' => auth()->id()]);
-        
-        foreach ($data->get('items', []) as $item) {
-            $cart->items()->updateOrCreate(
-                ['product_id' => $item['id']],
-                ['quantity' => $item['quantity']]
-            );
-        }
-
-        return StepResult::success(
-            data: ['cart_id' => $cart->id],
-            message: 'Cart updated'
-        );
-    }
-}
-```
-
----
-
-### Step 2: Shipping Address
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use App\Models\ShippingAddress;
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class ShippingAddressStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'shipping-address',
-            title: 'Shipping Address',
-            order: 2,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\ShippingAddressRequest::class;
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        $address = ShippingAddress::create([
-            'user_id' => auth()->id(),
-            'street' => $data->get('street'),
-            'city' => $data->get('city'),
-            'state' => $data->get('state'),
-            'zip' => $data->get('zip'),
-            'country' => $data->get('country'),
-        ]);
-
-        return StepResult::success(
-            data: ['address_id' => $address->id],
-            message: 'Shipping address saved'
-        );
-    }
-}
-```
-
----
-
-### Step 3: Payment
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use App\Services\PaymentGateway;
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class PaymentStep extends AbstractStep
-{
-    public function __construct(
-        private readonly PaymentGateway $paymentGateway
-    ) {
-        parent::__construct(
-            id: 'payment',
-            title: 'Payment',
-            order: 3,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\PaymentRequest::class;
-    }
-
-    public function getDependencies(): array
-    {
-        return ['cart-review', 'shipping-address'];
-    }
-
-
-    public function process(StepData $data): StepResult
-    {
-        $cartId = $this->getWizardData('cart-review.cart_id');
-        $addressId = $this->getWizardData('shipping-address.address_id');
-
-        try {
-            $payment = $this->paymentGateway->charge([
-                'cart_id' => $cartId,
-                'address_id' => $addressId,
-                'payment_method' => $data->get('payment_method'),
-                'card_number' => $data->get('card_number'),
-                'card_exp' => $data->get('card_exp'),
-                'card_cvv' => $data->get('card_cvv'),
-            ]);
-
-            return StepResult::success(
-                data: ['payment_id' => $payment->id],
-                message: 'Payment processed successfully'
-            );
-        } catch (\Exception $e) {
-            return StepResult::failure(
-                message: 'Payment failed: ' . $e->getMessage()
-            );
-        }
-    }
-}
-```
-
----
-
-## Survey Wizard with Conditional Logic
-
-A dynamic survey that shows/hides questions based on previous answers.
-
-### Step 1: Basic Info
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class BasicInfoStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'basic-info',
-            title: 'Basic Information',
-            order: 1,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\BasicInfoRequest::class;
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        return StepResult::success(
-            data: $data->all(),
-            message: 'Basic information saved'
-        );
-    }
-}
-```
-
----
-
-### Step 2: Employment Details (Conditional)
-
-```php
-<?php
-
-namespace App\Wizards\OnboardingWizard\Steps;
-
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class EmploymentDetailsStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'employment-details',
-            title: 'Employment Details',
-            order: 2,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\EmploymentDetailsRequest::class;
-    }
-
-    public function shouldSkip(array $wizardData): bool
-    {
-        return $wizardData['basic-info']['employment_status'] !== 'employed';
-    }
-
-
-    public function process(StepData $data): StepResult
-    {
-        return StepResult::success(
-            data: $data->all(),
-            message: 'Employment details saved'
-        );
-    }
-}
-```
-
----
-
-## Complete Demo: Registration Wizard
-
-This is a complete working example from the demo application showing both Blade and Vue implementations.
-
-### Project Structure
-
-```
-app/
-└── Wizards/
-    └── RegistrationWizard/
-        └── Steps/
-            ├── PersonalInfoStep.php
-            ├── PreferencesStep.php
-            └── SummaryStep.php
-            
-app/Http/
-├── Controllers/
-│   └── WizardViewController.php
-└── Requests/
-    └── Wizards/
-        ├── PersonalInfoRequest.php
-        └── PreferencesRequest.php
-```
-
-### Steps Implementation
-
-#### PersonalInfoStep.php
-
-```php
-<?php
-
-namespace App\Wizards\RegistrationWizard\Steps;
-
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class PersonalInfoStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'personal-info',
-            title: 'Personal Info',
-            order: 1,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        return StepResult::success(
-            data: $data->all(),
-            message: 'Step completed successfully'
-        );
-    }
-}
-```
-
-#### PreferencesStep.php
-
-```php
-<?php
-
-namespace App\Wizards\RegistrationWizard\Steps;
-
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class PreferencesStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'preferences',
-            title: 'Preferences',
-            order: 2,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\PreferencesRequest::class;
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        return StepResult::success(
-            data: $data->all(),
-            message: 'Step completed successfully'
-        );
-    }
-}
-```
-
-#### SummaryStep.php
-
-```php
-<?php
-
-namespace App\Wizards\RegistrationWizard\Steps;
-
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class SummaryStep extends AbstractStep
-{
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'summary',
-            title: 'Summary',
-            order: 3,
-        );
-    }
-
-    public function getFormRequest(): ?string
-    {
-        return null; // No validation needed for summary
-    }
-
-    public function process(StepData $data): StepResult
-    {
-        return StepResult::success(
-            data: $data->all(),
-            message: 'Ready to complete'
-        );
-    }
-}
-```
-
-### FormRequest Validators
-
-#### PersonalInfoRequest.php
-
-```php
-<?php
-
-namespace App\Http\Requests\Wizards;
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class PersonalInfoRequest extends FormRequest
-{
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'age' => ['required', 'integer', 'min:18'],
-        ];
-    }
-}
-```
-
-#### PreferencesRequest.php
-
-```php
-<?php
-
-namespace App\Http\Requests\Wizards;
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class PreferencesRequest extends FormRequest
-{
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'theme' => ['required', 'in:light,dark,auto'],
-            'notifications' => ['required', 'array'],
-            'notifications.email' => ['required', 'boolean'],
-            'notifications.sms' => ['required', 'boolean'],
-        ];
-    }
-}
-```
-
-### Controller (Supports Both Blade and Vue)
-
-```php
-<?php
-
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use Invelity\WizardPackage\Contracts\WizardManagerInterface;
-
-class WizardViewController extends Controller
-{
-    public function __construct(
-        private readonly WizardManagerInterface $wizardManager
-    ) {}
-
-    public function show(string $wizard, string $step)
-    {
-        $this->wizardManager->initialize($wizard);
-        
-        $wizardData = $this->wizardManager->getAllData();
-        
-        return view("wizards.steps.{$step}", [
-            'wizardData' => $wizardData,
-        ]);
-    }
-
-    public function store(Request $request, string $wizard, string $step)
-    {
-        $this->wizardManager->initialize($wizard);
-        
-        $result = $this->wizardManager->processStep($step, $request->all());
-        
-        if (!$result->success) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'errors' => $result->errors,
-                ], 422);
-            }
-            return back()->withErrors($result->errors)->withInput();
-        }
-        
-        $currentStep = $this->wizardManager->getCurrentStep();
-        
-        if ($request->expectsJson()) {
-            if ($currentStep) {
-                return response()->json([
-                    'success' => true,
-                    'completed' => false,
-                    'next_step' => $currentStep->getId(),
-                    'data' => $result->data,
-                ]);
-            }
-            
-            return response()->json([
-                'success' => true,
-                'completed' => true,
-                'data' => $result->data,
-            ]);
-        }
-        
-        if ($currentStep) {
-            return redirect()->route('wizard.show', [
-                'wizard' => $wizard,
-                'step' => $currentStep->getId(),
-            ]);
-        }
-        
-        return redirect()->route('wizard.show', [
-            'wizard' => $wizard,
-            'step' => 'summary',
-        ]);
-    }
-}
-```
-
-### Routes
+## Blade with your own controllers
 
 ```php
 // routes/web.php
+use App\Http\Controllers\OrderController;
+use App\Wizards\OrderWizard;
+use Invelity\WizardPackage\Http\Middleware\EnsureStepIsAccessible;
 
-use App\Http\Controllers\WizardViewController;
-
-Route::prefix('wizard')->group(function () {
-    Route::get('/{wizard}/{step}', [WizardViewController::class, 'show'])
-        ->name('wizard.show');
-    
-    Route::post('/{wizard}/{step}', [WizardViewController::class, 'store'])
-        ->name('wizard.store');
+Route::middleware(['web', EnsureStepIsAccessible::using(OrderWizard::class)])->group(function () {
+    Route::get('/order/{step}', [OrderController::class, 'show'])->name('order.step');
+    Route::post('/order/{step}', [OrderController::class, 'store']);
 });
 
-// Demo routes
-Route::get('/blade/demo', function () {
-    return redirect()->route('wizard.show', [
-        'wizard' => 'registration',
-        'step' => 'personal-info'
-    ]);
-});
-
-Route::get('/vue/demo', function () {
-    return view('vue-demo');
-});
+Route::post('/order', [OrderController::class, 'complete'])->middleware('web')->name('order.complete');
 ```
-
-### CSRF Configuration (for Vue/API)
 
 ```php
-// bootstrap/app.php
+// app/Http/Controllers/OrderController.php
+use App\Wizards\OrderWizard;
+use Illuminate\Http\Request;
 
-->withMiddleware(function (Middleware $middleware): void {
-    $middleware->validateCsrfTokens(except: [
-        'wizard/*',
-    ]);
-})
-```
+class OrderController
+{
+    public function show(OrderWizard $wizard, string $step)
+    {
+        return view("order.{$step}", [
+            'step' => $wizard->step($step),
+            'data' => $wizard->data($step),
+            'navigation' => $wizard->navigation($step),
+            'progress' => $wizard->progress(),
+        ]);
+    }
 
-### Environment Configuration
+    public function store(Request $request, OrderWizard $wizard, string $step)
+    {
+        $wizard->process($step, $request);
 
-```env
-# Use file-based sessions for wizard state persistence
-SESSION_DRIVER=file
-```
+        return to_route('order.step', $wizard->current()->id());
+    }
 
----
+    public function complete(OrderWizard $wizard)
+    {
+        $wizard->complete();   // listen to WizardCompleted to place the order
 
-## Frontend Integration Examples
-
-### React + Axios
-
-```javascript
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-function OnboardingWizard() {
-    const [step, setStep] = useState(null);
-    const [formData, setFormData] = useState({});
-    const [progress, setProgress] = useState({});
-
-    useEffect(() => {
-        fetchCurrentStep();
-    }, []);
-
-    const fetchCurrentStep = async () => {
-        const response = await axios.get('/wizard/onboarding');
-        setStep(response.data.step);
-        setProgress(response.data.progress);
-    };
-
-    const submitStep = async (stepId, data) => {
-        try {
-            const response = await axios.post(`/wizard/onboarding/${stepId}`, data);
-            
-            if (response.data.success) {
-                if (response.data.next_step) {
-                    setStep(response.data.next_step);
-                } else {
-                    alert('Wizard completed!');
-                }
-                setProgress(response.data.progress);
-            }
-        } catch (error) {
-            console.error('Validation errors:', error.response.data.errors);
-        }
-    };
-
-    return (
-        <div>
-            <h1>{step?.title}</h1>
-            <div className="progress">
-                {progress.percentage}% complete
-            </div>
-            <form onSubmit={(e) => {
-                e.preventDefault();
-                submitStep(step.id, formData);
-            }}>
-                {/* Form fields */}
-                <button type="submit">Next</button>
-            </form>
-        </div>
-    );
+        return to_route('order.step', $wizard->current()->id());
+    }
 }
 ```
 
----
-
-### Vue 3 + Composition API
-
-```vue
-<template>
-  <div class="wizard">
-    <h1>{{ step?.title }}</h1>
-    
-    <div class="progress-bar">
-      <div 
-        class="progress-fill" 
-        :style="{ width: progress.percentage + '%' }"
-      ></div>
-    </div>
-
-    <form @submit.prevent="submitStep">
-      <!-- Dynamic form fields based on step.id -->
-      <component :is="stepComponent" v-model="formData" />
-      
-      <div class="buttons">
-        <button 
-          type="button" 
-          @click="goBack" 
-          :disabled="!navigation.can_go_back"
-        >
-          Back
-        </button>
-        <button type="submit">Next</button>
-      </div>
-    </form>
-  </div>
-</template>
-
-<script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
-
-const step = ref(null);
-const progress = ref({});
-const navigation = ref({});
-const formData = ref({});
-
-const stepComponent = computed(() => {
-  const componentMap = {
-    'personal-info': PersonalInfoForm,
-    'preferences': PreferencesForm,
-    'email-verification': EmailVerificationForm
-  };
-  return componentMap[step.value?.id];
-});
-
-onMounted(async () => {
-  const response = await axios.get('/wizard/onboarding');
-  step.value = response.data.step;
-  progress.value = response.data.progress;
-  navigation.value = response.data.navigation;
-});
-
-const submitStep = async () => {
-  try {
-    const response = await axios.post(
-      `/wizard/onboarding/${step.value.id}`,
-      formData.value
-    );
-    
-    if (response.data.success) {
-      step.value = response.data.next_step;
-      progress.value = response.data.progress;
-      navigation.value = response.data.navigation;
-      formData.value = {};
-    }
-  } catch (error) {
-    console.error(error.response.data.errors);
-  }
-};
-
-const goBack = async () => {
-  const response = await axios.get(`/wizard/onboarding/${navigation.value.previous_step.id}`);
-  step.value = response.data.step;
-  navigation.value = response.data.navigation;
-};
-</script>
-```
-
----
-
-### Livewire Component
+Link the steps to your routes once, on the wizard:
 
 ```php
-<?php
+class OrderWizard extends Wizard
+{
+    protected function stepUrl(Step $step): ?string
+    {
+        return route('order.step', $step->id());
+    }
+}
+```
 
-namespace App\Livewire;
+```blade
+{{-- resources/views/order/partials/navigation.blade.php --}}
+<nav aria-label="Order progress">
+    <div role="progressbar" aria-valuenow="{{ $progress->percentage() }}" aria-valuemin="0" aria-valuemax="100"
+         style="width: {{ $progress->percentage() }}%"></div>
 
+    <ol>
+        @foreach ($navigation->items as $item)
+            <li @class(['current' => $item->current, 'done' => $item->status->value !== 'pending'])>
+                @if ($item->accessible && $item->url)
+                    <a href="{{ $item->url }}">{{ $item->position }}. {{ $item->title }}</a>
+                @else
+                    <span>{{ $item->position }}. {{ $item->title }}</span>
+                @endif
+            </li>
+        @endforeach
+    </ol>
+</nav>
+```
+
+```blade
+{{-- resources/views/order/calculator.blade.php --}}
+<form method="POST" action="{{ url("/order/{$step->id()}") }}">
+    @csrf
+    <input name="weight" value="{{ old('weight', $data['weight'] ?? '') }}">
+    @error('weight') <p>{{ $message }}</p> @enderror
+
+    @if ($navigation->previous)
+        <a href="{{ route('order.step', $navigation->previous) }}">Back</a>
+    @endif
+    <button>Continue</button>
+</form>
+```
+
+## Livewire
+
+```php
+use App\Wizards\OrderWizard;
 use Invelity\WizardPackage\Facades\Wizard;
 use Livewire\Component;
 
-class OnboardingWizard extends Component
+class OrderForm extends Component
 {
-    public $currentStep;
-    public $progress;
-    public $formData = [];
-    
-    public function mount()
+    public string $step = 'calculator';
+
+    public array $form = [];
+
+    public function mount(): void
     {
-        Wizard::initialize('onboarding');
-        $this->currentStep = Wizard::getCurrentStep();
-        $this->progress = Wizard::getProgress();
+        $this->step = $this->wizard()->current()->id();
+        $this->form = $this->wizard()->data($this->step);
     }
 
-    public function submitStep()
+    public function submit(): void
     {
-        $result = Wizard::processStep(
-            $this->currentStep->getId(),
-            $this->formData
-        );
+        $this->wizard()->process($this->step, $this->form);   // validation errors appear in $errors by field name
 
-        if ($result->isSuccess()) {
-            $nextStep = Wizard::getNextStep();
-            
-            if ($nextStep) {
-                $this->currentStep = $nextStep;
-                $this->formData = [];
-            } else {
-                Wizard::complete();
-                return redirect()->route('dashboard');
-            }
-        } else {
-            $this->addError('form', $result->message());
-        }
-
-        $this->progress = Wizard::getProgress();
+        $this->step = $this->wizard()->current()->id();
+        $this->form = $this->wizard()->data($this->step);
     }
 
     public function render()
     {
-        return view('livewire.onboarding-wizard');
+        return view('livewire.order-form', [
+            'navigation' => $this->wizard()->navigation($this->step),
+            'progress' => $this->wizard()->progress(),
+        ]);
+    }
+
+    private function wizard(): OrderWizard
+    {
+        return Wizard::for(OrderWizard::class);   // resolve per request; never store it on the component
     }
 }
 ```
 
----
+## Inertia
 
-## Blade Wizard with Components
+```php
+use Invelity\WizardPackage\Http\Resources\WizardResource;
 
-Complete Blade implementation using pre-built components:
-
-### personal-info.blade.php
-
-```blade
-<x-wizard::layout title="User Registration">
-    <x-wizard::progress-bar :steps="$steps" :currentStep="'personal-info'" />
-    
-    <x-wizard::form-wrapper :action="route('wizard.registration.store', 'personal-info')">
-        <h2>Personal Information</h2>
-        <p class="text-gray-600 mb-4">Please provide your basic information</p>
-        
-        <div class="space-y-4">
-            <div>
-                <label for="name" class="block text-sm font-medium">Full Name</label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    value="{{ old('name') }}"
-                    class="mt-1 block w-full rounded-md border-gray-300"
-                    required
-                />
-                @error('name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            
-            <div>
-                <label for="email" class="block text-sm font-medium">Email Address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    value="{{ old('email') }}"
-                    class="mt-1 block w-full rounded-md border-gray-300"
-                    required
-                />
-                @error('email')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            
-            <div>
-                <label for="age" class="block text-sm font-medium">Age</label>
-                <input 
-                    type="number" 
-                    id="age" 
-                    name="age" 
-                    value="{{ old('age') }}"
-                    class="mt-1 block w-full rounded-md border-gray-300"
-                    required
-                />
-                @error('age')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-        </div>
-        
-        <x-wizard::step-navigation 
-            :canGoBack="false"
-            :canGoForward="true"
-            :isLastStep="false"
-            :nextStep="'preferences'"
-            nextText="Continue to Preferences"
-        />
-    </x-wizard::form-wrapper>
-</x-wizard::layout>
+public function show(OrderWizard $wizard, string $step)
+{
+    return Inertia::render("Order/{$step}", [
+        'wizard' => new WizardResource($wizard, $step),
+    ]);
+}
 ```
 
----
+`Invelity\WizardPackage\Http\Resources\WizardResource` is the same shape the JSON API returns, so the page props match the
+[response format]({{ site.baseurl }}/api-reference#http-api).
 
-## Vue SPA Wizard with useWizard()
+## Vue, React or a mobile app over the JSON API
 
-Complete Vue 3 implementation using the composable:
-
-### RegistrationWizard.vue
-
-```vue
-<template>
-    <div v-if="!state.loading" class="max-w-2xl mx-auto p-6">
-        <!-- Progress Bar -->
-        <div class="mb-8">
-            <div class="flex justify-between mb-2">
-                <span class="text-sm font-medium">
-                    Step {{ state.currentStepIndex + 1 }} of {{ state.steps.length }}
-                </span>
-                <span class="text-sm font-medium">
-                    {{ Math.round((state.currentStepIndex + 1) / state.steps.length * 100) }}% Complete
-                </span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                    class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    :style="{ width: Math.round((state.currentStepIndex + 1) / state.steps.length * 100) + '%' }"
-                ></div>
-            </div>
-        </div>
-        
-        <!-- Step Content -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-2xl font-bold mb-4">{{ currentStep?.title }}</h2>
-            
-            <!-- Personal Info Step -->
-            <form v-if="currentStep?.id === 'personal-info'" @submit.prevent="handleSubmit">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Full Name</label>
-                        <input 
-                            v-model="formData.name"
-                            type="text" 
-                            class="w-full px-3 py-2 border rounded-md"
-                            :class="{ 'border-red-500': getFieldError('name') }"
-                        />
-                        <p v-if="getFieldError('name')" class="text-red-500 text-sm mt-1">
-                            {{ getFieldError('name') }}
-                        </p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Email</label>
-                        <input 
-                            v-model="formData.email"
-                            type="email" 
-                            class="w-full px-3 py-2 border rounded-md"
-                            :class="{ 'border-red-500': getFieldError('email') }"
-                        />
-                        <p v-if="getFieldError('email')" class="text-red-500 text-sm mt-1">
-                            {{ getFieldError('email') }}
-                        </p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Age</label>
-                        <input 
-                            v-model="formData.age"
-                            type="number" 
-                            class="w-full px-3 py-2 border rounded-md"
-                            :class="{ 'border-red-500': getFieldError('age') }"
-                        />
-                        <p v-if="getFieldError('age')" class="text-red-500 text-sm mt-1">
-                            {{ getFieldError('age') }}
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between mt-6">
-                    <button 
-                        v-if="canGoBack"
-                        type="button"
-                        @click="handleBack"
-                        class="px-4 py-2 border rounded-md hover:bg-gray-50"
-                    >
-                        Previous
-                    </button>
-                    <button 
-                        type="submit"
-                        :disabled="state.loading"
-                        class="ml-auto px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                    >
-                        {{ isLastStep ? 'Complete' : 'Next' }}
-                    </button>
-                </div>
-            </form>
-            
-            <!-- Preferences Step -->
-            <form v-else-if="currentStep?.id === 'preferences'" @submit.prevent="handleSubmit">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Theme</label>
-                        <select 
-                            v-model="formData.theme"
-                            class="w-full px-3 py-2 border rounded-md"
-                        >
-                            <option value="light">Light</option>
-                            <option value="dark">Dark</option>
-                            <option value="auto">Auto</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Notifications</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center">
-                                <input 
-                                    v-model="formData.notifications.email"
-                                    type="checkbox" 
-                                    class="mr-2"
-                                />
-                                Email notifications
-                            </label>
-                            <label class="flex items-center">
-                                <input 
-                                    v-model="formData.notifications.sms"
-                                    type="checkbox" 
-                                    class="mr-2"
-                                />
-                                SMS notifications
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between mt-6">
-                    <button 
-                        type="button"
-                        @click="handleBack"
-                        class="px-4 py-2 border rounded-md hover:bg-gray-50"
-                    >
-                        Previous
-                    </button>
-                    <button 
-                        type="submit"
-                        :disabled="state.loading"
-                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                    >
-                        {{ isLastStep ? 'Complete' : 'Next' }}
-                    </button>
-                </div>
-            </form>
-            
-            <!-- Summary Step -->
-            <div v-else-if="currentStep?.id === 'summary'">
-                <div class="bg-gray-50 rounded-md p-4 mb-4">
-                    <h3 class="font-medium mb-2">Registration Summary</h3>
-                    <dl class="space-y-1">
-                        <div>
-                            <dt class="text-sm text-gray-600">Name:</dt>
-                            <dd class="font-medium">{{ state.wizardData['personal-info']?.name }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm text-gray-600">Email:</dt>
-                            <dd class="font-medium">{{ state.wizardData['personal-info']?.email }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-sm text-gray-600">Theme:</dt>
-                            <dd class="font-medium">{{ state.wizardData['preferences']?.theme }}</dd>
-                        </div>
-                    </dl>
-                </div>
-                
-                <div class="flex justify-between mt-6">
-                    <button 
-                        type="button"
-                        @click="handleBack"
-                        class="px-4 py-2 border rounded-md hover:bg-gray-50"
-                    >
-                        Previous
-                    </button>
-                    <button 
-                        @click="handleComplete"
-                        :disabled="state.loading"
-                        class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
-                    >
-                        Complete Registration
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div v-else class="max-w-2xl mx-auto p-6">
-        <div class="text-center">Loading...</div>
-    </div>
-</template>
-
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useWizard } from '@/composables/useWizard';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const { 
-    state, 
-    currentStep, 
-    canGoBack,
-    canGoForward, 
-    isLastStep,
-    initialize, 
-    submitStep, 
-    goToStep,
-    getFieldError,
-    clearErrors
-} = useWizard('registration');
-
-const formData = ref<Record<string, any>>({
-    notifications: { email: false, sms: false }
-});
-
-onMounted(async () => {
-    await initialize();
-});
-
-const handleSubmit = async () => {
-    clearErrors();
-    const result = await submitStep(formData.value);
-    
-    if (result.success) {
-        formData.value = { notifications: { email: false, sms: false } };
-        
-        if (result.completed) {
-            router.push('/dashboard');
-        }
-    }
-};
-
-const handleBack = async () => {
-    const previousStep = state.steps[state.currentStepIndex - 1];
-    if (previousStep) {
-        await goToStep(previousStep.id);
-    }
-};
-
-const handleComplete = async () => {
-    const result = await submitStep({});
-    if (result.success) {
-        router.push('/dashboard');
-    }
-};
-</script>
+```php
+Route::middleware('web')->group(fn () => Route::wizard('api/order', OrderWizard::class));
 ```
 
----
+```js
+async function call(method, url, body) {
+    const response = await fetch(url, {
+        method,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': decodeURIComponent(document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? ''),
+        },
+        credentials: 'same-origin',
+        body: body ? JSON.stringify(body) : undefined,
+    });
 
-## Next Steps
+    if (response.status === 422) {
+        return { errors: (await response.json()).errors };
+    }
 
-- [View API Reference](api-reference)
-- [Learn Testing](testing)
-- [Back to Creating Wizards](creating-wizards)
+    return response.status === 204 ? {} : { wizard: (await response.json()).data };
+}
+
+const { wizard } = await call('GET', '/api/order');                         // where am I?
+const result = await call('POST', `/api/order/${wizard.step.id}`, form);    // submit the step
+if (result.errors) showErrors(result.errors); else render(result.wizard);   // wizard.step is the next step
+await call('POST', '/api/order/newsletter/skip');                           // skip an optional step
+await call('POST', '/api/order');                                           // complete
+```
+
+`wizard.navigation` gives everything a progress bar or step list needs: `title`, `status`, `is_current`,
+`is_accessible`, `url`.
+
+## A checkout that follows the user across devices
+
+```php
+class CheckoutWizard extends Wizard
+{
+    protected ?string $store = 'database';   // keyed by the authenticated user by default
+
+    protected array $steps = [ShippingStep::class, PaymentStep::class, ReviewStep::class, ThankYouStep::class];
+}
+```
+
+```php
+// Resume where the user left off, on any device
+return redirect($wizard->url($wizard->firstUnfinished()?->id() ?? $wizard->current()->id()));
+```

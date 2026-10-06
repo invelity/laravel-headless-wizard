@@ -4,149 +4,66 @@ title: Home
 nav_order: 1
 ---
 
-# Laravel Multi-Step Wizard Package (Headless)
+# Laravel Headless Wizard
 
 ![Laravel Headless Wizard]({{ site.baseurl }}/assets/images/featured.png)
 
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6" markdown="0">
-  <a href="https://packagist.org/packages/invelity/laravel-headless-wizard" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
-    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Version</span>
-    <span class="text-lg font-bold text-primary-600 group-hover:text-primary-700">v1.2.0</span>
-  </a>
-  <a href="https://github.com/invelity/laravel-headless-wizard/actions" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
-    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Tests</span>
-    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">Passing</span>
-  </a>
-  <a href="https://github.com/invelity/laravel-headless-wizard" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
-    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Coverage</span>
-    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">89.7%</span>
-  </a>
-  <a href="https://github.com/invelity/laravel-headless-wizard" target="_blank" rel="noopener" class="flex flex-col items-center justify-center px-4 py-3 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:shadow-md transition-all duration-200 group no-underline">
-    <span class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">PHPStan</span>
-    <span class="text-lg font-bold text-green-600 group-hover:text-green-700">Level 5</span>
-  </a>
-</div>
+Multi-step wizards for Laravel, built the way Laravel itself is built.
 
-A powerful **headless** multi-step wizard package for Laravel applications. Build complex, multi-page forms with progress tracking, navigation, validation, and conditional steps. **Bring your own frontend** - works with React, Vue, Inertia, Livewire, Alpine.js, or any JavaScript framework.
+- **Declare** a wizard and its steps as classes.
+- **Validate** every step with a form request.
+- **Let the package keep** each visitor's progress and work out where they may go next.
+- **Render** it any way you like: Blade, Livewire, Inertia, Vue, React or a native app.
 
----
+```php
+use App\Wizards\OrderWizard;
 
-## 🚀 Quick Start
+class OrderStepController
+{
+    public function store(Request $request, OrderWizard $wizard, string $step)
+    {
+        $wizard->process($step, $request);   // validated by the step's form request
 
-Install the package:
+        return to_route('order.step', $wizard->current()->id());
+    }
+}
+```
+
+## Why this package
+
+- **Typed and stateless.** The wizard is injected like a form request and bound to the current visitor. There is no
+  `initialize()` and no string ids.
+- **Laravel-native validation.** Each step names a form request, and the request runs its whole lifecycle.
+- **Flow rules in one place.**
+  - optional and conditional steps;
+  - dependencies that reopen later steps when earlier data changes;
+  - display-only confirmation steps.
+- **Safe by default.**
+  - every visitor's state is kept apart;
+  - only validated input is stored;
+  - the package registers no routes unless you ask for them.
+- **Extensible.** Custom stores plug in through `Wizard::extend()`, and every lifecycle moment dispatches an event.
+
+## Requirements
+
+- PHP 8.4 or higher
+- Laravel 12 or 13
+
+## Five-minute tour
 
 ```bash
 composer require invelity/laravel-headless-wizard
+
+php artisan wizard:make OrderWizard
+php artisan wizard:make-step CalculatorStep --wizard=OrderWizard
+php artisan wizard:make-step PersonalDataStep --wizard=OrderWizard
+php artisan wizard:make-step ConfirmationStep --wizard=OrderWizard --display
 ```
 
-Publish the configuration:
+Then:
 
-```bash
-php artisan vendor:publish --tag="wizard-config"
-```
+1. add rules to `app/Http/Requests/Wizards/CalculatorRequest.php` and `PersonalDataRequest.php`;
+2. serve the steps from your own controllers, or register the [JSON API]({{ site.baseurl }}/api-reference#http-api);
+3. read [Wizards and steps]({{ site.baseurl }}/creating-wizards) to learn optional, conditional and dependent steps.
 
-Create your first wizard:
-
-```bash
-php artisan wizard:make Onboarding
-# Interactive: Choose wizard type (Blade/API/Livewire/Inertia)
-```
-
-Add steps to your wizard:
-
-```bash
-php artisan wizard:make-step Onboarding PersonalInfo --order=1
-# Interactive prompts guide you through step creation
-```
-
----
-
-## 📚 Documentation
-
-<div class="docs-grid" markdown="1">
-
-### [Installation](installation)
-Get started with Laravel Headless Wizard in minutes
-
-### [Configuration](configuration)
-Configure storage, routes, and behavior
-
-### [Creating Wizards](creating-wizards)
-Learn how to create multi-step wizards
-
-### [API Reference](api-reference)
-Complete API documentation
-
-### [Examples](examples)
-Real-world usage examples
-
-### [Testing](testing)
-Test your wizard implementations
-
-</div>
-
----
-
-## ✨ Key Features
-
-- 🚀 **Zero Frontend Lock-in** - Pure JSON API for any framework
-- ⚡ **Interactive Generators** - Beautiful CLI with Laravel Prompts for wizard creation
-- 🎨 **Pre-built Components** - Blade components for rapid prototyping (Layout, ProgressBar, Navigation)
-- 🔄 **Vue 3 Composable** - useWizard() composable with TypeScript definitions for SPA integration
-- 🔀 **Multi-Type Wizards** - Generate Blade, API, Livewire, or Inertia wizards
-- ✅ **Laravel-Native Validation** - Uses FormRequest classes with automatic integration
-- 💾 **Flexible Storage** - Session, database, or cache adapters
-- 📊 **Smart Progress Tracking** - Real-time completion percentages with automatic calculation
-- 🔀 **Conditional Logic** - Optional steps, dynamic flows, and step reordering
-- 🔔 **Event-Driven** - Hook into every wizard lifecycle event
-- ✨ **Modern PHP 8.4** - Property hooks, constructor promotion, and strict types
-
----
-
-## 📊 Code Quality
-
-- **89.7% Test Coverage** - 399 comprehensive Pest tests
-- **Cyclomatic Complexity: 4.37** - Clean, maintainable code
-- **PHPStan Level 5** - Zero static analysis errors
-- **100% Type Coverage** - Full type declarations
-- **Architecture Tests** - SOLID principles enforced via Pest Arch
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please see our [Contributing Guide](contributing) for details.
-
----
-
-## 📝 License
-
-The MIT License (MIT). Please see [License File](https://github.com/invelity/laravel-headless-wizard/blob/main/LICENSE.md) for more information.
-
----
-
-<style>
-.docs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.docs-grid h3 {
-  background: #f6f8fa;
-  padding: 1rem;
-  border-radius: 6px;
-  border-left: 3px solid #0366d6;
-  margin: 0;
-}
-
-.docs-grid h3 a {
-  text-decoration: none;
-  color: #0366d6;
-}
-
-.docs-grid h3 a:hover {
-  text-decoration: underline;
-}
-</style>
+Upgrading from 1.x? See the [upgrade guide]({{ site.baseurl }}/upgrading).
