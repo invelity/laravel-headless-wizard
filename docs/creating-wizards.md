@@ -1,846 +1,251 @@
 ---
 layout: default
-title: Creating Wizards
+title: Wizards and Steps
 nav_order: 4
 ---
 
-# Creating Wizards
+# Wizards and steps
 
-Learn how to create multi-step wizards from scratch.
+## Defining a wizard
 
----
-
-## Quick Start
-
-### 1. Generate a Wizard
-
-```bash
-php artisan wizard:make Onboarding
-```
-
-**Interactive prompts:**
-```
- What type of wizard do you want to create?
-  [blade] Blade (Traditional server-side rendering)
-  [api] API (Headless JSON responses)
-  [livewire] Livewire (Reactive components)
-  [inertia] Inertia.js (SPA with Vue/React)
- > blade
-
-ℹ Wizard created successfully!
-✎ Wizard class: app/Wizards/OnboardingWizard/Onboarding.php
-✎ Controller: app/Http/Controllers/OnboardingController.php
-✎ Views: resources/views/wizards/onboarding/
-```
-
-Or use command options to skip interactive prompts:
-
-```bash
-php artisan wizard:make Onboarding --type=api
-```
-
-### 2. Generate Steps
-
-```bash
-php artisan wizard:make-step Onboarding PersonalInfo --order=1
-```
-
-**Interactive prompts:**
-```
- What is the step title? › Personal Information
- Is this step optional? › No
-
-ℹ Step created successfully!
-✎ Step class: app/Wizards/OnboardingWizard/Steps/PersonalInfoStep.php
-✎ FormRequest: app/Http/Requests/Wizards/PersonalInfoRequest.php
-✎ Step will be auto-discovered
-
-✎ Next steps:
-  • Add validation rules: app/Http/Requests/Wizards/PersonalInfoRequest.php
-  • Implement business logic: app/Wizards/OnboardingWizard/Steps/PersonalInfoStep.php
-```
-
----
-
-## Wizard Types
-
-Laravel Headless Wizard supports 4 wizard types to fit your stack:
-
-### Blade Wizards
-
-Traditional server-side rendered wizards with Blade templates and pre-built components.
-
-```bash
-php artisan wizard:make Onboarding --type=blade
-```
-
-**Best for:**
-- Traditional Laravel applications
-- Server-side rendering
-- Rapid prototyping with pre-built components
-
-**Features:**
-- Auto-generated Blade views with layout
-- Pre-built components (ProgressBar, Navigation, FormWrapper)
-- CSRF protection included
-- Traditional form submissions
-
-### API Wizards
-
-Headless JSON API for modern SPA frameworks (React, Vue, Angular, Svelte).
-
-```bash
-php artisan wizard:make Onboarding --type=api
-```
-
-**Best for:**
-- Decoupled frontend/backend
-- Mobile apps
-- Multiple frontend consumers
-
-**Features:**
-- Pure JSON responses
-- RESTful API endpoints
-- useWizard() Vue composable included
-- Requires CSRF exception setup
-
-**CSRF Setup Required:**
-```php
-// bootstrap/app.php
-->withMiddleware(function (Middleware $middleware): void {
-    $middleware->validateCsrfTokens(except: [
-        'wizard/onboarding/*',
-    ]);
-})
-```
-
-### Livewire Wizards
-
-Reactive components with Laravel Livewire.
-
-```bash
-php artisan wizard:make Onboarding --type=livewire
-```
-
-**Best for:**
-- Reactive UIs without JavaScript frameworks
-- Real-time validation
-- Dynamic forms
-
-### Inertia Wizards
-
-SPA experience with Vue/React using Inertia.js.
-
-```bash
-php artisan wizard:make Onboarding --type=inertia
-```
-
-**Best for:**
-- Modern SPA with server-side routing
-- Vue/React with Laravel backend
-- Best of both worlds (SPA + Laravel)
-
----
-
-## Wizard Structure
-
-A wizard consists of:
-
-1. **Wizard Class** - Orchestrates the overall flow (`app/Wizards/{Name}Wizard/{Name}.php`)
-2. **Step Classes** - Individual wizard steps (`app/Wizards/{Name}Wizard/Steps/`)
-3. **Form Requests** - Laravel validation for each step (`app/Http/Requests/Wizards/`)
-4. **Auto-Discovery** - Wizards are automatically discovered, no config registration needed
-
----
-
-## Creating Custom Steps
-
-### Step Class Example
+A wizard is a class that extends `Invelity\WizardPackage\Wizard` and lists its steps in order:
 
 ```php
-<?php
+namespace App\Wizards;
 
-namespace App\Wizards\OnboardingWizard\Steps;
+use App\Wizards\Steps\BillingStep;
+use App\Wizards\Steps\CalculatorStep;
+use App\Wizards\Steps\ConfirmationStep;
+use App\Wizards\Steps\NewsletterStep;
+use App\Wizards\Steps\PersonalDataStep;
+use App\Wizards\Steps\SummaryStep;
+use Invelity\WizardPackage\Wizard;
 
-use Invelity\WizardPackage\Steps\AbstractStep;
-use Invelity\WizardPackage\ValueObjects\StepData;
-use Invelity\WizardPackage\ValueObjects\StepResult;
-
-class PersonalInfoStep extends AbstractStep
+class OrderWizard extends Wizard
 {
-    public function __construct()
-    {
-        parent::__construct(
-            id: 'personal-info',
-            title: 'Personal Information',
-            order: 1
-        );
-    }
+    protected array $steps = [
+        CalculatorStep::class,
+        PersonalDataStep::class,
+        NewsletterStep::class,
+        BillingStep::class,
+        SummaryStep::class,
+        ConfirmationStep::class,
+    ];
+}
+```
 
-    public function getFormRequest(): ?string
-    {
-        return \App\Http\Requests\Wizards\PersonalInfoRequest::class;
-    }
+| Property | Default | Meaning |
+| --- | --- | --- |
+| `$steps` | `[]` | The step classes, in order. They are resolved through the container, so they may inject services. |
+| `$name` | kebab-cased class name without `Wizard` (`order`) | Identifies the wizard in stores, route names and events. |
+| `$store` | `null` (the default store) | The store that keeps the state. |
+| `$allowJumping` | `false` | Lets the visitor open any step regardless of order. Dependencies still apply. |
 
-    public function process(StepData $data): StepResult
-    {
-        // Process the step data
-        $name = $data->get('name');
-        $email = $data->get('email');
-        
-        // Your business logic here
-        // For example, create a user record, send email, etc.
-        
-        return StepResult::success('Personal information saved!');
-    }
+Generate one with `php artisan wizard:make OrderWizard`.
 
-    public function shouldSkip(array $wizardData): bool
-    {
-        // Skip this step if email already exists
-        return isset($wizardData['email_verified']) && $wizardData['email_verified'];
-    }
+## Using a wizard
 
-    public function getDependencies(): array
+Type-hint the wizard anywhere the container resolves arguments: controllers, jobs, Livewire components. Or call
+`Wizard::for()`. Either way you get a fresh instance bound to the current visitor.
+
+```php
+public function show(OrderWizard $wizard, string $step) { /* ... */ }
+
+$wizard = Wizard::for(OrderWizard::class);
+$wizard = Wizard::for(OrderWizard::class, $user);   // another visitor, with the cache or database store
+```
+
+Reading never writes. The state is stored the first time something changes, and `WizardStarted` is dispatched then.
+
+## Defining a step
+
+A step extends `Invelity\WizardPackage\Step`:
+
+```php
+namespace App\Wizards\Steps;
+
+use App\Http\Requests\Wizards\CalculatorRequest;
+use App\Services\PriceCalculator;
+use Invelity\WizardPackage\Step;
+
+class CalculatorStep extends Step
+{
+    protected ?string $formRequest = CalculatorRequest::class;
+
+    public function handle(array $data, PriceCalculator $prices): array
     {
-        // This step has no dependencies
-        return [];
+        return [...$data, 'price' => $prices->quote($data['weight'])];
     }
 }
 ```
 
-### Form Request Example
+| Property or method | Default | Meaning |
+| --- | --- | --- |
+| `$id` / `id()` | kebab-cased class name without `Step` (`calculator`) | Identifies the step within the wizard and in URLs. |
+| `$title` / `title()` | headline of the class name (`Calculator`) | Shown in navigation. Override `title()` to translate it. |
+| `$formRequest` | `null` | The form request that validates the input. Without one the step accepts no input. |
+| `$optional` | `false` | The visitor may skip the step. |
+| `$displayOnly` | `false` | The step only shows information (a confirmation page). |
+| `$dependencies` | `[]` | Step classes that must be finished first; see [reopening](#dependencies-and-reopening). |
+| `shouldSkip(State $state)` | `false` | Leaves the step out of the flow for this state; see [conditional steps](#conditional-steps). |
+| `handle()` | stores the validated data | Called through the container with `$data` (and `$wizard`). Returns the array to store, or nothing to store the validated data. |
+
+Generate one with `php artisan wizard:make-step CalculatorStep --wizard=OrderWizard`.
+
+## Validation
+
+`process()` validates the step's input exactly like Laravel validates a type-hinted form request.
+
+- **The whole lifecycle runs:** `prepareForValidation()`, `authorize()`, the rules, the `after()` hooks and
+  `passedValidation()`.
+- **The request knows the context:** `$this->user()` and `$this->route()` work, and `$this->input()` contains the
+  submitted data.
+- **Only `validated()` data is stored.**
+- **Failures throw Laravel's exceptions:** a `ValidationException` (422 for JSON, otherwise a redirect back with errors)
+  or an `AuthorizationException` (403).
 
 ```php
-<?php
-
-namespace App\Http\Requests\Wizards;
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class PersonalInfoRequest extends FormRequest
+class PersonalDataRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'regex:/^[0-9]{10}$/'],
-            'date_of_birth' => ['required', 'date', 'before:today'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'email.unique' => 'This email is already registered.',
-            'phone.regex' => 'Phone number must be 10 digits.',
+            'email' => ['required', 'email'],
         ];
     }
 }
 ```
 
----
-
-## Optional Steps
-
-Make a step optional by passing `isOptional: true`:
+`process()` accepts the request itself, which keeps uploaded files, or a plain array:
 
 ```php
-public function __construct()
-{
-    parent::__construct(
-        id: 'newsletter',
-        title: 'Newsletter Preferences',
-        order: 3,
-        isOptional: true, // Users can skip this step
-        canSkip: true
-    );
-}
-
-public function getFormRequest(): ?string
-{
-    return null; // No validation for optional step
-}
+$wizard->process('personal-data', $request);
+$wizard->process('personal-data', ['name' => 'Jane', 'email' => 'jane@example.com']);
 ```
 
-{: .note }
-> **Smart Defaults**: Generated step constructors automatically omit `isOptional: false` and `canSkip: false` for cleaner code. Only include these parameters when set to `true`.
+Uploaded files reach `handle()` as `UploadedFile` objects. Store them there and return their paths, because the state
+must stay serialisable.
 
----
-
-## Conditional Steps
-
-Skip steps based on wizard data:
+## Moving through the wizard
 
 ```php
-public function shouldSkip(array $wizardData): bool
+$wizard->process('calculator', $request);   // validate, store, move on
+$wizard->skip('newsletter');                // only optional steps
+$wizard->goTo('calculator');                // move back to an accessible step
+$wizard->current();                         // the step the visitor should be on
+$wizard->next('calculator');                // relative to any step, or to the current one
+$wizard->previous();
+$wizard->firstUnfinished();                 // where to resume
+$wizard->canAccess('summary');
+```
+
+A step is accessible when it takes part in the flow, its dependencies are finished, and every required step before it is
+finished. Optional and display-only steps never block the steps after them. Processing or skipping a step the visitor
+may not open throws `StepNotAccessibleException` (403).
+
+## Optional steps
+
+```php
+class NewsletterStep extends Step
 {
-    // Skip billing if user selected free plan
-    return $wizardData['plan_type'] === 'free';
+    protected bool $optional = true;
 }
 ```
 
----
+The visitor may `skip()` it. Skipped steps count as finished for progress and completion.
 
-## Step Dependencies
+## Conditional steps
 
-Require other steps to be completed first:
+Leave a step out of the flow based on the state:
 
 ```php
-public function getDependencies(): array
+class BillingStep extends Step
 {
-    // This step requires personal-info and address to be completed
-    return ['personal-info', 'address'];
-}
-```
-
----
-
-## Processing Step Data
-
-The `process()` method is called after validation:
-
-```php
-public function process(StepData $data): StepResult
-{
-    try {
-        // Access validated data
-        $name = $data->get('name');
-        $email = $data->get('email');
-        
-        // Your business logic
-        User::create([
-            'name' => $name,
-            'email' => $email,
-        ]);
-        
-        // Return success
-        return StepResult::success('User created successfully!');
-        
-    } catch (\Exception $e) {
-        // Return failure with error message
-        return StepResult::failure($e->getMessage());
-    }
-}
-```
-
-### StepResult Options
-
-```php
-// Success
-return StepResult::success('Step completed!');
-
-// Success with redirect
-return StepResult::redirect('/custom-route', ['key' => 'value']);
-
-// Failure
-return StepResult::failure('Something went wrong');
-
-// Failure with validation errors
-return StepResult::failure('Validation failed', [
-    'email' => ['Email already exists'],
-]);
-```
-
----
-
-## Accessing Wizard Data
-
-Get data from previous steps:
-
-```php
-use Invelity\WizardPackage\Traits\HasWizardSteps;
-
-class PaymentStep extends AbstractStep
-{
-    use HasWizardSteps;
-    
-    public function process(StepData $data): StepResult
+    public function shouldSkip(State $state): bool
     {
-        // Get data from previous steps
-        $userEmail = $this->getWizardData('personal-info.email');
-        $planType = $this->getWizardData('subscription.plan');
-        
-        // Process payment
-        // ...
-        
-        return StepResult::success();
+        return ($state->data('plan')['plan'] ?? null) === 'free';
     }
 }
 ```
 
----
+A step left out does not appear in the navigation, does not count towards progress and never blocks completion.
 
-## Step Lifecycle Events
+## Dependencies and reopening
 
-Listen to step events:
+A step can depend on earlier steps:
 
 ```php
-// In your EventServiceProvider
-protected $listen = [
-    \Invelity\WizardPackage\Events\StepCompleted::class => [
-        SendStepCompletedNotification::class,
-    ],
-    \Invelity\WizardPackage\Events\StepSkipped::class => [
-        LogSkippedStep::class,
-    ],
-];
-```
-
-Available events:
-- `WizardStarted` - When wizard is initialized
-- `StepCompleted` - When a step is successfully completed
-- `StepSkipped` - When an optional step is skipped
-- `WizardCompleted` - When all steps are finished
-
----
-
-## Blade Components
-
-For Blade wizards, use pre-built components for rapid development:
-
-### Layout Component
-
-Provides base wizard layout with title and content slot:
-
-```blade
-<x-wizard::layout title="User Onboarding">
-    <!-- Your wizard content here -->
-</x-wizard::layout>
-```
-
-### Progress Bar Component
-
-Shows wizard completion progress:
-
-```blade
-<x-wizard::progress-bar 
-    :steps="$steps" 
-    :currentStep="$currentStep" 
-/>
-```
-
-The component automatically calculates completion percentage based on current step position.
-
-### Form Wrapper Component
-
-Wraps your form with CSRF protection and error handling:
-
-```blade
-<x-wizard::form-wrapper :action="route('wizard.onboarding.store', $step->id)">
-    <!-- Your form fields -->
-    <input type="text" name="name" value="{{ old('name') }}" />
-    <input type="email" name="email" value="{{ old('email') }}" />
-    
-    <!-- Navigation buttons -->
-</x-wizard::form-wrapper>
-```
-
-Automatically displays validation errors at the top of the form.
-
-### Step Navigation Component
-
-Provides back/next/complete buttons:
-
-```blade
-<x-wizard::step-navigation 
-    :canGoBack="$canGoBack"
-    :canGoForward="$canGoForward"
-    :isLastStep="$isLastStep"
-    :previousStep="$previousStep ?? null"
-    :nextStep="$nextStep ?? null"
-    backText="Previous"
-    nextText="Next"
-    completeText="Complete"
-/>
-```
-
-### Complete Example
-
-```blade
-<x-wizard::layout title="User Onboarding">
-    <x-wizard::progress-bar :steps="$steps" :currentStep="$currentStep" />
-    
-    <x-wizard::form-wrapper :action="route('wizard.onboarding.store', 'personal-info')">
-        <h2>Personal Information</h2>
-        
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" value="{{ old('name') }}" />
-        </div>
-        
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" />
-        </div>
-        
-        <x-wizard::step-navigation 
-            :canGoBack="false"
-            :canGoForward="true"
-            :isLastStep="false"
-            :nextStep="$nextStep"
-        />
-    </x-wizard::form-wrapper>
-</x-wizard::layout>
-```
-
-**Customization:**
-
-Publish components to customize styling:
-
-```bash
-php artisan vendor:publish --tag="wizard-components"
-```
-
-Components will be available in `resources/views/vendor/wizard-package/components/`.
-
----
-
-## Vue 3 Composable
-
-For API/SPA wizards, use the `useWizard()` composable:
-
-### Installation
-
-Publish assets:
-
-```bash
-php artisan vendor:publish --tag="wizard-assets"
-```
-
-Import in your Vue component:
-
-```typescript
-import { useWizard } from '@/composables/useWizard';
-
-export default {
-    setup() {
-        const { 
-            state, 
-            currentStep, 
-            canGoBack, 
-            canGoForward, 
-            isLastStep,
-            initialize, 
-            submitStep, 
-            goToStep 
-        } = useWizard('onboarding');
-        
-        return { 
-            state, 
-            currentStep, 
-            canGoBack, 
-            canGoForward, 
-            isLastStep,
-            initialize, 
-            submitStep, 
-            goToStep 
-        };
-    }
-};
-```
-
-### Reactive State
-
-```typescript
-interface WizardState {
-    currentStepIndex: number;
-    steps: WizardStep[];
-    formData: Record<string, any>;
-    errors: Record<string, string[]>;
-    loading: boolean;
-    completed: boolean;
-    wizardData: any;
-}
-```
-
-### Methods
-
-#### Initialize Wizard
-
-```typescript
-await initialize();
-```
-
-#### Submit Step
-
-```typescript
-const result = await submitStep({
-    name: 'John Doe',
-    email: 'john@example.com'
-});
-
-if (result.success) {
-    console.log('Step completed!', result.nextStep);
-} else {
-    console.error('Validation errors:', result.errors);
-}
-```
-
-#### Navigate to Step
-
-```typescript
-await goToStep('personal-info');
-```
-
-#### Form Helpers
-
-```typescript
-// Set field value
-setFieldValue('email', 'john@example.com');
-
-// Get field error
-const emailError = getFieldError('email');
-
-// Clear all errors
-clearErrors();
-```
-
-### Complete Vue Example
-
-```vue
-<template>
-    <div v-if="!state.loading" class="wizard">
-        <div class="progress">
-            Step {{ state.currentStepIndex + 1 }} of {{ state.steps.length }}
-            <progress :value="state.currentStepIndex + 1" :max="state.steps.length"></progress>
-        </div>
-        
-        <h2>{{ currentStep?.title }}</h2>
-        
-        <form @submit.prevent="handleSubmit">
-            <div v-if="currentStep?.id === 'personal-info'">
-                <input v-model="formData.name" type="text" placeholder="Name" />
-                <span v-if="getFieldError('name')" class="error">
-                    {{ getFieldError('name') }}
-                </span>
-                
-                <input v-model="formData.email" type="email" placeholder="Email" />
-                <span v-if="getFieldError('email')" class="error">
-                    {{ getFieldError('email') }}
-                </span>
-            </div>
-            
-            <div class="navigation">
-                <button v-if="canGoBack" type="button" @click="goToStep(previousStep.id)">
-                    Previous
-                </button>
-                <button type="submit" :disabled="state.loading">
-                    {{ isLastStep ? 'Complete' : 'Next' }}
-                </button>
-            </div>
-        </form>
-    </div>
-</template>
-
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useWizard } from '@/composables/useWizard';
-
-const { 
-    state, 
-    currentStep, 
-    canGoBack, 
-    isLastStep,
-    initialize, 
-    submitStep, 
-    goToStep,
-    setFieldValue,
-    getFieldError
-} = useWizard('onboarding');
-
-const formData = ref<Record<string, any>>({});
-
-onMounted(async () => {
-    await initialize();
-});
-
-const handleSubmit = async () => {
-    const result = await submitStep(formData.value);
-    if (result.success) {
-        formData.value = {};
-    }
-};
-</script>
-```
-
----
-
-## Automatic Step Reordering
-
-When you add a new step with a specific order, existing steps are automatically reordered:
-
-```bash
-# Existing steps: Step1 (order: 1), Step3 (order: 2)
-php artisan wizard:make-step Onboarding NewStep --order=2
-
-# Result:
-# - Step1 (order: 1)
-# - NewStep (order: 2) ← newly inserted
-# - Step3 (order: 3) ← automatically incremented
-```
-
-The package scans the `Steps/` directory and updates step order properties automatically. No manual file editing required!
-
----
-
-## Using the Facade
-
-### Initialize a Wizard
-
-```php
-use Invelity\WizardPackage\Facades\Wizard;
-
-// Initialize
-Wizard::initialize('onboarding');
-
-// Get current step
-$step = Wizard::getCurrentStep();
-
-// Process step
-$result = Wizard::processStep('personal-info', [
-    'name' => 'John Doe',
-    'email' => 'john@example.com',
-]);
-
-// Navigate
-$nextStep = Wizard::getNextStep();
-$prevStep = Wizard::getPreviousStep();
-
-// Check progress
-$progress = Wizard::getProgress();
-echo $progress->completionPercentage(); // 33%
-
-// Complete wizard
-Wizard::complete();
-```
-
----
-
-## Frontend Integration
-
-### Vue 3 with useWizard()
-
-**Recommended approach for SPA:**
-
-```vue
-<script setup>
-import { useWizard } from '@/composables/useWizard';
-
-const { state, currentStep, submitStep, initialize } = useWizard('onboarding');
-
-onMounted(() => initialize());
-
-const handleSubmit = async (formData) => {
-    const result = await submitStep(formData);
-    if (result.success) {
-        // Navigate to next step automatically
-    }
-};
-</script>
-```
-
-### Manual Fetch API (Alternative)
-
-If you prefer manual control or use React/Angular:
-
-```javascript
-// Fetch wizard state
-const response = await fetch('/wizard/onboarding/personal-info');
-const { step, navigation, progress } = await response.json();
-
-// Submit step data
-const result = await fetch('/wizard/onboarding/personal-info', {
-    method: 'POST',
-    headers: { 
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-    },
-    body: JSON.stringify({
-        name: 'John Doe',
-        email: 'john@example.com'
-    })
-});
-
-const { success, next_step, errors } = await result.json();
-```
-
-### API Response Format
-
-```json
+class SummaryStep extends Step
 {
-    "success": true,
-    "message": "Step completed successfully",
-    "next_step": {
-        "id": "address",
-        "title": "Address Information",
-        "url": "/wizard/onboarding/address"
-    },
-    "progress": {
-        "completed": 1,
-        "total": 3,
-        "percentage": 33,
-        "is_complete": false
-    },
-    "navigation": {
-        "can_go_back": true,
-        "can_go_forward": true,
-        "previous_step": {
-            "id": "personal-info",
-            "title": "Personal Information"
-        },
-        "next_step": {
-            "id": "payment",
-            "title": "Payment Details"
-        }
-    }
+    protected array $dependencies = [CalculatorStep::class, PersonalDataStep::class];
 }
 ```
 
----
+The summary opens only once both are finished. When the visitor processes the calculator again **with different data**,
+the summary is reopened: it must be submitted again. Its previous data is kept for prefilling, and `StepReopened` is
+dispatched. Processing the calculator with the same data changes nothing.
 
-## Advanced: Custom Wizard Class
-
-You can extend the base wizard for custom behavior:
+To reopen a step and its dependents yourself, call `reopen()`. It also moves the visitor there:
 
 ```php
-<?php
+$wizard->reopen('calculator');
+```
 
-namespace App\Wizards;
+## Display-only steps
 
-use Invelity\WizardPackage\Wizard;
+A confirmation page, a "what happens next" page or an info screen:
 
-class OnboardingWizard extends Wizard
+```php
+class ConfirmationStep extends Step
 {
-    public function onComplete(): void
-    {
-        // Custom logic when wizard completes
-        $user = auth()->user();
-        $user->update(['onboarding_completed' => true]);
-        
-        // Send welcome email
-        Mail::to($user)->send(new WelcomeEmail());
-    }
-    
-    public function onStepComplete(string $stepId): void
-    {
-        // Custom logic after each step
-        activity()
-            ->causedBy(auth()->user())
-            ->log("Completed step: {$stepId}");
-    }
+    protected bool $displayOnly = true;
 }
 ```
 
----
+It takes no input, so processing it is refused, and it never counts towards progress or completion. It becomes
+accessible once the required steps before it are finished. After `complete()` the visitor lands on the last display-only
+step.
 
-## Next Steps
+## Completing
 
-- [View API Reference](api-reference)
-- [See Real Examples](examples)
-- [Learn Testing](testing)
+```php
+$data = $wizard->complete();
+```
+
+- **Requirement:** every required step must be finished; otherwise a `ValidationException` lists the missing steps.
+- **On success:** `WizardCompleted` is dispatched with the data of every step.
+- **Afterwards:** a completed wizard refuses further input with `WizardAlreadyCompletedException` (409), so completing
+  twice cannot create a duplicate order. `reopen()` makes it editable again; `reset()` starts over.
+
+## Metadata
+
+Keep data that belongs to the wizard but not to a step, such as the chosen carrier or a basket, as metadata:
+
+```php
+$wizard->putMetadata('carrier', 'gls');
+$wizard->putMetadata(['parcels.0.weight' => 2.5, 'cash_on_delivery' => true]);
+$wizard->metadata('parcels.0.weight');       // 2.5
+$wizard->forgetMetadata('cash_on_delivery');
+$wizard->start(['source' => 'landing-page']); // initial metadata, only when the wizard starts
+```
+
+## Events
+
+| Event | When | Payload |
+| --- | --- | --- |
+| `WizardStarted` | the state is stored for the first time | `wizard`, `scope`, `metadata` |
+| `StepCompleted` | a step was processed | `wizard`, `scope`, `step`, `data`, `percentage` |
+| `StepSkipped` | an optional step was skipped | `wizard`, `scope`, `step` |
+| `StepReopened` | a finished step was reopened | `wizard`, `scope`, `step` |
+| `WizardCompleted` | the wizard was completed | `wizard`, `scope`, `data` |
+| `WizardReset` | the state was removed | `wizard`, `scope` |
+
+`wizard` is the wizard class, so a queued listener can load it again:
+
+```php
+public function handle(WizardCompleted $event): void
+{
+    $wizard = Wizard::for($event->wizard, $event->scope);
+}
+```

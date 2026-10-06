@@ -6,133 +6,51 @@ nav_order: 2
 
 # Installation
 
-Get started with Laravel Headless Wizard in just a few minutes.
-
----
-
 ## Requirements
 
 - PHP 8.4 or higher
-- Laravel 11, 12 or 13
+- Laravel 12 or 13
 
----
-
-## Step 1: Install via Composer
+## Install the package
 
 ```bash
 composer require invelity/laravel-headless-wizard
 ```
 
----
+The service provider and the `Wizard` facade are discovered automatically.
 
-## Step 2: Publish Configuration
+## Choose a store
+
+The state of a wizard lives in the **session** by default, so there is nothing else to set up. Pick another store when
+the wizard must outlive the session or follow a user across devices.
+
+| Store | Use it when | Setup |
+| --- | --- | --- |
+| `session` | progress belongs to one browser session (default) | none |
+| `cache` | many servers share a cache and sessions are short | `WIZARD_STORE=cache`, optionally `WIZARD_CACHE_STORE=redis` |
+| `database` | progress must survive for days, or you want to query or prune it | publish and run the migration, `WIZARD_STORE=database` |
+| `array` | tests | `config(['wizard.default' => 'array'])` |
+
+For the database store:
 
 ```bash
-php artisan vendor:publish --tag="wizard-config"
-```
-
-This creates `config/wizard.php` where you can configure storage, routes, and behavior.
-
----
-
-## Step 3: Publish Migrations (Optional)
-
-If you want to use database storage instead of session:
-
-```bash
-php artisan vendor:publish --tag="wizard-migrations"
+php artisan vendor:publish --tag=wizard-migrations
 php artisan migrate
 ```
 
----
+Schedule the removal of abandoned states:
 
-## Step 4: Publish Assets (Optional)
+```php
+// routes/console.php
+Schedule::command('wizard:prune --days=30')->daily();
+```
 
-### Blade Components
-
-Publish Blade components for customization:
+## Publish what you want to change
 
 ```bash
-php artisan vendor:publish --tag="wizard-components"
+php artisan vendor:publish --tag=wizard-config        # config/wizard.php
+php artisan vendor:publish --tag=wizard-translations  # lang/vendor/wizard
+php artisan vendor:publish --tag=wizard-stubs         # stubs/*.stub used by the generators
 ```
 
-Components will be published to `resources/views/vendor/wizard-package/components/`.
-
-### Vue 3 Composable
-
-Publish Vue composable and TypeScript definitions:
-
-```bash
-php artisan vendor:publish --tag="wizard-assets"
-```
-
-Assets will be published to `resources/js/composables/` and `resources/js/types/`.
-
-### Command Stubs
-
-Publish command stubs for customization:
-
-```bash
-php artisan vendor:publish --tag="wizard-stubs"
-```
-
-Stubs will be published to `stubs/vendor/wizard/`.
-
----
-
-## Verify Installation
-
-Create your first wizard to verify everything is working:
-
-```bash
-php artisan wizard:make Onboarding
-```
-
-**Interactive prompts:**
-```
- What type of wizard do you want to create?
-  [blade] Blade (Traditional server-side rendering)
-  [api] API (Headless JSON responses)
-  [livewire] Livewire (Reactive components)
-  [inertia] Inertia.js (SPA with Vue/React)
- > blade
-
-ℹ Wizard created successfully!
-✎ Wizard class: app/Wizards/OnboardingWizard/Onboarding.php
-✎ Controller: app/Http/Controllers/OnboardingController.php
-✎ Views: resources/views/wizards/onboarding/
-
-✎ Next steps:
-  • Generate first step: php artisan wizard:make-step Onboarding
-  • Wizard will be auto-discovered on next request
-```
-
-For API/SPA wizards, you'll also see:
-```
-⚠ CSRF Protection Notice
-✎ For API/SPA wizards, add wizard routes to CSRF exceptions:
-✎ app/Http/Middleware/VerifyCsrfToken.php
-✎ protected $except = ['api/wizards/onboarding/*'];
-```
-
----
-
-## Quick Setup Guide
-
-For a complete step-by-step guide with Blade and Vue examples, see the [Setup Guide](https://github.com/invelity/laravel-headless-wizard/blob/main/SETUP.md) in the demo repository.
-
-This includes:
-- Complete wizard structure setup
-- Blade implementation with views
-- Vue.js SPA implementation
-- CSRF configuration
-- Environment setup
-- Troubleshooting
-
----
-
-## Next Steps
-
-- [Configure your wizard](configuration)
-- [Create wizard steps](creating-wizards)
-- [View examples](examples)
+`php artisan about` shows the installed version and the default store.

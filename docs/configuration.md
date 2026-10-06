@@ -6,264 +6,115 @@ nav_order: 3
 
 # Configuration
 
-Learn how to configure Laravel Headless Wizard for your application.
-
----
-
-## Configuration File
-
-After publishing the config, you'll find `config/wizard.php` with the following options:
+Publish the configuration file with `php artisan vendor:publish --tag=wizard-config`.
 
 ```php
 return [
-    'storage' => [
-        'driver' => 'session', // session, database, or cache
-        'ttl' => 3600, // Cache TTL in seconds
-    ],
+    'default' => env('WIZARD_STORE', 'session'),
 
-    'routes' => [
-        'enabled' => true,
-        'prefix' => 'wizard',
-        'middleware' => ['web'],
-    ],
-
-    'navigation' => [
-        'allow_jump' => false, // Allow jumping to any completed step
-        'show_all_steps' => true, // Show all steps in navigation
-    ],
-
-    'validation' => [
-        'validate_on_navigate' => true, // Validate when navigating back
-        'marks_completed' => true, // Mark step as completed after validation
-    ],
-
-    'events' => [
-        'dispatch' => true, // Fire lifecycle events
-        'log_progress' => false,
-    ],
-
-    'cleanup' => [
-        'abandoned_after_days' => 30,
-        'auto_cleanup' => false, // Enable scheduled cleanup
+    'stores' => [
+        'session' => ['driver' => 'session', 'prefix' => 'wizard_'],
+        'cache' => ['driver' => 'cache', 'store' => env('WIZARD_CACHE_STORE'), 'prefix' => 'wizard:', 'ttl' => 60 * 60 * 24],
+        'database' => ['driver' => 'database', 'connection' => env('WIZARD_DB_CONNECTION'), 'table' => 'wizard_states', 'encrypt' => true],
+        'array' => ['driver' => 'array'],
     ],
 ];
 ```
 
-**Note:** Wizards and steps are **auto-discovered** from `app/Wizards/*Wizard/` directories. No manual registration needed!
+## Stores
 
----
+| Driver | Options | Notes |
+| --- | --- | --- |
+| `session` | `prefix` | Keys the state as `{prefix}{wizard name}`. The session already belongs to one visitor, so the scope is not part of the key. |
+| `cache` | `store`, `prefix`, `ttl` | `store` is a cache store from `config/cache.php` (null for the default). `ttl` is in seconds; `null` keeps the state forever. |
+| `database` | `connection`, `table`, `encrypt` | One row per wizard and scope. The state is encrypted with the application key unless `encrypt` is `false`. Supports `wizard:prune`. |
+| `array` | — | Keeps the state in memory for the lifetime of the process. Meant for tests. |
 
-## Storage Drivers
-
-### Session Storage (Default)
-
-Stores wizard data in the user's session. Best for simple wizards.
+A wizard can use another store than the default:
 
 ```php
-'storage' => [
-    'driver' => 'session',
+class OrderWizard extends Wizard
+{
+    protected ?string $store = 'database';
+}
+```
+
+### Custom stores
+
+A store implements `Invelity\WizardPackage\Contracts\Store`, and `PrunableStore` if it can remove old states:
+
+```php
+use Invelity\WizardPackage\Contracts\Store;
+
+final class RedisJsonStore implements Store
+{
+    public function get(string $wizard, string $scope): ?array { /* ... */ }
+    public function put(string $wizard, string $scope, array $state): void { /* ... */ }
+    public function forget(string $wizard, string $scope): void { /* ... */ }
+}
+```
+
+Register the driver in a service provider and reference it from the configuration:
+
+```php
+Wizard::extend('redis-json', fn (Application $app, array $config) => new RedisJsonStore($config['connection']));
+```
+
+```php
+'stores' => [
+    'redis' => ['driver' => 'redis-json', 'connection' => 'default'],
 ],
 ```
 
-**Important:** Ensure your `.env` uses a persistent session driver:
+## Scope
 
-```env
-SESSION_DRIVER=file  # or database, redis
-# DO NOT use 'array' - state will be lost between requests
-```
+The scope tells the cache and database stores whose wizard they hold. By default it is:
 
-**Pros:**
-- No database setup required
-- Fast access
-- Automatic cleanup on session end
+1. the authenticated user (`App\Models\User|42`), or else
+2. a random token kept in the session (`session|…`), which survives `session()->regenerate()` at login.
 
-**Cons:**
-- Data lost when session expires
-- Not suitable for long-running wizards
-- Can't resume across devices
-
-### Database Storage
-
-Stores wizard data in the database. Best for persistent wizards.
+Resolve it differently, for example per team in an area only signed-in users reach:
 
 ```php
-'storage' => [
-    'driver' => 'database',
-],
+Wizard::resolveScopeUsing(fn (Request $request) => $request->user()->currentTeam);
 ```
 
-**Pros:**
-- Persistent across sessions
-- Can resume on different devices
-- Queryable for analytics
+The resolver must return a model, an authenticatable user, a non-empty string, an integer or a `Stringable` value.
+Models become `{morph class}|{key}`; the other values are used as they are.
 
-**Cons:**
-- Requires database table
-- Slightly slower than session/cache
-
-**Setup:**
-```bash
-php artisan vendor:publish --tag="wizard-migrations"
-php artisan migrate
-```
-
-{: .important }
-> **Security Note:** Step data in the `wizard_progress` table is automatically **encrypted** using Laravel's `encrypted:array` cast with your `APP_KEY`. This protects sensitive user data while the wizard is in progress. Data is automatically decrypted when retrieved. The `step_data` column uses `TEXT` type (not `JSON`) to store the encrypted string.
->
-> **Important for Production:**
-> - Keep your `APP_KEY` secure and backed up
-> - If you rotate `APP_KEY`, existing wizard progress will become unreadable
-> - Consider clearing old wizard progress before key rotation
-> - For guest users, wizard data is tied to session - no `user_id` foreign key constraint
-
-### Cache Storage
-
-Stores wizard data in your cache driver. Best for high-performance needs.
+Load another visitor's wizard, for example in a job or an admin screen, by passing the scope explicitly:
 
 ```php
-'storage' => [
-    'driver' => 'cache',
-    'ttl' => 3600, // Time to live in seconds
-],
+$wizard = Wizard::for(OrderWizard::class, $user);
 ```
 
-**Pros:**
-- Very fast (especially with Redis/Memcached)
-- Automatic expiration
-- Scales horizontally
+Explicit scopes need the cache or database store. The session store only ever sees the current visitor's session.
 
-**Cons:**
-- May expire unexpectedly
-- Not queryable
-- Requires cache setup
+## Step URLs
 
----
+Navigation items carry a URL when the application can provide one. The wizard looks for it in this order:
 
-## Navigation Options
-
-### Allow Jump Navigation
-
-Allow users to jump to any completed step:
+1. the wizard's own `stepUrl()` method;
+2. `Wizard::resolveUrlsUsing()`;
+3. the routes registered with `Route::wizard()`;
+4. otherwise `null`.
 
 ```php
-'navigation' => [
-    'allow_jump' => true,
-],
+class OrderWizard extends Wizard
+{
+    protected function stepUrl(Step $step): ?string
+    {
+        return route('order.step', $step->id());
+    }
+}
 ```
 
-### Show All Steps
+## Translations
 
-Control whether all steps are visible in navigation:
+The messages the package shows to visitors live in `wizard::messages` and ship in English and Slovak. Publish them with
+`--tag=wizard-translations` to change them or add a language.
 
-```php
-'navigation' => [
-    'show_all_steps' => false, // Only show accessible steps
-],
-```
+## Laravel Octane
 
----
-
-## Validation Options
-
-### Validate on Navigate Back
-
-Require validation when navigating to previous steps:
-
-```php
-'validation' => [
-    'validate_on_navigate' => true,
-],
-```
-
-### Mark as Completed
-
-Automatically mark steps as completed after successful validation:
-
-```php
-'validation' => [
-    'marks_completed' => true,
-],
-```
-
----
-
-## Route Configuration
-
-### Custom Prefix
-
-Change the URL prefix for wizard routes:
-
-```php
-'routes' => [
-    'prefix' => 'my-wizard', // /my-wizard/checkout/step-1
-],
-```
-
-### Middleware
-
-Add middleware to wizard routes:
-
-```php
-'routes' => [
-    'middleware' => ['web', 'auth', 'verified'],
-],
-```
-
-### Disable Routes
-
-If you want to handle routing yourself:
-
-```php
-'routes' => [
-    'enabled' => false,
-],
-```
-
----
-
-## Events
-
-### Enable/Disable Events
-
-Control whether lifecycle events are fired:
-
-```php
-'events' => [
-    'dispatch' => false, // Disable all events
-    'log_progress' => true, // Log wizard progress
-],
-```
-
-Available events:
-- `WizardStarted`
-- `StepCompleted`
-- `StepSkipped`
-- `WizardCompleted`
-
----
-
-## Environment-Specific Configuration
-
-You can override configuration in your `.env` file:
-
-```env
-WIZARD_STORAGE_DRIVER=database
-WIZARD_ALLOW_JUMP_NAVIGATION=true
-WIZARD_FIRE_EVENTS=false
-```
-
-Then reference in config:
-
-```php
-'storage' => [
-    'driver' => env('WIZARD_STORAGE_DRIVER', 'session'),
-],
-```
-
----
-
-## Next Steps
-
-- [Create your first wizard](creating-wizards)
-- [View API reference](api-reference)
-- [See examples](examples)
+The wizard manager keeps no state between requests, and the provider points it at every request's sandbox. Resolve
+wizards per request (inject them, or call `Wizard::for()`), and never store a wizard instance in a singleton.
