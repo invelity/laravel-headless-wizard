@@ -70,6 +70,9 @@ class OrderWizard extends Wizard
 }
 ```
 
+`php artisan wizard:make-step CalculatorStep --wizard=OrderWizard --view` creates the step's view,
+`resources/views/order/calculator.blade.php`, which `view("order.{$step}")` renders.
+
 {% raw %}
 ```blade
 {{-- resources/views/order/partials/navigation.blade.php --}}

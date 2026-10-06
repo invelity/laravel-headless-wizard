@@ -36,6 +36,7 @@ public function store(Request $request, OrderWizard $wizard, string $step)
 - **Opt-in JSON API.** `Route::wizard('order', OrderWizard::class)` registers resource-style routes with one response
   shape. The package registers no routes by itself.
 - **Generators.** `php artisan wizard:make` and `wizard:make-step` are built on Laravel's `GeneratorCommand`.
+  `wizard:make-step --view` also creates the step's Blade view with `make:view`.
 - **Events.** `WizardStarted`, `StepCompleted`, `StepSkipped`, `StepReopened`, `WizardCompleted`, `WizardReset`.
 - **Translated messages** in English and Slovak.
 

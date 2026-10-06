@@ -90,7 +90,9 @@ class CalculatorStep extends Step
 | `shouldSkip(State $state)` | `false` | Leaves the step out of the flow for this state; see [conditional steps](#conditional-steps). |
 | `handle()` | stores the validated data | Called through the container with `$data` (and `$wizard`). Returns the array to store, or nothing to store the validated data. |
 
-Generate one with `php artisan wizard:make-step CalculatorStep --wizard=OrderWizard`.
+Generate one with `php artisan wizard:make-step CalculatorStep --wizard=OrderWizard`. Add `--view` to also create its
+Blade view with Laravel's `make:view`. The view is named after the wizard and the step (`order.calculator`, so
+`resources/views/order/calculator.blade.php`), and `--view=checkout.payment` picks another name.
 
 ## Validation
 
