@@ -14,6 +14,12 @@
         "validation"
     ],
     "homepage": "https://github.com/invelity/laravel-headless-wizard",
+    "support": {
+        "issues": "https://github.com/invelity/laravel-headless-wizard/issues",
+        "source": "https://github.com/invelity/laravel-headless-wizard",
+        "docs": "https://invelity.github.io/laravel-headless-wizard/",
+        "security": "https://github.com/invelity/laravel-headless-wizard/security/policy"
+    },
     "license": "MIT",
     "authors": [
         {
@@ -31,12 +37,10 @@
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.14",
         "nunomaduro/collision": "^8.8",
-        "nunomaduro/phpinsights": "*",
         "orchestra/testbench": "^9.0.0||^10.0.0||^11.0.0",
         "pestphp/pest": "^3.0||^4.0",
         "pestphp/pest-plugin-arch": "^3.0||^4.0",
         "pestphp/pest-plugin-laravel": "^3.0||^4.0",
-        "phpmetrics/phpmetrics": "^2.9",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0"
@@ -65,8 +69,7 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "phpstan/extension-installer": true
         }
     },
     "extra": {
@@ -77,6 +80,9 @@
             "aliases": {
                 "Wizard": "Invelity\\WizardPackage\\Facades\\Wizard"
             }
+        },
+        "branch-alias": {
+            "dev-main": "2.x-dev"
         }
     },
     "minimum-stability": "dev",

@@ -18,7 +18,7 @@
     backupStaticProperties="false"
 >
     <testsuites>
-        <testsuite name="WebSystem Test Suite">
+        <testsuite name="Laravel Headless Wizard">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
