@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\File;
 use Invelity\WizardPackage\Facades\Wizard;
 use Orchestra\Testbench\Concerns\InteractsWithPublishedFiles;
 
@@ -50,6 +51,7 @@ it('does not overwrite a wizard unless forced', function () {
 });
 
 it('prefers a published stub', function () {
+    File::ensureDirectoryExists(base_path('stubs'));
     file_put_contents(base_path('stubs/wizard.stub'), "<?php\n\nnamespace {{ namespace }};\n\n// custom stub\nclass {{ class }} {}\n");
 
     $this->artisan('wizard:make', ['name' => 'OrderWizard'])->assertSuccessful();
@@ -102,7 +104,7 @@ it('mirrors nested step names in the form request', function () {
 });
 
 it('keeps an existing form request unless forced', function () {
-    @mkdir(app_path('Http/Requests/Wizards'), recursive: true);
+    File::ensureDirectoryExists(app_path('Http/Requests/Wizards'));
     file_put_contents(app_path('Http/Requests/Wizards/SummaryRequest.php'), '<?php // edited');
 
     $this->artisan('wizard:make-step', ['name' => 'SummaryStep'])
