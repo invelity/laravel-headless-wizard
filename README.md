@@ -14,8 +14,6 @@ A powerful **headless** multi-step wizard package for Laravel. Build complex, mu
 
 - 🚀 **Zero Frontend Lock-in** - Pure JSON API for any framework
 - ⚡ **Interactive Generators** - Beautiful CLI with Laravel Prompts for wizard creation
-- 🎨 **Pre-built Components** - Blade components for rapid prototyping (Layout, ProgressBar, Navigation)
-- 🔄 **Vue 3 Composable** - useWizard() composable with TypeScript definitions for SPA integration
 - 🔀 **Multi-Type Wizards** - Generate Blade, API, Livewire, or Inertia wizards
 - ✅ **Laravel-Native Validation** - Uses FormRequest classes with automatic integration
 - 💾 **Flexible Storage** - Session, database, or cache adapters
