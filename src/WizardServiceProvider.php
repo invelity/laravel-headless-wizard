@@ -11,12 +11,15 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Invelity\WizardPackage\Console\PruneCommand;
 use Invelity\WizardPackage\Contracts\Factory;
 use Invelity\WizardPackage\Exceptions\StepNotAccessibleException;
 use Invelity\WizardPackage\Exceptions\StepNotFoundException;
 use Invelity\WizardPackage\Exceptions\WizardAlreadyCompletedException;
+use Invelity\WizardPackage\Http\Middleware\EnsureStepIsAccessible;
+use Invelity\WizardPackage\Routing\WizardRouteRegistrar;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -51,6 +54,7 @@ final class WizardServiceProvider extends ServiceProvider
     {
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'wizard');
 
+        $this->registerRouting();
         $this->registerExceptionMapping();
         $this->registerOctaneListeners();
 
@@ -58,6 +62,23 @@ final class WizardServiceProvider extends ServiceProvider
             $this->registerPublishing();
             $this->registerCommands();
         }
+    }
+
+    /**
+     * Register the Route::wizard() macro and the step access middleware.
+     *
+     * The package registers no routes of its own; applications opt in per wizard.
+     */
+    private function registerRouting(): void
+    {
+        $app = $this->app;
+
+        Router::macro('wizard', function (string $uri, string $wizard) use ($app): array {
+            /** @var class-string<Wizard> $wizard */
+            return $app->make(WizardRouteRegistrar::class)->register($uri, $wizard);
+        });
+
+        $this->app->make(Router::class)->aliasMiddleware('wizard.step', EnsureStepIsAccessible::class);
     }
 
     /**
