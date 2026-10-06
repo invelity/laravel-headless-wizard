@@ -1,0 +1,18 @@
+<?php
+
+namespace {{ namespace }};
+
+use Invelity\WizardPackage\Contracts\Step;
+use Invelity\WizardPackage\Wizard;
+
+class {{ class }} extends Wizard
+{
+    /**
+     * The steps of the wizard, in order.
+     *
+     * @var list<class-string<Step>>
+     */
+    protected array $steps = [
+        //
+    ];
+}

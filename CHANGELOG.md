@@ -22,6 +22,10 @@ All notable changes to `wizard-package` will be documented in this file.
 - Display-only steps, such as a confirmation page, which take no input and never block completion (#29).
 - `metadata()`, `putMetadata()` and `forgetMetadata()` with dot notation; `start()` with initial metadata; `goTo()`, `firstUnfinished()`, `navigation()` relative to any step, and `url()` with `Wizard::resolveUrlsUsing()` or a wizard's own `stepUrl()` (#28).
 - `wizard:prune` and the `ArrayStore` for tests (#27).
+- Generators built on Laravel's `GeneratorCommand`:
+  - `wizard:make OrderWizard` creates a wizard;
+  - `wizard:make-step SummaryStep --wizard=OrderWizard [--optional] [--display]` creates a step and its form request, and adds the step to the wizard with a sorted import.
+  - Both prompt for missing input and honour stubs published with the `wizard-stubs` tag (#33).
 
 ### Fixed
 
