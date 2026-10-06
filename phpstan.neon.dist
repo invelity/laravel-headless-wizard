@@ -1,12 +1,16 @@
-includes:
-    - phpstan-baseline.neon
-
 parameters:
     level: 5
     paths:
         - src
-        - config
         - database
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+    ignoreErrors:
+        # The store manager is a singleton that receives the application, like Laravel's own
+        # managers; WizardServiceProvider::registerOctaneListeners() points it at every new
+        # Octane sandbox, which is what this rule asks for.
+        -
+            identifier: larastan.octaneCompatibility
+            path: src/WizardServiceProvider.php
+            count: 1

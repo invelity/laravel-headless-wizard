@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
 use Invelity\WizardPackage\Commands\MakeStepCommand;
 use Invelity\WizardPackage\Commands\MakeWizardCommand;
+use Invelity\WizardPackage\Console\PruneCommand;
 use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
 use Invelity\WizardPackage\Contracts\StepFinderInterface;
 use Invelity\WizardPackage\Contracts\WizardDataInterface;
@@ -118,6 +121,8 @@ class WizardServiceProvider extends PackageServiceProvider
 
         // Register wizard discovery service
         $this->app->singleton(WizardDiscoveryService::class);
+
+        $this->app->singleton(StoreManager::class, fn (Application $app) => new StoreManager($app));
     }
 
     /**
@@ -125,11 +130,31 @@ class WizardServiceProvider extends PackageServiceProvider
      */
     public function packageBooted(): void
     {
+        $this->registerOctaneListeners();
         $this->registerMiddleware();
         $this->registerRoutes();
         $this->registerPublishableStubs();
         $this->registerDiscoveredWizards();
         $this->registerCommands();
+    }
+
+    /**
+     * Point the store manager at the application that serves the current request.
+     *
+     * Laravel Octane serves many requests with one booted application and hands every request
+     * a sandbox copy, so the singleton manager must resolve sessions from the sandbox.
+     */
+    protected function registerOctaneListeners(): void
+    {
+        $this->app->make(Dispatcher::class)->listen([
+            'Laravel\\Octane\\Events\\RequestReceived',
+            'Laravel\\Octane\\Events\\TaskReceived',
+            'Laravel\\Octane\\Events\\TickReceived',
+        ], function (object $event): void {
+            if (property_exists($event, 'sandbox') && $event->sandbox instanceof Application) {
+                $this->app->make(StoreManager::class)->setApplication($event->sandbox);
+            }
+        });
     }
 
     /**
@@ -150,6 +175,7 @@ class WizardServiceProvider extends PackageServiceProvider
             $this->commands([
                 MakeStepCommand::class,
                 MakeWizardCommand::class,
+                PruneCommand::class,
             ]);
         }
     }
