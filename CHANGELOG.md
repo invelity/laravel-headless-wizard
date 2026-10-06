@@ -11,6 +11,7 @@ All notable changes to `wizard-package` will be documented in this file.
 - The cache and database stores kept one state for all visitors. Every store now keeps each visitor apart: the authenticated user, or a token kept in the session (#27).
 - The package registers no routes by itself, and the 1.x endpoints that edited or deleted wizard progress by numeric id, without an ownership check, are gone (#32).
 - Steps without a form request no longer store raw input; only validated data is stored (#30).
+- 1.x gets the fixes for the shared state and for the routes by numeric id in v1.4.1.
 
 ### Changed
 
@@ -47,6 +48,17 @@ All notable changes to `wizard-package` will be documented in this file.
 - **Breaking:** the Blade components (`x-wizard::layout`, `progress-bar`, `step-navigation`, `form-wrapper`), the published views and the `useWizard()` Vue composable. None of them matched the package's HTTP API (for example `route('wizard.show', $step)` without the wizard parameter, `/api/wizard/{id}` that does not exist). The package stays headless; build the UI from the navigation and progress data (#25).
 
 **Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v1.4.0...v2.0.0
+
+## v1.4.1 - Visitor-scoped Storage - 2026-10-06
+
+### Security
+
+- The cache and database storages kept one wizard state for all visitors, so visitors could read and overwrite each other's data. Both now keep every visitor apart: the authenticated user, or else a random token kept in the session under `_wizard_scope`. The database storage keeps that key in the `session_id` column. The default session storage was not affected.
+- With the database storage, the edit, update and delete routes (`wizard/{wizard}/{wizardId}/edit/{step}` and `wizard/{wizard}/{wizardId}`) loaded or deleted any `WizardProgress` record by its numeric id. They now reach only the visitor's own records of that wizard: the rows the storage keeps for the visitor, or rows whose `user_id` is the authenticated user's. Any other id answers 404.
+
+Wizard progress that the cache or database storage kept before this release was shared by all visitors and is not carried over, so wizards in progress start again. The orphaned rows can be deleted with `WizardProgress::whereNull('session_id')->whereNull('user_id')->delete()`.
+
+**Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v1.4.0...v1.4.1
 
 ## v1.4.0 - Laravel 13 Support - 2026-10-06
 
