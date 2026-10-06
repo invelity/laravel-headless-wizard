@@ -47,7 +47,6 @@ class WizardServiceProvider extends PackageServiceProvider
         $package
             ->name('wizard')
             ->hasConfigFile('wizard')
-            ->hasRoute('web')
             ->hasMigration('create_wizard_progress_table')
             ->hasTranslations()
             ->hasViews('wizard-package')
@@ -136,9 +135,22 @@ class WizardServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         $this->registerMiddleware();
+        $this->registerRoutes();
         $this->registerPublishableStubs();
         $this->registerDiscoveredWizards();
         $this->registerCommands();
+    }
+
+    /**
+     * Register the package routes unless "wizard.routes.enabled" is false.
+     */
+    protected function registerRoutes(): void
+    {
+        if (! config('wizard.routes.enabled', true)) {
+            return;
+        }
+
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
     }
 
     protected function registerCommands(): void

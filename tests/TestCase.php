@@ -63,8 +63,6 @@ class TestCase extends Orchestra
         config()->set('wizard.validation.validate_on_navigate', true);
         config()->set('wizard.validation.allow_skip_optional', true);
         config()->set('wizard.events.fire_events', true);
-        config()->set('wizard.routes.prefix', 'wizard');
-        config()->set('wizard.routes.middleware', ['web', 'wizard.session']);
 
         config()->set('wizard.wizards.test-wizard', [
             'steps' => [
