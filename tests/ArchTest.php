@@ -177,6 +177,7 @@ test('classes depend on abstractions not concretions', function () {
                     'Invelity\\WizardPackage\\Core\\WizardConfiguration',
                     'Invelity\\WizardPackage\\Steps\\StepFactory',
                     'Invelity\\WizardPackage\\Factories\\WizardNavigationFactory',
+                    'Invelity\\WizardPackage\\Storage\\VisitorScope',
                 ];
 
                 if (in_array($typeName, $allowedConcretes)) {

@@ -9,6 +9,7 @@ use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardConfiguration;
 use Invelity\WizardPackage\Models\WizardProgress;
+use Invelity\WizardPackage\Storage\VisitorScope;
 use Invelity\WizardPackage\ValueObjects\StepResult;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -18,6 +19,7 @@ class WizardLifecycleManager implements WizardLifecycleManagerInterface
         private readonly WizardStorageInterface $storage,
         private readonly WizardEventManagerInterface $eventManager,
         private readonly WizardConfiguration $configuration,
+        private readonly VisitorScope $scope = new VisitorScope,
     ) {}
 
     public function initializeWizard(string $wizardId, array $steps, array $config = []): void
@@ -48,11 +50,7 @@ class WizardLifecycleManager implements WizardLifecycleManagerInterface
     public function loadFromStorage(string $wizardId, int $instanceId, array $steps): void
     {
         if ($this->configuration->storage === 'database') {
-            $wizardData = WizardProgress::find($instanceId);
-
-            if ($wizardData === null) {
-                throw new NotFoundHttpException("Wizard instance {$instanceId} not found.");
-            }
+            $wizardData = $this->findOwnedInstance($wizardId, $instanceId);
 
             $this->storage->put($wizardId, [
                 'wizard_id' => $wizardData->wizard_id,
@@ -97,15 +95,26 @@ class WizardLifecycleManager implements WizardLifecycleManagerInterface
     public function deleteWizard(string $wizardId, int $instanceId): void
     {
         if ($this->configuration->storage === 'database') {
-            $wizardData = WizardProgress::find($instanceId);
-
-            if ($wizardData === null) {
-                throw new NotFoundHttpException("Wizard instance {$instanceId} not found.");
-            }
-
-            $wizardData->delete();
+            $this->findOwnedInstance($wizardId, $instanceId)->delete();
         }
 
         $this->storage->forget($wizardId);
+    }
+
+    /**
+     * Another visitor's instance answers like a missing one, so instance ids
+     * cannot be probed.
+     */
+    private function findOwnedInstance(string $wizardId, int $instanceId): WizardProgress
+    {
+        $wizardData = $this->scope
+            ->constrain(WizardProgress::query()->whereKey($instanceId)->where('wizard_id', $wizardId))
+            ->first();
+
+        if ($wizardData === null) {
+            throw new NotFoundHttpException("Wizard instance {$instanceId} not found.");
+        }
+
+        return $wizardData;
     }
 }

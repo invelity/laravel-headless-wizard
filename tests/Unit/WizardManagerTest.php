@@ -1,11 +1,14 @@
 <?php
 
 declare(strict_types=1);
+
+use Illuminate\Foundation\Auth\User;
 use Invelity\WizardPackage\Contracts\WizardManagerInterface;
 use Invelity\WizardPackage\Contracts\WizardStorageInterface;
 use Invelity\WizardPackage\Core\WizardManager;
 use Invelity\WizardPackage\Exceptions\InvalidStepException;
 use Invelity\WizardPackage\Models\WizardProgress;
+use Invelity\WizardPackage\Storage\VisitorScope;
 use Invelity\WizardPackage\Tests\Fixtures\ContactDetailsStep;
 use Invelity\WizardPackage\Tests\Fixtures\PersonalInfoStep;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -83,6 +86,7 @@ test('loadFromStorage with database loads from WizardProgress model', function (
 
     $progress = WizardProgress::create([
         'wizard_id' => 'test',
+        'session_id' => (new VisitorScope)->key(),
         'current_step' => 'personal-info',
         'completed_steps' => [],
         'step_data' => ['personal-info' => ['name' => 'John']],
@@ -111,6 +115,7 @@ test('deleteWizard with database removes WizardProgress record', function () {
 
     $progress = WizardProgress::create([
         'wizard_id' => 'test',
+        'session_id' => (new VisitorScope)->key(),
         'current_step' => 'personal-info',
         'completed_steps' => [],
         'step_data' => [],
@@ -131,4 +136,92 @@ test('deleteWizard with database throws exception when instance not found', func
 
     expect(fn () => $manager->deleteWizard('test', 99999))
         ->toThrow(NotFoundHttpException::class);
+});
+
+test('loadFromStorage with database does not load another visitor\'s instance', function () {
+    config([
+        'wizard.storage' => 'database',
+        'wizard.wizards.test.steps' => [
+            PersonalInfoStep::class,
+        ],
+    ]);
+
+    $progress = WizardProgress::create([
+        'wizard_id' => 'test',
+        'session_id' => 'session:another-visitor',
+        'current_step' => 'personal-info',
+        'completed_steps' => [],
+        'step_data' => ['personal-info' => ['name' => 'John']],
+        'metadata' => [],
+        'started_at' => now(),
+    ]);
+
+    $manager = app(WizardManager::class);
+
+    expect(fn () => $manager->loadFromStorage('test', $progress->id))
+        ->toThrow(NotFoundHttpException::class);
+});
+
+test('loadFromStorage with database does not load an instance of another wizard', function () {
+    config([
+        'wizard.storage' => 'database',
+        'wizard.wizards.test.steps' => [
+            PersonalInfoStep::class,
+        ],
+    ]);
+
+    $progress = WizardProgress::create([
+        'wizard_id' => 'other',
+        'session_id' => (new VisitorScope)->key(),
+        'completed_steps' => [],
+        'step_data' => [],
+    ]);
+
+    $manager = app(WizardManager::class);
+
+    expect(fn () => $manager->loadFromStorage('test', $progress->id))
+        ->toThrow(NotFoundHttpException::class);
+});
+
+test('loadFromStorage with database loads an instance assigned to the authenticated user', function () {
+    config([
+        'wizard.storage' => 'database',
+        'wizard.wizards.test.steps' => [
+            PersonalInfoStep::class,
+        ],
+    ]);
+
+    $this->actingAs((new User)->forceFill(['id' => 7]));
+
+    $progress = WizardProgress::create([
+        'wizard_id' => 'test',
+        'user_id' => 7,
+        'current_step' => 'personal-info',
+        'completed_steps' => [],
+        'step_data' => ['personal-info' => ['name' => 'John']],
+        'metadata' => [],
+        'started_at' => now(),
+    ]);
+
+    $manager = app(WizardManager::class);
+    $manager->loadFromStorage('test', $progress->id);
+
+    expect($manager->getAllData())->toHaveKey('personal-info');
+});
+
+test('deleteWizard with database does not delete another visitor\'s instance', function () {
+    config(['wizard.storage' => 'database']);
+
+    $progress = WizardProgress::create([
+        'wizard_id' => 'test',
+        'session_id' => 'session:another-visitor',
+        'completed_steps' => [],
+        'step_data' => [],
+    ]);
+
+    $manager = app(WizardManagerInterface::class);
+
+    expect(fn () => $manager->deleteWizard('test', $progress->id))
+        ->toThrow(NotFoundHttpException::class)
+        ->and(WizardProgress::find($progress->id))->not->toBeNull();
 });
