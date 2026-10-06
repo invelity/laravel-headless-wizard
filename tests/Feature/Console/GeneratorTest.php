@@ -17,6 +17,8 @@ beforeEach(function () {
         'app/Http/Requests/Wizards/Order/*.php',
         'stubs/wizard.stub',
         'stubs/step.stub',
+        'resources/views/order/*.blade.php',
+        'resources/views/checkout/steps/*.blade.php',
     ];
 });
 
@@ -187,6 +189,33 @@ it('asks for the name and the kind of the step', function () {
 
     $this->assertFileContains(['protected bool $optional = true;'], 'app/Wizards/Steps/NewsletterStep.php');
     $this->assertFileContains(['use App\Wizards\Steps\NewsletterStep;', '        NewsletterStep::class,'], 'app/Wizards/OrderWizard.php');
+});
+
+it('creates the view of the step with make:view', function () {
+    $this->artisan('wizard:make', ['name' => 'OrderWizard'])->assertSuccessful();
+    $this->artisan('wizard:make-step', ['name' => 'Order/SummaryStep', '--wizard' => 'OrderWizard', '--view' => null])
+        ->assertSuccessful();
+
+    $this->assertFilenameExists('resources/views/order/summary.blade.php');
+});
+
+it('creates the view of the step under the given name', function () {
+    $this->artisan('wizard:make-step', ['name' => 'SummaryStep', '--view' => 'checkout.steps.summary'])->assertSuccessful();
+
+    $this->assertFilenameExists('resources/views/checkout/steps/summary.blade.php');
+});
+
+it('needs a view name or a wizard to name the view', function () {
+    $this->artisan('wizard:make-step', ['name' => 'SummaryStep', '--view' => null])
+        ->expectsOutputToContain('Name the view (--view=order.summary) or the wizard (--wizard=OrderWizard) to create it.')
+        ->assertSuccessful();
+});
+
+it('creates no view unless asked to', function () {
+    $this->artisan('wizard:make', ['name' => 'OrderWizard'])->assertSuccessful();
+    $this->artisan('wizard:make-step', ['name' => 'SummaryStep', '--wizard' => 'OrderWizard'])->assertSuccessful();
+
+    $this->assertFilenameNotExists('resources/views/order/summary.blade.php');
 });
 
 it('generates a wizard that runs', function () {

@@ -2,6 +2,14 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## v2.1.0 - Step Views - 2026-10-06
+
+### Added
+
+- `wizard:make-step --view` also creates the step's Blade view with Laravel's `make:view`. The view is named after the wizard and the step (`wizard:make-step SummaryStep --wizard=OrderWizard --view` creates `resources/views/order/summary.blade.php`), and `--view=checkout.summary` picks another name (#10).
+
+**Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v2.0.0...v2.1.0
+
 ## v2.0.0 - Laravel-core Rewrite - 2026-10-06
 
 2.0 rebuilds the package the way Laravel itself is built. To upgrade, read [UPGRADING.md](UPGRADING.md). Sessions written by 1.x keep working.

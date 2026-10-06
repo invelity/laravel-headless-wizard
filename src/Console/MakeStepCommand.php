@@ -71,6 +71,10 @@ final class MakeStepCommand extends GeneratorCommand implements PromptsForMissin
             $this->addToWizard($wizard);
         }
 
+        if ($this->option('view') !== false) {
+            $this->createView();
+        }
+
         return null;
     }
 
@@ -111,7 +115,7 @@ final class MakeStepCommand extends GeneratorCommand implements PromptsForMissin
     /**
      * Get the console command options.
      *
-     * @return list<array{0: string, 1: string|null, 2: int, 3: string}>
+     * @return list<array{0: string, 1: string|null, 2: int, 3: string, 4?: false}>
      */
     protected function getOptions(): array
     {
@@ -119,6 +123,7 @@ final class MakeStepCommand extends GeneratorCommand implements PromptsForMissin
             ['wizard', 'w', InputOption::VALUE_REQUIRED, 'The wizard to add the step to'],
             ['optional', 'o', InputOption::VALUE_NONE, 'Let visitors skip the step'],
             ['display', 'd', InputOption::VALUE_NONE, 'Create a display-only step, which takes no input'],
+            ['view', null, InputOption::VALUE_OPTIONAL, 'Create a Blade view for the step, named "{wizard}.{step}" unless a name is given', false],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the classes even if the step already exists'],
         ];
     }
@@ -185,6 +190,40 @@ final class MakeStepCommand extends GeneratorCommand implements PromptsForMissin
         $this->files->put($path, $this->replaceNamespace($stub, $class)->replaceClass($stub, $class));
 
         $this->components->info(sprintf('Form request [%s] created successfully.', $path));
+    }
+
+    /**
+     * Create the Blade view of the step with Laravel's "make:view" command.
+     *
+     * Unless a name is given, "SummaryStep" of "OrderWizard" gets the view "order.summary": the default name of the
+     * wizard, then the default id of the step.
+     */
+    private function createView(): void
+    {
+        $view = $this->option('view');
+        $wizard = $this->option('wizard');
+
+        if (! is_string($view) || $view === '') {
+            if (! is_string($wizard) || $wizard === '') {
+                $this->components->warn('Name the view (--view=order.summary) or the wizard (--wizard=OrderWizard) to create it.');
+
+                return;
+            }
+
+            $view = Str::kebab($this->withoutSuffix($wizard, 'Wizard')).'.'.Str::kebab($this->withoutSuffix($this->getNameInput(), 'Step'));
+        }
+
+        $this->call('make:view', ['name' => $view, '--force' => $this->option('force')]);
+    }
+
+    /**
+     * Get the base name of a class without the given suffix, as wizards and steps derive their default names.
+     */
+    private function withoutSuffix(string $class, string $suffix): string
+    {
+        $name = class_basename(str_replace('/', '\\', $class));
+
+        return $name !== $suffix && Str::endsWith($name, $suffix) ? Str::beforeLast($name, $suffix) : $name;
     }
 
     /**

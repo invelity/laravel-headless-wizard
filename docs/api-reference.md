@@ -187,5 +187,5 @@ EnsureStepIsAccessible::redirectUsing(
 | Command | Description |
 | --- | --- |
 | `wizard:make {name} [--force]` | Create a wizard in `App\Wizards`. |
-| `wizard:make-step {name} [--wizard=] [--optional] [--display] [--force]` | Create a step in `App\Wizards\Steps`, its form request in `App\Http\Requests\Wizards`, and add the step to a wizard. |
+| `wizard:make-step {name} [--wizard=] [--optional] [--display] [--view[=]] [--force]` | Create a step in `App\Wizards\Steps`, its form request in `App\Http\Requests\Wizards`, and add the step to a wizard. `--view` also creates its Blade view with `make:view`, named `{wizard}.{step}` unless a name is given. |
 | `wizard:prune [--store=] [--days=30]` | Remove states that have not changed for the given number of days. |
