@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Events;
 
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
+use Invelity\WizardPackage\Wizard;
 
-final class StepSkipped
+/**
+ * Dispatched when an optional step has been skipped.
+ */
+final readonly class StepSkipped
 {
-    use Dispatchable, SerializesModels;
-
+    /**
+     * Create a new event instance.
+     *
+     * @param  class-string<Wizard>  $wizard  The class of the wizard.
+     */
     public function __construct(
-        public readonly string $wizardId,
-        public readonly string $stepId,
-        public readonly string $reason,
+        public string $wizard,
+        public string $scope,
+        public string $step,
     ) {}
 }

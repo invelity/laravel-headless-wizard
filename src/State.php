@@ -42,7 +42,7 @@ final readonly class State implements Arrayable
      * @param  list<string>  $completed  The steps that were processed.
      * @param  list<string>  $skipped  The optional steps that were skipped.
      * @param  array<string, array<string, mixed>>  $data  The stored data, keyed by step.
-     * @param  array<string, mixed>  $metadata
+     * @param  array<array-key, mixed>  $metadata
      * @param  array<string, mixed>  $attributes  Keys of the stored array that this package does not own.
      */
     public function __construct(
@@ -68,7 +68,6 @@ final readonly class State implements Arrayable
         /** @var array<string, mixed> $attributes */
         $attributes = array_diff_key($state, array_flip(self::KEYS));
 
-        /** @var array<string, mixed> $metadata */
         $metadata = is_array($state['metadata'] ?? null) ? $state['metadata'] : [];
 
         return new self(
@@ -206,7 +205,7 @@ final readonly class State implements Arrayable
     /**
      * Get a copy of the state with the given metadata.
      *
-     * @param  array<string, mixed>  $metadata
+     * @param  array<array-key, mixed>  $metadata
      */
     public function withMetadata(array $metadata): self
     {
@@ -232,7 +231,7 @@ final readonly class State implements Arrayable
     /**
      * Get a copy of the state with the given properties replaced.
      *
-     * @param  array{current?: string|null, completed?: list<string>, skipped?: list<string>, data?: array<string, array<string, mixed>>, metadata?: array<string, mixed>, startedAt?: CarbonImmutable, completedAt?: CarbonImmutable|null}  $changes
+     * @param  array{current?: string|null, completed?: list<string>, skipped?: list<string>, data?: array<string, array<string, mixed>>, metadata?: array<array-key, mixed>, startedAt?: CarbonImmutable, completedAt?: CarbonImmutable|null}  $changes
      */
     private function copy(array $changes): self
     {

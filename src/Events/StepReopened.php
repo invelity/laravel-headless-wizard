@@ -7,19 +7,18 @@ namespace Invelity\WizardPackage\Events;
 use Invelity\WizardPackage\Wizard;
 
 /**
- * Dispatched when the state of a wizard is stored for the first time.
+ * Dispatched when a finished step has been reopened, either explicitly or because a step it depends on changed.
  */
-final readonly class WizardStarted
+final readonly class StepReopened
 {
     /**
      * Create a new event instance.
      *
      * @param  class-string<Wizard>  $wizard  The class of the wizard.
-     * @param  array<array-key, mixed>  $metadata
      */
     public function __construct(
         public string $wizard,
         public string $scope,
-        public array $metadata,
+        public string $step,
     ) {}
 }

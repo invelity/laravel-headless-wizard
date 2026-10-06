@@ -4,8 +4,30 @@ All notable changes to `wizard-package` will be documented in this file.
 
 ## Unreleased
 
+### Changed
+
+- **Breaking:** wizards are classes that extend `Invelity\WizardPackage\Wizard` and list their steps in `$steps`. `Wizard::for(OrderWizard::class)`, or injecting `OrderWizard $wizard`, returns an instance bound to the current visitor. There is no `initialize()`, no stateful manager singleton and no string id (#28).
+- **Breaking:** steps extend `Invelity\WizardPackage\Step` and are declarative (`$id`, `$title`, `$optional`, `$displayOnly`, `$dependencies`, `$formRequest`). An optional `handle()` receives the validated data and any services it type-hints. The step order is the order of the wizard's `$steps` (#29).
+- **Breaking:** step input is validated by the step's form request with its whole lifecycle (`prepareForValidation()`, `authorize()`, `after()` hooks, `passedValidation()`). Only validated data is stored, and a step without a form request accepts no input (#30).
+- **Breaking:** wizard state lives in named stores configured under `wizard.default` and `wizard.stores`. The cache and database stores keep every visitor apart. The session store keeps the 1.x key `wizard_{name}` and reads 1.x records, including keys the package does not own (#27).
+- **Breaking:** the events are `WizardStarted`, `StepCompleted`, `StepSkipped`, `StepReopened`, `WizardCompleted` and `WizardReset`, with scalar payloads that name the wizard class and the visitor's scope. They are always dispatched (#31).
+- **Breaking:** unknown steps answer 404 and inaccessible steps 403. Changes to a completed wizard answer 409. Skipping a required step or completing an unfinished wizard raises a validation error. Messages are translated (English, Slovak) (#31).
+
+### Added
+
+- Reopening: processing a step with changed data reopens the finished steps that depend on it, and `reopen()` does it explicitly (#29).
+- Display-only steps, such as a confirmation page, which take no input and never block completion (#29).
+- `metadata()`, `putMetadata()` and `forgetMetadata()` with dot notation; `start()` with initial metadata; `goTo()`, `firstUnfinished()`, `navigation()` relative to any step, and `url()` with `Wizard::resolveUrlsUsing()` or a wizard's own `stepUrl()` (#28).
+- `wizard:prune` and the `ArrayStore` for tests (#27).
+
+### Fixed
+
+- Conditionally skipped steps no longer block completion or count towards progress (#26).
+- Navigation is computed relative to the requested step, so the next step is no longer off by one (#26).
+
 ### Removed
 
+- **Breaking:** `WizardManagerInterface` and the twelve other single-implementation interfaces, the `Wizard` wrapper class, the `WizardPackage` facade, folder-based wizard discovery, `WizardProgress` and its migration, the 1.x routes, middleware and generators, and every 1.x config key. The HTTP API and the generators return as opt-in, rebuilt features (#32, #33).
 - **Breaking:** the Blade components (`x-wizard::layout`, `progress-bar`, `step-navigation`, `form-wrapper`), the published views and the `useWizard()` Vue composable. None of them matched the package's HTTP API (for example `route('wizard.show', $step)` without the wizard parameter, `/api/wizard/{id}` that does not exist). The package stays headless; build the UI from the navigation and progress data (#25).
 
 ## v1.4.0 - Laravel 13 Support - 2026-10-06

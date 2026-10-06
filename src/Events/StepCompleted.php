@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Events;
 
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
+use Invelity\WizardPackage\Wizard;
 
-final class StepCompleted
+/**
+ * Dispatched when the input of a step has been validated and stored.
+ */
+final readonly class StepCompleted
 {
-    use Dispatchable, SerializesModels;
-
+    /**
+     * Create a new event instance.
+     *
+     * @param  class-string<Wizard>  $wizard  The class of the wizard.
+     * @param  array<string, mixed>  $data  The data stored for the step.
+     * @param  int  $percentage  The progress of the wizard after the step.
+     */
     public function __construct(
-        public readonly string $wizardId,
-        public readonly string $stepId,
-        public readonly array $stepData,
-        public readonly int $progress,
+        public string $wizard,
+        public string $scope,
+        public string $step,
+        public array $data,
+        public int $percentage,
     ) {}
 }

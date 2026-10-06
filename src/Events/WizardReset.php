@@ -7,19 +7,17 @@ namespace Invelity\WizardPackage\Events;
 use Invelity\WizardPackage\Wizard;
 
 /**
- * Dispatched when the state of a wizard is stored for the first time.
+ * Dispatched when the stored state of a wizard has been removed.
  */
-final readonly class WizardStarted
+final readonly class WizardReset
 {
     /**
      * Create a new event instance.
      *
      * @param  class-string<Wizard>  $wizard  The class of the wizard.
-     * @param  array<array-key, mixed>  $metadata
      */
     public function __construct(
         public string $wizard,
         public string $scope,
-        public array $metadata,
     ) {}
 }

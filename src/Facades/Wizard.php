@@ -5,28 +5,26 @@ declare(strict_types=1);
 namespace Invelity\WizardPackage\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Invelity\WizardPackage\Contracts\WizardManagerInterface;
+use Invelity\WizardPackage\Contracts\Factory;
+use Invelity\WizardPackage\WizardManager;
 
 /**
- * @method static void initialize(string $wizardId, array $config = [])
- * @method static \Invelity\WizardPackage\Contracts\WizardStepInterface|null getCurrentStep()
- * @method static \Invelity\WizardPackage\Contracts\WizardStepInterface getStep(string $stepId)
- * @method static \Invelity\WizardPackage\ValueObjects\StepResult processStep(string $stepId, array $data)
- * @method static void navigateToStep(string $stepId)
- * @method static \Invelity\WizardPackage\Contracts\WizardStepInterface|null getNextStep()
- * @method static \Invelity\WizardPackage\Contracts\WizardStepInterface|null getPreviousStep()
- * @method static bool canAccessStep(string $stepId)
- * @method static \Invelity\WizardPackage\ValueObjects\WizardProgressValue getProgress()
- * @method static array getAllData()
- * @method static \Invelity\WizardPackage\ValueObjects\StepResult complete()
- * @method static void reset()
+ * @method static TWizard for<TWizard of \Invelity\WizardPackage\Wizard>(class-string<TWizard>|TWizard $wizard, mixed $scope = null)
+ * @method static \Invelity\WizardPackage\Contracts\Store store(string|null $name = null)
+ * @method static \Invelity\WizardPackage\WizardManager extend(string $driver, \Closure $callback)
+ * @method static \Invelity\WizardPackage\WizardManager resolveScopeUsing(\Closure|null $resolver)
+ * @method static \Invelity\WizardPackage\WizardManager resolveUrlsUsing(\Closure|null $resolver)
+ * @method static string normalizeScope(mixed $scope)
  *
- * @see WizardManagerInterface
+ * @see WizardManager
  */
 class Wizard extends Facade
 {
+    /**
+     * Get the registered name of the component.
+     */
     protected static function getFacadeAccessor(): string
     {
-        return WizardManagerInterface::class;
+        return Factory::class;
     }
 }

@@ -4,221 +4,134 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage;
 
-use Illuminate\Contracts\Container\BindingResolutionException;
+use Composer\InstalledVersions;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
-use Invelity\WizardPackage\Commands\MakeStepCommand;
-use Invelity\WizardPackage\Commands\MakeWizardCommand;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Support\ServiceProvider;
 use Invelity\WizardPackage\Console\PruneCommand;
-use Invelity\WizardPackage\Contracts\FormRequestValidatorInterface;
-use Invelity\WizardPackage\Contracts\StepFinderInterface;
-use Invelity\WizardPackage\Contracts\WizardDataInterface;
-use Invelity\WizardPackage\Contracts\WizardEventManagerInterface;
-use Invelity\WizardPackage\Contracts\WizardInitializationInterface;
-use Invelity\WizardPackage\Contracts\WizardLifecycleManagerInterface;
-use Invelity\WizardPackage\Contracts\WizardManagerInterface;
-use Invelity\WizardPackage\Contracts\WizardNavigationManagerInterface;
-use Invelity\WizardPackage\Contracts\WizardProgressTrackerInterface;
-use Invelity\WizardPackage\Contracts\WizardStepAccessInterface;
-use Invelity\WizardPackage\Contracts\WizardStepProcessorInterface;
-use Invelity\WizardPackage\Contracts\WizardStorageInterface;
-use Invelity\WizardPackage\Core\WizardConfiguration;
-use Invelity\WizardPackage\Core\WizardManager;
-use Invelity\WizardPackage\Factories\WizardNavigationFactory;
-use Invelity\WizardPackage\Generators\FormRequestGenerator;
-use Invelity\WizardPackage\Generators\StepGenerator;
-use Invelity\WizardPackage\Http\Middleware\StepAccess;
-use Invelity\WizardPackage\Http\Middleware\WizardSession;
-use Invelity\WizardPackage\Http\Responses\WizardStepResponseBuilder;
-use Invelity\WizardPackage\Services\StepFinderService;
-use Invelity\WizardPackage\Services\Validation\FormRequestValidator;
-use Invelity\WizardPackage\Services\WizardDiscoveryService;
-use Invelity\WizardPackage\Services\WizardEventManager;
-use Invelity\WizardPackage\Services\WizardLifecycleManager;
-use Invelity\WizardPackage\Services\WizardProgressTracker;
-use Invelity\WizardPackage\Services\WizardStepProcessor;
-use Invelity\WizardPackage\Storage\CacheStorage;
-use Invelity\WizardPackage\Storage\DatabaseStorage;
-use Invelity\WizardPackage\Storage\SessionStorage;
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Invelity\WizardPackage\Contracts\Factory;
+use Invelity\WizardPackage\Exceptions\StepNotAccessibleException;
+use Invelity\WizardPackage\Exceptions\StepNotFoundException;
+use Invelity\WizardPackage\Exceptions\WizardAlreadyCompletedException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class WizardServiceProvider extends PackageServiceProvider
+final class WizardServiceProvider extends ServiceProvider
 {
-    public function configurePackage(Package $package): void
-    {
-        $package
-            ->name('wizard')
-            ->hasConfigFile('wizard')
-            ->hasMigration('create_wizard_progress_table')
-            ->hasTranslations();
-    }
-
-    public function packageRegistered(): void
-    {
-        $this->app->singleton(WizardConfiguration::class, function ($app) {
-            return WizardConfiguration::fromConfig();
-        });
-
-        $this->app->singleton(WizardStorageInterface::class, function ($app) {
-            $storageConfig = config('wizard.storage', 'session');
-            $storage = is_array($storageConfig) ? ($storageConfig['driver'] ?? 'session') : $storageConfig;
-
-            return match ($storage) {
-                'database' => $app->make(DatabaseStorage::class),
-                'cache' => $app->make(CacheStorage::class),
-                default => $app->make(SessionStorage::class),
-            };
-        });
-
-        // Register validation service
-        $this->app->singleton(FormRequestValidatorInterface::class, FormRequestValidator::class);
-
-        // Register event manager
-        $this->app->singleton(WizardEventManagerInterface::class, WizardEventManager::class);
-
-        // Register step processor
-        $this->app->singleton(WizardStepProcessorInterface::class, WizardStepProcessor::class);
-
-        // Register progress tracker
-        $this->app->singleton(WizardProgressTrackerInterface::class, WizardProgressTracker::class);
-
-        // Register lifecycle manager
-        $this->app->singleton(WizardLifecycleManagerInterface::class, WizardLifecycleManager::class);
-
-        // Register response builders
-        $this->app->singleton(WizardStepResponseBuilder::class);
-
-        // Register step finder service
-        $this->app->singleton(StepFinderInterface::class, StepFinderService::class);
-
-        // Register generators
-        $this->app->singleton(StepGenerator::class);
-        $this->app->singleton(FormRequestGenerator::class);
-
-        // Register factories
-        $this->app->singleton(WizardNavigationFactory::class);
-
-        $this->app->singleton(WizardManagerInterface::class, WizardManager::class);
-
-        // Register segregated interfaces (bind to same WizardManager singleton instance)
-        $this->app->bind(WizardInitializationInterface::class, function ($app) {
-            return $app->make(WizardManagerInterface::class);
-        });
-        $this->app->bind(WizardStepAccessInterface::class, function ($app) {
-            return $app->make(WizardManagerInterface::class);
-        });
-        $this->app->bind(WizardNavigationManagerInterface::class, function ($app) {
-            return $app->make(WizardManagerInterface::class);
-        });
-        $this->app->bind(WizardDataInterface::class, function ($app) {
-            return $app->make(WizardManagerInterface::class);
-        });
-
-        $this->app->singleton(Wizard::class, function ($app) {
-            return new Wizard($app->make(WizardManagerInterface::class));
-        });
-
-        // Register wizard discovery service
-        $this->app->singleton(WizardDiscoveryService::class);
-
-        $this->app->singleton(StoreManager::class, fn (Application $app) => new StoreManager($app));
-    }
-
     /**
-     * @throws BindingResolutionException
+     * Register any package services.
      */
-    public function packageBooted(): void
+    public function register(): void
     {
-        $this->registerOctaneListeners();
-        $this->registerMiddleware();
-        $this->registerRoutes();
-        $this->registerPublishableStubs();
-        $this->registerDiscoveredWizards();
-        $this->registerCommands();
+        $this->mergeConfigFrom(__DIR__.'/../config/wizard.php', 'wizard');
+
+        $this->app->singleton(StoreManager::class, fn (Application $app): StoreManager => new StoreManager($app));
+
+        $this->app->singleton(WizardManager::class, fn (Application $app): WizardManager => new WizardManager($app, $app->make(StoreManager::class)));
+
+        $this->app->alias(WizardManager::class, Factory::class);
+
+        // Every wizard the container resolves, including those type-hinted on controllers and
+        // jobs, is bound to the current visitor, the same way form requests are bound to the
+        // current request.
+        $this->app->resolving(Wizard::class, function (Wizard $wizard, Application $app): void {
+            $app->make(WizardManager::class)->hydrate($wizard);
+        });
     }
 
     /**
-     * Point the store manager at the application that serves the current request.
+     * Bootstrap any package services.
+     */
+    public function boot(): void
+    {
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'wizard');
+
+        $this->registerExceptionMapping();
+        $this->registerOctaneListeners();
+
+        if ($this->app->runningInConsole()) {
+            $this->registerPublishing();
+            $this->registerCommands();
+        }
+    }
+
+    /**
+     * Turn the package exceptions into HTTP responses with translated messages.
+     */
+    private function registerExceptionMapping(): void
+    {
+        $this->callAfterResolving(ExceptionHandler::class, function (ExceptionHandler $handler, Application $app): void {
+            if (! $handler instanceof Handler) {
+                return;
+            }
+
+            $message = function (string $key) use ($app): string {
+                $message = $app->make(Translator::class)->get("wizard::messages.{$key}");
+
+                return is_string($message) ? $message : $key;
+            };
+
+            $handler->map(fn (StepNotFoundException $e): NotFoundHttpException => new NotFoundHttpException($message('step_not_found'), $e));
+            $handler->map(fn (StepNotAccessibleException $e): AccessDeniedHttpException => new AccessDeniedHttpException($message('step_not_accessible'), $e));
+            $handler->map(fn (WizardAlreadyCompletedException $e): ConflictHttpException => new ConflictHttpException($message('already_completed'), $e));
+        });
+    }
+
+    /**
+     * Point the singleton managers at the application that serves the current request.
      *
      * Laravel Octane serves many requests with one booted application and hands every request
-     * a sandbox copy, so the singleton manager must resolve sessions from the sandbox.
+     * a sandbox copy, so the managers must resolve requests and sessions from the sandbox.
      */
-    protected function registerOctaneListeners(): void
+    private function registerOctaneListeners(): void
     {
         $this->app->make(Dispatcher::class)->listen([
-            'Laravel\\Octane\\Events\\RequestReceived',
-            'Laravel\\Octane\\Events\\TaskReceived',
-            'Laravel\\Octane\\Events\\TickReceived',
+            'Laravel\Octane\Events\RequestReceived',
+            'Laravel\Octane\Events\TaskReceived',
+            'Laravel\Octane\Events\TickReceived',
         ], function (object $event): void {
             if (property_exists($event, 'sandbox') && $event->sandbox instanceof Application) {
                 $this->app->make(StoreManager::class)->setApplication($event->sandbox);
+                $this->app->make(WizardManager::class)->setContainer($event->sandbox);
             }
         });
     }
 
     /**
-     * Register the package routes unless "wizard.routes.enabled" is false.
+     * Register the files the application may publish.
      */
-    protected function registerRoutes(): void
+    private function registerPublishing(): void
     {
-        if (! config('wizard.routes.enabled', true)) {
-            return;
-        }
+        $this->publishes([
+            __DIR__.'/../config/wizard.php' => $this->app->configPath('wizard.php'),
+        ], 'wizard-config');
 
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-    }
+        $this->publishesMigrations([
+            __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
+        ], 'wizard-migrations');
 
-    protected function registerCommands(): void
-    {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                MakeStepCommand::class,
-                MakeWizardCommand::class,
-                PruneCommand::class,
-            ]);
-        }
-    }
-
-    protected function registerPublishableStubs(): void
-    {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../resources/stubs' => base_path('stubs/vendor/wizard'),
-            ], 'wizard-stubs');
-        }
-    }
-
-    protected function registerMiddleware(): void
-    {
-        $this->app['router']->aliasMiddleware('wizard.session', WizardSession::class);
-        $this->app['router']->aliasMiddleware('wizard.step-access', StepAccess::class);
+        $this->publishes([
+            __DIR__.'/../resources/lang' => $this->app->langPath('vendor/wizard'),
+        ], 'wizard-translations');
     }
 
     /**
-     * @throws BindingResolutionException
+     * Register the console commands.
      */
-    protected function registerDiscoveredWizards(): void
+    private function registerCommands(): void
     {
-        $discoveryService = $this->app->make(WizardDiscoveryService::class);
-        $wizards = $discoveryService->discoverWizards();
+        $this->commands([
+            PruneCommand::class,
+        ]);
 
-        $wizardsConfig = [];
-
-        $wizards->each(function ($wizard) use ($discoveryService, &$wizardsConfig) {
-            $wizardClass = get_class($wizard);
-            $steps = $discoveryService->discoverSteps($wizardClass);
-
-            $wizardId = method_exists($wizard, 'getId')
-                ? $wizard->getId()
-                : str(class_basename($wizardClass))->kebab()->toString();
-
-            $wizardsConfig[$wizardId] = [
-                'class' => $wizardClass,
-                'steps' => $steps->map(fn ($step) => get_class($step))->toArray(),
-            ];
-        });
-
-        config(['wizard.wizards' => $wizardsConfig]);
+        AboutCommand::add('Wizard', fn (): array => [
+            'Version' => InstalledVersions::getPrettyVersion('invelity/laravel-headless-wizard') ?? 'unknown',
+            'Default store' => $this->app->make(StoreManager::class)->getDefaultInstance(),
+        ]);
     }
 }
