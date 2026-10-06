@@ -15,6 +15,9 @@ All notable changes to `wizard-package` will be documented in this file.
 
 ### Added
 
+- Opt-in JSON API per wizard: `Route::wizard('order', OrderWizard::class)` registers `GET/POST/DELETE order` and `GET/POST order/{step}` plus `POST order/{step}/skip`, named like resource routes and constrained to the wizard's step ids. Every endpoint enforces step access and responds with one `WizardResource` shape (#32).
+- `EnsureStepIsAccessible` middleware (`wizard.step:{wizard}`) for applications that serve the steps from their own routes. It redirects to the step the visitor should be on, or answers 403 for JSON, and is configurable with `redirectUsing()` (#32).
+- Step URLs in the navigation come from the routes registered with `Route::wizard()`, keeping parameters the wizard is nested under (#32).
 - Reopening: processing a step with changed data reopens the finished steps that depend on it, and `reopen()` does it explicitly (#29).
 - Display-only steps, such as a confirmation page, which take no input and never block completion (#29).
 - `metadata()`, `putMetadata()` and `forgetMetadata()` with dot notation; `start()` with initial metadata; `goTo()`, `firstUnfinished()`, `navigation()` relative to any step, and `url()` with `Wizard::resolveUrlsUsing()` or a wizard's own `stepUrl()` (#28).

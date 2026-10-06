@@ -13,12 +13,16 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Invelity\WizardPackage\Contracts\Factory;
 use Invelity\WizardPackage\Contracts\Step;
 use Invelity\WizardPackage\Contracts\Store;
 use Invelity\WizardPackage\Exceptions\InvalidWizardException;
+use Invelity\WizardPackage\Http\Controllers\StepController;
 use Invelity\WizardPackage\Validation\StepValidator;
 use Stringable;
 
@@ -47,6 +51,13 @@ final class WizardManager implements Factory
      * @var (Closure(Wizard, Step): ?string)|null
      */
     private ?Closure $urlResolver = null;
+
+    /**
+     * The routes that show the steps of a wizard, keyed by wizard class; false when there is none.
+     *
+     * @var array<class-string<Wizard>, Route|false>
+     */
+    private array $stepRoutes = [];
 
     /**
      * Create a new wizard manager.
@@ -111,7 +122,9 @@ final class WizardManager implements Factory
             translator: $this->container->make(Translator::class),
             validator: new StepValidator($this->container),
             scopeResolver: $scope === null ? fn (): string => $this->resolveScope() : fn (): string => $scope,
-            urlResolver: fn (Wizard $wizard, Step $step): ?string => $this->urlResolver === null ? null : ($this->urlResolver)($wizard, $step),
+            urlResolver: fn (Wizard $wizard, Step $step): ?string => $this->urlResolver === null
+                ? $this->routeUrl($wizard, $step)
+                : ($this->urlResolver)($wizard, $step),
         ));
     }
 
@@ -151,6 +164,47 @@ final class WizardManager implements Factory
             $scope instanceof Stringable => (string) $scope,
             default => throw new InvalidArgumentException('A wizard scope must be a model, an authenticatable user, a string or an integer.'),
         };
+    }
+
+    /**
+     * Get the URL of a step from the routes registered with Route::wizard().
+     */
+    private function routeUrl(Wizard $wizard, Step $step): ?string
+    {
+        $route = $this->stepRoutes[$wizard::class] ??= $this->findStepRoute($wizard::class);
+
+        if ($route === false) {
+            return null;
+        }
+
+        $current = $this->container->make('request')->route();
+        $parameters = [];
+
+        // Carry over the parameters the step route shares with the current route, such as a
+        // tenant or an order the wizard is nested under.
+        foreach ($route->parameterNames() as $name) {
+            if (is_string($name) && $current instanceof Route && $current->hasParameter($name)) {
+                $parameters[$name] = $current->parameter($name);
+            }
+        }
+
+        return $this->container->make(UrlGenerator::class)->toRoute($route, [...$parameters, 'step' => $step->id()], true);
+    }
+
+    /**
+     * Find the route that shows the steps of a wizard.
+     *
+     * @param  class-string<Wizard>  $wizard
+     */
+    private function findStepRoute(string $wizard): Route|false
+    {
+        foreach ($this->container->make(Router::class)->getRoutes()->getRoutes() as $route) {
+            if (($route->defaults['wizard'] ?? null) === $wizard && $route->getActionName() === StepController::class.'@show') {
+                return $route;
+            }
+        }
+
+        return false;
     }
 
     /**
