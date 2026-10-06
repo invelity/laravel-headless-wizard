@@ -163,7 +163,7 @@ it('validates an HTTP request with its files', function () {
     {
         public function rules(): array
         {
-            return ['avatar' => ['required', 'image'], 'name' => ['required']];
+            return ['contract' => ['required', 'file', 'max:100'], 'name' => ['required']];
         }
     };
 
@@ -182,13 +182,13 @@ it('validates an HTTP request with its files', function () {
          */
         public function handle(array $data): array
         {
-            return ['name' => $data['name'], 'avatar' => $data['avatar']->getClientOriginalName()];
+            return ['name' => $data['name'], 'contract' => $data['contract']->getClientOriginalName()];
         }
     });
 
-    $http = Request::create('/', 'POST', ['name' => 'Jane'], files: ['avatar' => UploadedFile::fake()->image('avatar.png')]);
+    $http = Request::create('/', 'POST', ['name' => 'Jane'], files: ['contract' => UploadedFile::fake()->create('contract.pdf', 20)]);
 
-    expect($wizard->process('details', $http))->toBe(['name' => 'Jane', 'avatar' => 'avatar.png']);
+    expect($wizard->process('details', $http))->toBe(['name' => 'Jane', 'contract' => 'contract.pdf']);
 });
 
 it('validates JSON requests', function () {
