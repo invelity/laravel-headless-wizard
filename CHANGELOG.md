@@ -2,6 +2,17 @@
 
 All notable changes to `wizard-package` will be documented in this file.
 
+## v1.4.1 - Visitor-scoped Storage - 2026-10-06
+
+### Security
+
+- The cache and database storages kept one wizard state for all visitors, so visitors could read and overwrite each other's data. Both now keep every visitor apart: the authenticated user, or else a random token kept in the session under `_wizard_scope`. The database storage keeps that key in the `session_id` column. The default session storage was not affected.
+- With the database storage, the edit, update and delete routes (`wizard/{wizard}/{wizardId}/edit/{step}` and `wizard/{wizard}/{wizardId}`) loaded or deleted any `WizardProgress` record by its numeric id. They now reach only the visitor's own records of that wizard: the rows the storage keeps for the visitor, or rows whose `user_id` is the authenticated user's. Any other id answers 404.
+
+Wizard progress that the cache or database storage kept before this release was shared by all visitors and is not carried over, so wizards in progress start again. The orphaned rows can be deleted with `WizardProgress::whereNull('session_id')->whereNull('user_id')->delete()`.
+
+**Full Changelog**: https://github.com/invelity/laravel-headless-wizard/compare/v1.4.0...v1.4.1
+
 ## v1.4.0 - Laravel 13 Support - 2026-10-06
 
 ### Added

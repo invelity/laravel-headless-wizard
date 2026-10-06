@@ -14,6 +14,7 @@ readonly class CacheStorage implements WizardStorageInterface
         private Repository $cache,
         private int $ttl = 7200,
         private string $prefix = 'wizard:',
+        private VisitorScope $scope = new VisitorScope,
     ) {}
 
     public function put(string $key, array $data): void
@@ -54,6 +55,6 @@ readonly class CacheStorage implements WizardStorageInterface
 
     private function getKey(string $key): string
     {
-        return $this->prefix.$key;
+        return $this->prefix.$key.':'.hash('xxh128', $this->scope->key());
     }
 }
