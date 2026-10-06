@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Invelity\WizardPackage\Events;
 
-use Carbon\Carbon;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
+use Invelity\WizardPackage\Wizard;
 
-final class WizardCompleted
+/**
+ * Dispatched when a wizard has been completed.
+ */
+final readonly class WizardCompleted
 {
-    use Dispatchable, SerializesModels;
-
+    /**
+     * Create a new event instance.
+     *
+     * @param  class-string<Wizard>  $wizard  The class of the wizard.
+     * @param  array<string, array<string, mixed>>  $data  The data of every step.
+     */
     public function __construct(
-        public readonly string $wizardId,
-        public readonly array $allData,
-        public readonly Carbon $completedAt,
+        public string $wizard,
+        public string $scope,
+        public array $data,
     ) {}
 }

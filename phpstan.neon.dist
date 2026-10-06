@@ -6,11 +6,13 @@ parameters:
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+    # The public API validates its documented argument types at runtime as well.
+    treatPhpDocTypesAsCertain: false
     ignoreErrors:
-        # The store manager is a singleton that receives the application, like Laravel's own
-        # managers; WizardServiceProvider::registerOctaneListeners() points it at every new
-        # Octane sandbox, which is what this rule asks for.
+        # Both managers are singletons that receive the application, like Laravel's own
+        # managers; WizardServiceProvider::registerOctaneListeners() points them at every
+        # new Octane sandbox, which is what this rule asks for.
         -
             identifier: larastan.octaneCompatibility
             path: src/WizardServiceProvider.php
-            count: 1
+            count: 2

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Invelity\WizardPackage\State;
 use Invelity\WizardPackage\Step;
+use Invelity\WizardPackage\Tests\Fixtures\Steps\BillingStep;
 use Invelity\WizardPackage\Tests\Fixtures\Steps\CalculatorStep;
 use Invelity\WizardPackage\Tests\Fixtures\Steps\ConfirmationStep;
 use Invelity\WizardPackage\Tests\Fixtures\Steps\NewsletterStep;
@@ -29,8 +30,8 @@ it('keeps class names without the Step suffix intact', function () {
         ->and($step->title())->toBe('Review your order');
 });
 
-it('is required, takes input and has no dependencies by default', function () {
-    $step = new CalculatorStep;
+it('is required, takes no input and has no dependencies by default', function () {
+    $step = new BillingStep;
 
     expect($step->isOptional())->toBeFalse()
         ->and($step->isDisplayOnly())->toBeFalse()
