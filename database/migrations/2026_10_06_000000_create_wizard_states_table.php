@@ -14,7 +14,9 @@ return new class extends Migration
      */
     public function getConnection(): ?string
     {
-        return Config::get('wizard.stores.database.connection');
+        $connection = Config::get('wizard.stores.database.connection');
+
+        return is_string($connection) ? $connection : null;
     }
 
     /**
@@ -47,6 +49,6 @@ return new class extends Migration
      */
     private function table(): string
     {
-        return Config::get('wizard.stores.database.table', 'wizard_states');
+        return Config::string('wizard.stores.database.table', 'wizard_states');
     }
 };

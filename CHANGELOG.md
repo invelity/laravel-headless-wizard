@@ -27,6 +27,11 @@ All notable changes to `wizard-package` will be documented in this file.
   - `wizard:make-step SummaryStep --wizard=OrderWizard [--optional] [--display]` creates a step and its form request, and adds the step to the wizard with a sorted import.
   - Both prompt for missing input and honour stubs published with the `wizard-stubs` tag (#33).
 
+### Changed (tooling)
+
+- Requires PHP 8.4+ and Laravel 12 or 13; Laravel 11 reached the end of its security support in March 2026 and stays supported by 1.x. Tested with Pest 4 (Laravel 12) and Pest 5 (Laravel 13) on PHP 8.4 and 8.5, lowest and stable dependencies (#24).
+- PHPStan runs at `level: max` without a baseline (#24).
+
 ### Fixed
 
 - Conditionally skipped steps no longer block completion or count towards progress (#26).
