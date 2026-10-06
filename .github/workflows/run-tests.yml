@@ -58,6 +58,8 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
       - name: Install dependencies
+        # bash keeps the ^ in version constraints intact; cmd.exe would strip it on Windows.
+        shell: bash
         run: |
           composer require "laravel/framework:${{ matrix.constraint }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
